@@ -35,6 +35,9 @@ const state = {
   quickActionsCollapsed: false,
   quickActionsMode: "templates",
   chatHistory: [],
+  canvasArtifacts: [],
+  activeArtifactId: "HOME",
+  mobileWorkspaceTab: "chat",
 };
 
 // Instancias vivas de Chart.js para actualización reactiva desde el documento
@@ -1268,8 +1271,505 @@ function renderQuestionCatalog() {
  * Reinicia la sesión de conversación y muestra un saludo ejecutivo limpio
  * que explica de un vistazo la capacidad híbrida (Plantillas de Reporte + Análisis Abierto Gemini IA).
  */
+/**
+ * Cambia la pestaña visible en dispositivos móviles (< lg) dentro de la ventana flotante dividida:
+ * - "chat": Muestra el chat conversacional y oculta el lienzo izquierdo en móvil.
+ * - "canvas": Muestra el lienzo de gráficos/tablas y oculta el chat en móvil.
+ * En escritorio (lg:flex), ambos paneles permanecen visibles simultáneamente lado a lado.
+ */
+function switchMobileWorkspaceTab(tabName) {
+  state.mobileWorkspaceTab = tabName === "canvas" ? "canvas" : "chat";
+  const canvasPanel = document.getElementById("ai-canvas-panel");
+  const chatPanel = document.getElementById("ai-chat-panel");
+  const btnChat = document.getElementById("btn-mobile-view-chat");
+  const btnCanvas = document.getElementById("btn-mobile-view-canvas");
+
+  if (!canvasPanel || !chatPanel) return;
+
+  if (state.mobileWorkspaceTab === "canvas") {
+    canvasPanel.classList.remove("hidden");
+    canvasPanel.classList.add("flex", "w-full");
+    chatPanel.classList.add("hidden", "lg:flex");
+    chatPanel.classList.remove("flex");
+
+    if (btnCanvas) {
+      btnCanvas.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-extrabold bg-[#0B2545] text-white shadow-sm transition-colors flex items-center justify-center gap-1.5";
+    }
+    if (btnChat) {
+      btnChat.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-white text-slate-700 border border-slate-200/80 transition-colors flex items-center justify-center gap-1.5";
+    }
+  } else {
+    canvasPanel.classList.add("hidden", "lg:flex");
+    canvasPanel.classList.remove("flex", "w-full");
+    chatPanel.classList.remove("hidden");
+    chatPanel.classList.add("flex");
+
+    if (btnChat) {
+      btnChat.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-extrabold bg-[#0B2545] text-white shadow-sm transition-colors flex items-center justify-center gap-1.5";
+    }
+    if (btnCanvas) {
+      btnCanvas.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-white text-slate-700 border border-slate-200/80 transition-colors flex items-center justify-center gap-1.5";
+    }
+  }
+}
+
+/**
+ * Construye gráficos visuales SVG ejecutivos (Donut de Cobertura/Riesgo + Barras Horizontales de Readiness y 9-Box)
+ * sin utilizar ningún atributo inline style= para cumplir con las reglas estrictas del proyecto.
+ */
+function buildQueryVisualChartHtml(query, routeType, records) {
+  const allRecords = Array.isArray(records) && records.length > 0 ? records : state.records;
+  const qNorm = String(query || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  // Detectar si la consulta se enfoca en una empresa específica
+  const companies = [...new Set(allRecords.map((r) => r.empresa).filter(Boolean))];
+  const matchedCompany = companies.find((c) =>
+    qNorm.includes(c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase())
+  );
+
+  const scopeRecords = matchedCompany
+    ? allRecords.filter((r) => r.empresa === matchedCompany)
+    : allRecords;
+
+  const scopeTitle = matchedCompany ? `Foco: ${matchedCompany}` : "Consolidado Grupo Breca";
+  const total = Math.max(scopeRecords.length, 1);
+
+  const withSuc = scopeRecords.filter((r) => r.tiene_sucesor === "Sí").length;
+  const withoutSuc = scopeRecords.length - withSuc;
+  const covPct = Math.round((withSuc / total) * 100);
+
+  const riskHigh = scopeRecords.filter((r) => r.riesgo === "Alto").length;
+  const riskMed = scopeRecords.filter((r) => r.riesgo === "Medio").length;
+  const riskLow = scopeRecords.filter((r) => r.riesgo === "Bajo").length;
+  const redAlerts = scopeRecords.filter((r) => r.riesgo === "Alto" && r.tiene_sucesor !== "Sí").length;
+
+  const readyNow = scopeRecords.filter((r) => r.readiness === "Inmediato").length;
+  const ready1to2 = scopeRecords.filter((r) => r.readiness === "1 a 2 años").length;
+  const ready3to5 = scopeRecords.filter((r) => r.readiness === "3 a 5 años" || r.readiness === "+ de 5 años").length;
+  const topTalent = scopeRecords.filter((r) => Number(r.nine_box) >= 8).length;
+
+  // Cálculo de barra SVG en base a viewBox 0..200
+  const barW = (count) => Math.max(6, Math.round((count / total) * 200));
+
+  return `
+    <div class="ai-canvas-visual-grid">
+      <!-- Tarjeta Gráfica 1: Donut SVG de Cobertura y Semáforo de Riesgo -->
+      <div class="ai-canvas-chart-card">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#0B2545]">📊 Cobertura y Riesgo (${escapeHtml(scopeTitle)})</span>
+          <span class="ai-badge ai-badge-blue">${scopeRecords.length} pos.</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="relative w-24 h-24 shrink-0 flex items-center justify-center">
+            <svg class="w-24 h-24 -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#e2e8f0" stroke-width="3.8"></circle>
+              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#10b981" stroke-width="3.8" stroke-dasharray="${covPct} ${100 - covPct}" stroke-dashoffset="0"></circle>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span class="text-sm font-extrabold text-[#0B2545]">${covPct}%</span>
+              <span class="text-[9px] font-bold uppercase text-slate-400">Cubierto</span>
+            </div>
+          </div>
+          <div class="flex-1 space-y-1.5 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-600 font-medium">✅ Con Sucesor:</span>
+              <strong class="text-emerald-700 font-extrabold">${withSuc} (${covPct}%)</strong>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-slate-600 font-medium">⚠️ Sin Sucesor:</span>
+              <strong class="text-amber-700 font-extrabold">${withoutSuc} (${100 - covPct}%)</strong>
+            </div>
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+              <span class="text-slate-600 font-medium">🚨 Alerta Roja (Alto s/suc):</span>
+              <strong class="text-rose-700 font-extrabold">${redAlerts}</strong>
+            </div>
+            <div class="flex items-center gap-1.5 pt-0.5 text-[10px]">
+              <span class="ai-badge ai-badge-red">Alto: ${riskHigh}</span>
+              <span class="ai-badge ai-badge-amber">Medio: ${riskMed}</span>
+              <span class="ai-badge ai-badge-green">Bajo: ${riskLow}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta Gráfica 2: Barras SVG de Pipeline Readiness y Top Talent 9-Box -->
+      <div class="ai-canvas-chart-card">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#0B2545]">🚀 Pipeline de Sucesión y 9-Box</span>
+          <span class="ai-badge ai-badge-indigo">Top 8-9: ${topTalent}</span>
+        </div>
+        <div class="space-y-2 text-xs">
+          <div>
+            <div class="flex justify-between text-[11px] mb-0.5">
+              <span class="font-semibold text-slate-700">⚡ Lista Ahora (Inmediato)</span>
+              <span class="font-extrabold text-emerald-700">${readyNow} pos.</span>
+            </div>
+            <svg class="w-full h-2.5 rounded-full overflow-hidden bg-slate-100" viewBox="0 0 200 10" preserveAspectRatio="none">
+              <rect x="0" y="0" width="${barW(readyNow)}" height="10" rx="5" fill="#10b981"></rect>
+            </svg>
+          </div>
+          <div>
+            <div class="flex justify-between text-[11px] mb-0.5">
+              <span class="font-semibold text-slate-700">⏳ Corto Plazo (1 a 2 años)</span>
+              <span class="font-extrabold text-blue-700">${ready1to2} pos.</span>
+            </div>
+            <svg class="w-full h-2.5 rounded-full overflow-hidden bg-slate-100" viewBox="0 0 200 10" preserveAspectRatio="none">
+              <rect x="0" y="0" width="${barW(ready1to2)}" height="10" rx="5" fill="#2563eb"></rect>
+            </svg>
+          </div>
+          <div>
+            <div class="flex justify-between text-[11px] mb-0.5">
+              <span class="font-semibold text-slate-700">🌱 Mediano/Largo (3 a 5+ años)</span>
+              <span class="font-extrabold text-amber-700">${ready3to5} pos.</span>
+            </div>
+            <svg class="w-full h-2.5 rounded-full overflow-hidden bg-slate-100" viewBox="0 0 200 10" preserveAspectRatio="none">
+              <rect x="0" y="0" width="${barW(ready3to5)}" height="10" rx="5" fill="#f59e0b"></rect>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Renderiza el Panorama Base (estado inicial en vivo) en el Lienzo Izquierdo (#ai-canvas-body)
+ * con KPIs consolidados, gráficos SVG interactivos y tabla ejecutiva de las 12 empresas.
+ */
+function renderCanvasHomeOverview() {
+  state.activeArtifactId = "HOME";
+  const canvasBody = document.getElementById("ai-canvas-body");
+  const titleEl = document.getElementById("ai-canvas-title");
+  const badgeEl = document.getElementById("ai-canvas-route-badge");
+  const followupsEl = document.getElementById("ai-canvas-followups");
+
+  if (!canvasBody) return;
+
+  const records = state.records || [];
+  const total = records.length || 101;
+  const withSuc = records.filter((r) => r.tiene_sucesor === "Sí").length;
+  const withoutSuc = total - withSuc;
+  const covPct = Math.round((withSuc / Math.max(total, 1)) * 1000) / 10;
+  const readyNow = records.filter((r) => r.readiness === "Inmediato").length;
+  const redAlerts = records.filter((r) => r.riesgo === "Alto" && r.tiene_sucesor !== "Sí").length;
+
+  if (titleEl) {
+    titleEl.textContent = `Panorama General de Sucesión (${total} Posiciones · 12 Empresas)`;
+  }
+  if (badgeEl) {
+    badgeEl.className = "ai-route-badge-template shrink-0";
+    badgeEl.innerHTML = `<span>📊</span><span>Lienzo Ejecutivo en Vivo</span>`;
+  }
+  if (followupsEl) {
+    followupsEl.classList.add("hidden");
+    followupsEl.innerHTML = "";
+  }
+
+  // Agrupar resumen por empresa
+  const companyMap = {};
+  records.forEach((r) => {
+    const c = r.empresa || "Sin Empresa";
+    if (!companyMap[c]) {
+      companyMap[c] = { empresa: c, total: 0, conSucesor: 0, sinSucesor: 0, riesgoAlto: 0, alertasRojas: 0, topTalent: 0 };
+    }
+    companyMap[c].total += 1;
+    if (r.tiene_sucesor === "Sí") companyMap[c].conSucesor += 1;
+    else companyMap[c].sinSucesor += 1;
+    if (r.riesgo === "Alto") companyMap[c].riesgoAlto += 1;
+    if (r.riesgo === "Alto" && r.tiene_sucesor !== "Sí") companyMap[c].alertasRojas += 1;
+    if (Number(r.nine_box) >= 8) companyMap[c].topTalent += 1;
+  });
+
+  const companyRows = Object.values(companyMap)
+    .sort((a, b) => b.total - a.total)
+    .map((c) => {
+      const pct = Math.round((c.conSucesor / Math.max(c.total, 1)) * 100);
+      const badgeClass = pct >= 70 ? "ai-badge-green" : pct >= 50 ? "ai-badge-amber" : "ai-badge-red";
+      return `
+        <tr>
+          <td class="font-bold text-[#0B2545]">
+            <button type="button" data-quick-question="Comparación de empresas: foco en ${escapeHtml(c.empresa)}" class="hover:text-blue-700 hover:underline text-left font-bold">
+              ${escapeHtml(c.empresa)}
+            </button>
+          </td>
+          <td><strong>${c.total}</strong></td>
+          <td><span class="ai-badge ${badgeClass}">${c.conSucesor} (${pct}%)</span></td>
+          <td>${c.sinSucesor}</td>
+          <td>${c.alertasRojas > 0 ? `<span class="ai-badge ai-badge-red">${c.alertasRojas} crítica(s)</span>` : `<span class="ai-badge ai-badge-green">0</span>`}</td>
+          <td><span class="ai-badge ai-badge-indigo">${c.topTalent}</span></td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  canvasBody.innerHTML = `
+    <div class="ai-structured-response">
+      ${buildQueryVisualChartHtml("", "TEMPLATE", records)}
+
+      <div class="ai-html-card">
+        <div class="ai-html-header">
+          <div>
+            <h4 class="ai-html-title">Resumen Consolidado del Talent Pool · Grupo Breca</h4>
+            <p class="ai-html-subtitle">Selecciona cualquier consulta en el chat derecho para proyectar aquí fichas, tablas, gráficos y planes de acción</p>
+          </div>
+          <span class="ai-badge ai-badge-navy">${total} Posiciones</span>
+        </div>
+        <div class="ai-html-body">
+          <div class="ai-kpi-grid">
+            <div class="ai-kpi-box">
+              <span class="ai-kpi-label">Total Evaluados</span>
+              <span class="ai-kpi-value">${total}</span>
+            </div>
+            <div class="ai-kpi-box">
+              <span class="ai-kpi-label">Cobertura Sucesión</span>
+              <span class="ai-kpi-value">${covPct}% (${withSuc})</span>
+            </div>
+            <div class="ai-kpi-box">
+              <span class="ai-kpi-label">Sucesión Inmediata</span>
+              <span class="ai-kpi-value">${readyNow} Ready Now</span>
+            </div>
+            <div class="ai-kpi-box">
+              <span class="ai-kpi-label">Alertas Rojas</span>
+              <span class="ai-kpi-value">${redAlerts} Críticas</span>
+            </div>
+          </div>
+
+          <div class="ai-section-title">🏢 Matriz Comparativa por Empresa (Haz clic en una empresa para profundizar)</div>
+          <div class="ai-table-wrap">
+            <table class="ai-table">
+              <thead>
+                <tr>
+                  <th>Empresa</th>
+                  <th>Posiciones</th>
+                  <th>Cobertura</th>
+                  <th>Sin Sucesor</th>
+                  <th>Alerta Roja (Alto s/suc)</th>
+                  <th>Top Talent (8-9)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${companyRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  updateCanvasHistoryBar();
+}
+
+/**
+ * Separa la respuesta generada por el Agente IA en dos componentes complementarios:
+ * 1. chatConversationalHtml (Lado Derecho): Estado de ejecución ("¡Todo listo!") + Análisis textual conversacional (sin tablas ni grillas pesadas) + botón para enfocar el reporte en el lienzo izquierdo.
+ * 2. canvasVisualHtml (Lado Izquierdo): Gráficos SVG contextuales + Tarjetas KPI + Tablas ejecutivas + Fichas detalladas + Planes de acción.
+ */
+function splitAgentResponseForWorkspace(validatedHtml, query, routeType, routeLabel, isLiveGemini, records, artifactId) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(validatedHtml, "text/html");
+
+  // Extraer título del reporte si existe
+  const reportTitleEl = doc.querySelector(".ai-html-title, h3, h4");
+  const reportTitle = reportTitleEl ? reportTitleEl.textContent.trim() : query;
+
+  // Contar tablas y KPIs presentes en la respuesta estructurada
+  const tablesCount = doc.querySelectorAll("table").length;
+  const kpiBoxes = Array.from(doc.querySelectorAll(".ai-kpi-box"));
+  const kpiSummaryItems = kpiBoxes.slice(0, 4).map((box) => {
+    const lbl = box.querySelector(".ai-kpi-label")?.textContent?.trim() || "";
+    const val = box.querySelector(".ai-kpi-value")?.textContent?.trim() || "";
+    return lbl && val ? `<strong>${escapeHtml(lbl)}:</strong> ${escapeHtml(val)}` : "";
+  }).filter(Boolean);
+
+  // Clonar el documento para construir la versión puramente conversacional/textual del chat
+  const chatDoc = parser.parseFromString(validatedHtml, "text/html");
+  // Eliminar tablas y grillas de KPI del lado del chat para que vayan exclusivamente al lienzo izquierdo
+  chatDoc.querySelectorAll(".ai-table-wrap, table, .ai-kpi-grid, .ai-html-header").forEach((el) => el.remove());
+
+  // Recolectar bloques narrativos (párrafos, alertas ejecutivas y listas de hallazgos)
+  const narrativeBlocks = [];
+  chatDoc.querySelectorAll("p, .ai-alert-box, ul, ol").forEach((el) => {
+    const text = (el.textContent || "").trim();
+    if (text.length > 12 && !narrativeBlocks.some((b) => b.includes(text.slice(0, 40)))) {
+      if (el.tagName === "UL" || el.tagName === "OL") {
+        const items = Array.from(el.querySelectorAll("li"))
+          .slice(0, 4)
+          .map((li) => `<li>${li.innerHTML}</li>`)
+          .join("");
+        if (items) narrativeBlocks.push(`<ul>${items}</ul>`);
+      } else {
+        narrativeBlocks.push(`<p>${el.innerHTML}</p>`);
+      }
+    }
+  });
+
+  // Si era una plantilla predominantemente tabular, sintetizar un análisis textual ejecutivo para el chat
+  if (narrativeBlocks.length === 0) {
+    narrativeBlocks.push(
+      `<p>He procesado la consulta <strong>"${escapeHtml(query)}"</strong> sobre el Talent Pool oficial (${state.records.length} posiciones) y he proyectado el reporte elaborado con sus gráficos y tablas en el panel izquierdo.</p>`
+    );
+  }
+  if (kpiSummaryItems.length > 0) {
+    narrativeBlocks.push(
+      `<p>📌 <strong>Indicadores clave detectados:</strong> ${kpiSummaryItems.join(" · ")}.</p>`
+    );
+  }
+  if (tablesCount > 0) {
+    const totalRows = doc.querySelectorAll("tbody tr").length;
+    narrativeBlocks.push(
+      `<p>📊 Se ${tablesCount === 1 ? "ha generado <strong>1 tabla ejecutiva</strong>" : `han generado <strong>${tablesCount} tablas ejecutivas</strong>`} (${totalRows} registros detallados) junto con los gráficos de distribución en el lienzo izquierdo.</p>`
+    );
+  }
+
+  const narrativeHtml = narrativeBlocks.slice(0, 5).join("");
+
+  const chatConversationalHtml = `
+    <div class="ai-chat-exec-card">
+      <div class="ai-chat-exec-header">
+        <span class="ai-chat-status-pill ai-chat-status-ready">
+          <span>✅</span>
+          <span>¡Todo listo! · Análisis completado</span>
+        </span>
+        <span class="text-[10px] font-bold text-slate-400">${escapeHtml(routeLabel)}</span>
+      </div>
+      <div class="ai-chat-narrative">
+        ${narrativeHtml}
+      </div>
+      <button type="button" data-focus-artifact="${escapeHtml(artifactId)}" class="ai-chat-canvas-btn">
+        <span>📊 Ver gráficos y tablas en el panel izquierdo: <strong>${escapeHtml(reportTitle.slice(0, 48))}</strong></span>
+        <span>→</span>
+      </button>
+    </div>
+  `;
+
+  // Construir el contenido visual elaborado para el Lienzo Izquierdo (#ai-canvas-body)
+  const visualChartBlock = buildQueryVisualChartHtml(query, routeType, records);
+  const canvasVisualHtml = `
+    <div class="space-y-4 animate-fade-in">
+      ${visualChartBlock}
+      ${validatedHtml}
+    </div>
+  `;
+
+  return {
+    reportTitle,
+    chatConversationalHtml,
+    canvasVisualHtml,
+  };
+}
+
+/**
+ * Actualiza la barra superior de historial de reportes en el Lienzo Izquierdo.
+ */
+function updateCanvasHistoryBar() {
+  const bar = document.getElementById("ai-canvas-history-bar");
+  const list = document.getElementById("ai-canvas-history-list");
+  const mobileBadge = document.getElementById("mobile-canvas-badge");
+
+  if (!bar || !list) return;
+
+  const artifacts = state.canvasArtifacts || [];
+  if (mobileBadge) {
+    mobileBadge.textContent = artifacts.length > 0 ? `${artifacts.length} rep.` : "Vivo";
+  }
+
+  if (artifacts.length === 0) {
+    bar.classList.add("hidden");
+    list.innerHTML = "";
+    return;
+  }
+
+  bar.classList.remove("hidden");
+  const homeActive = state.activeArtifactId === "HOME" ? "ai-history-chip-active" : "";
+  const chipsHtml = [
+    `<button type="button" data-artifact-id="HOME" class="ai-history-chip ${homeActive}">
+      <span>🏠</span>
+      <span>Base</span>
+    </button>`,
+    ...artifacts.map((art, idx) => {
+      const isActive = state.activeArtifactId === art.id ? "ai-history-chip-active" : "";
+      const shortTitle = art.title.length > 26 ? art.title.slice(0, 26) + "…" : art.title;
+      return `
+        <button type="button" data-artifact-id="${escapeHtml(art.id)}" class="ai-history-chip ${isActive}" title="${escapeHtml(art.query)}">
+          <span>#${idx + 1}</span>
+          <span>${escapeHtml(shortTitle)}</span>
+        </button>
+      `;
+    }),
+  ].join("");
+
+  list.innerHTML = chipsHtml;
+}
+
+/**
+ * Muestra un reporte específico del historial en el Lienzo Izquierdo (#ai-canvas-body).
+ */
+function renderActiveCanvasArtifact(artifactId) {
+  if (!artifactId || artifactId === "HOME") {
+    renderCanvasHomeOverview();
+    return;
+  }
+
+  const art = (state.canvasArtifacts || []).find((a) => a.id === artifactId);
+  if (!art) {
+    renderCanvasHomeOverview();
+    return;
+  }
+
+  state.activeArtifactId = art.id;
+  const canvasBody = document.getElementById("ai-canvas-body");
+  const titleEl = document.getElementById("ai-canvas-title");
+  const badgeEl = document.getElementById("ai-canvas-route-badge");
+  const followupsEl = document.getElementById("ai-canvas-followups");
+
+  if (titleEl) titleEl.textContent = art.title || art.query;
+  if (badgeEl) {
+    const isOpen = art.routeType === "OPEN_ANALYSIS";
+    badgeEl.className = isOpen ? "ai-route-badge-open shrink-0" : "ai-route-badge-template shrink-0";
+    badgeEl.innerHTML = `<span>${art.isLiveGemini ? "✨" : isOpen ? "🧠" : "⚡"}</span><span>${escapeHtml(art.routeLabel)}</span>`;
+  }
+
+  if (canvasBody) {
+    canvasBody.innerHTML = art.canvasHtml;
+    canvasBody.scrollTop = 0;
+  }
+
+  if (followupsEl) {
+    if (Array.isArray(art.followUps) && art.followUps.length > 0) {
+      const isOpen = art.routeType === "OPEN_ANALYSIS";
+      followupsEl.classList.remove("hidden");
+      followupsEl.innerHTML = `
+        <div class="ai-followup-bar">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mr-1">Profundizar análisis:</span>
+          ${art.followUps
+            .map(
+              (fq) =>
+                `<button type="button" data-followup-question="${escapeHtml(fq)}" class="ai-followup-chip">
+                  <span>${isOpen ? "⚡" : "🧠"}</span>
+                  <span>${escapeHtml(fq)}</span>
+                </button>`
+            )
+            .join("")}
+        </div>
+      `;
+    } else {
+      followupsEl.classList.add("hidden");
+      followupsEl.innerHTML = "";
+    }
+  }
+
+  updateCanvasHistoryBar();
+}
+
+/**
+ * Reinicia la sesión de conversación y el Lienzo Izquierdo, mostrando el saludo conversacional
+ * a la derecha y el Panorama Ejecutivo Base (gráficos y tabla de 12 empresas) a la izquierda.
+ */
 function startNewChatSession() {
   state.chatHistory = [];
+  state.canvasArtifacts = [];
+  state.activeArtifactId = "HOME";
 
   const catalogPanel = document.getElementById("catalog-panel");
   if (catalogPanel) catalogPanel.classList.add("hidden");
@@ -1277,6 +1777,8 @@ function startNewChatSession() {
 
   const input = document.getElementById("chat-input");
   if (input) input.value = "";
+
+  renderCanvasHomeOverview();
 
   const container = document.getElementById("chat-messages-container");
   if (!container) return;
@@ -1286,9 +1788,9 @@ function startNewChatSession() {
       <div class="w-8 h-8 rounded-xl bg-[#0B2545] text-white flex items-center justify-center text-xs font-extrabold shrink-0 shadow-sm">
         IA
       </div>
-      <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-200/90 shadow-sm max-w-[92%]">
+      <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-200/90 shadow-sm max-w-[94%]">
         <p class="ai-linear-response">
-          ¡Hola! 👋 ¿En qué puedo ayudarte hoy con el reporte de talento y sucesión? Puedes solicitar <strong>reportes estructurados</strong> (fichas, comparativas, alertas) o hacer <strong>preguntas abiertas de análisis y estrategia</strong>.
+          ¡Hola! 👋 Bienvenido al <strong>Espacio de Trabajo Dividido</strong> del Agente IA. Aquí en el <strong>chat derecho</strong> conversaremos con el estado de ejecución y el <strong>análisis textual</strong>, mientras que en el <strong>lienzo izquierdo</strong> se proyectarán automáticamente los <strong>gráficos, tablas ejecutivas, fichas y matrices</strong>.
         </p>
       </div>
     </div>
@@ -1315,22 +1817,21 @@ function openChatDrawer() {
   const overlay = document.getElementById("chat-drawer-overlay");
   if (!overlay) return;
   overlay.classList.remove("hidden");
-  // Si no hay mensajes previos en la sesión, inicializar con el saludo ejecutivo
   if (!state.chatHistory || state.chatHistory.length === 0) {
     startNewChatSession();
+  } else if (!document.getElementById("ai-canvas-body")?.innerHTML.trim()) {
+    renderActiveCanvasArtifact(state.activeArtifactId || "HOME");
   }
 }
 
 function minimizeChatDrawer() {
   const overlay = document.getElementById("chat-drawer-overlay");
   if (overlay) overlay.classList.add("hidden");
-  // Minimizar: conserva la conversación, el historial y las respuestas intactas para reanudarlas
 }
 
 function closeChatDrawer() {
   const overlay = document.getElementById("chat-drawer-overlay");
   if (overlay) overlay.classList.add("hidden");
-  // Cerrar explícitamente: finaliza la sesión y reinicia el estado limpio
   startNewChatSession();
 }
 
@@ -1351,7 +1852,6 @@ function validateAndSanitizeAgentHtml(rawResponse, isLinearHint = false) {
   const hasLinearClass = cleaned.includes("ai-linear-response");
   const isLinear = Boolean(isLinearHint || (hasLinearClass && !hasStructuredClass));
 
-  // Si llegó en Markdown puro desde un modelo externo, convertirlo primero con marked
   if (!hasStructuredClass && !hasLinearClass && !cleaned.startsWith("<")) {
     cleaned = window.marked ? window.marked.parse(cleaned) : `<p class="ai-linear-response">${escapeHtml(cleaned)}</p>`;
   }
@@ -1359,10 +1859,8 @@ function validateAndSanitizeAgentHtml(rawResponse, isLinearHint = false) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(cleaned, "text/html");
 
-  // Eliminar nodos peligrosos o prohibidos
   doc.querySelectorAll("script, iframe, object, embed, style, link, meta").forEach((el) => el.remove());
 
-  // Limpiar atributos inline prohibidos (style= y manejadores on*)
   doc.body.querySelectorAll("*").forEach((el) => {
     Array.from(el.attributes).forEach((attr) => {
       const name = attr.name.toLowerCase();
@@ -1370,7 +1868,6 @@ function validateAndSanitizeAgentHtml(rawResponse, isLinearHint = false) {
         el.removeAttribute(attr.name);
       }
     });
-    // Si una tabla no tiene la clase ejecutiva ai-table, aplicársela
     if (el.tagName === "TABLE" && !el.classList.contains("ai-table")) {
       el.classList.add("ai-table");
     }
@@ -1398,7 +1895,6 @@ function validateAndSanitizeAgentHtml(rawResponse, isLinearHint = false) {
   };
 }
 
-
 // ============================================================================
 // GESTIÓN DE GOOGLE GEMINI API KEY & CONSULTA EN VIVO EN CLIENTE (GITHUB PAGES)
 // ============================================================================
@@ -1406,21 +1902,18 @@ const GEMINI_STORAGE_KEY = "centria_gemini_api_key";
 
 function getStoredGeminiKey() {
   try {
-    // 1. Obtener de parámetro URL (?key=... o ?gemini_key=... o ?api_key=...) para pruebas directas silenciosas
     const params = new URLSearchParams(window.location.search);
     const paramKey = params.get("key") || params.get("gemini_key") || params.get("api_key");
     if (paramKey && paramKey.trim().length > 10) {
       localStorage.setItem("centria_gemini_api_key", paramKey.trim());
       return paramKey.trim();
     }
-    // 2. Obtener de configuración global embebida
     if (window.CENTRIA_CONFIG && window.CENTRIA_CONFIG.GEMINI_API_KEY) {
       return String(window.CENTRIA_CONFIG.GEMINI_API_KEY).trim();
     }
     if (window.GEMINI_API_KEY) {
       return String(window.GEMINI_API_KEY).trim();
     }
-    // 3. Obtener de almacenamiento local previo (configurado por detrás)
     return localStorage.getItem("centria_gemini_api_key") || "";
   } catch (_e) {
     return "";
@@ -1429,19 +1922,12 @@ function getStoredGeminiKey() {
 
 /**
  * Smart Document Digester (Digestor Inteligente de Datos de Sucesión)
- * Pre-procesa, sintetiza y digiere las 14 columnas de 2026_Reporte_Sucesion.xlsx
- * antes de pasarlas a Google Gemini 2.5 Flash o al motor analítico de talento.
- * 
- * Genera una estructura ejecutiva de alta densidad analítica para que el LLM
- * realice diagnósticos causales, cruces multifactoriales y hojas de ruta sin perderse
- * en registros brutos repetitivos.
  */
 function digestTalentDocumentForLLM(query, records) {
   const qNorm = String(query || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   const allRecords = Array.isArray(records) ? records : [];
   const total = allRecords.length || 1;
 
-  // 1. Métricas Macro Consolidadas del Grupo Breca
   const companies = [...new Set(allRecords.map(r => r.empresa).filter(Boolean))];
   const criticalRoles = allRecords.filter(r => r.cargo_valor === "Sí");
   const withSuccessor = allRecords.filter(r => r.tiene_sucesor === "Sí");
@@ -1452,25 +1938,20 @@ function digestTalentDocumentForLLM(query, records) {
   const medRisk = allRecords.filter(r => r.riesgo === "Medio");
   const lowRisk = allRecords.filter(r => r.riesgo === "Bajo");
 
-  // Alertas Rojas Inminentes: Riesgo Alto sin Sucesor
   const imminentRedAlerts = allRecords.filter(r => r.riesgo === "Alto" && r.tiene_sucesor !== "Sí");
 
-  // Pipeline de Madurez (Readiness)
   const readyNow = allRecords.filter(r => r.readiness === "Inmediato");
   const ready1to2 = allRecords.filter(r => r.readiness === "1 a 2 años");
   const ready3to5 = allRecords.filter(r => r.readiness === "3 a 5 años" || r.readiness === "+ de 5 años");
 
-  // Distribución 9-Box
   const topTalentBox9 = allRecords.filter(r => Number(r.nine_box) === 9);
   const topTalentBox8 = allRecords.filter(r => Number(r.nine_box) === 8);
   const keyPlayersBox5 = allRecords.filter(r => Number(r.nine_box) === 5);
 
-  // Motivación de Sucesores
   const motHigh = allRecords.filter(r => r.motivacion_sucesor === "Alta");
   const motMed = allRecords.filter(r => r.motivacion_sucesor === "Media");
   const motLow = allRecords.filter(r => r.motivacion_sucesor === "Baja");
 
-  // 2. Resumen Comparativo por Empresa
   const companyDigest = companies.map(c => {
     const subset = allRecords.filter(r => r.empresa === c);
     const subWithSuc = subset.filter(r => r.tiene_sucesor === "Sí").length;
@@ -1485,7 +1966,6 @@ function digestTalentDocumentForLLM(query, records) {
     };
   });
 
-  // 3. Foco Contextual según entidades de la consulta
   const mentionedTalents = allRecords.filter(r => {
     const nameNorm = (r.nombre || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const parts = nameNorm.split(/\s+/).filter(p => p.length >= 4);
@@ -1649,7 +2129,6 @@ async function callGeminiApiLive(userQuery, history = [], records = [], apiKey =
   const model = "gemini-2.5-flash";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
 
-  // Digestión Inteligente del Documento antes de llamar a Gemini
   const digestedDoc = digestTalentDocumentForLLM(userQuery, records);
 
   const systemPrompt = `Eres el Director de Talento & Asesor Estratégico Senior de Sucesión para Grupo Breca y Centria.
@@ -1710,10 +2189,6 @@ DIRECTIVAS OBLIGATORIAS:
   return replyText;
 }
 
-/**
- * Renderiza fluidamente la respuesta con animación progresiva y cursor activo,
- * asegurando una experiencia dinámica y conversacional.
- */
 function streamTypewriterContent(targetElement, fullHtml, isLinear = false, onComplete = null) {
   if (!targetElement) return;
 
@@ -1744,7 +2219,6 @@ function streamTypewriterContent(targetElement, fullHtml, isLinear = false, onCo
       }
     }, speed);
   } else {
-    // Para tarjetas estructuradas, transición fluida mediante clase CSS
     targetElement.classList.add("animate-fade-in");
     targetElement.innerHTML = fullHtml;
     const container = document.getElementById("chat-messages-container");
@@ -1772,32 +2246,56 @@ async function sendChatQuestion(questionText) {
   const input = document.getElementById("chat-input");
   if (input) input.value = "";
 
-  // Pre-clasificar la intención con el enrutador híbrido para informar al usuario en tiempo real
   const clientIntent =
     typeof window.classifyTalentQueryIntent === "function"
       ? window.classifyTalentQueryIntent(q, state.records)
       : { route: "TEMPLATE", routeLabel: "Plantilla Ejecutiva de Reporte" };
 
   const storedKey = getStoredGeminiKey();
-  const willUseGeminiLive = Boolean(storedKey && clientIntent.route === "OPEN_ANALYSIS");
 
   if (typingText) {
     if (clientIntent.route === "OPEN_ANALYSIS") {
-      typingText.textContent = "🧠 Gemini IA analizando causas, correlaciones y estrategia con documento digerido...";
+      typingText.textContent = "🧠 Ejecutando análisis estratégico y proyectando tablas/gráficos a la izquierda...";
     } else {
-      typingText.textContent = "⚡ Estructurando plantilla ejecutiva de reporte...";
+      typingText.textContent = "⚡ Ejecutando plantilla ejecutiva y proyectando resultados a la izquierda...";
     }
   }
 
+  // 1. Mostrar pregunta del usuario en el chat derecho
   if (container) {
     const userDiv = document.createElement("div");
     userDiv.className = "flex justify-end";
     userDiv.innerHTML = `
-      <div class="max-w-[85%] rounded-2xl rounded-tr-sm bg-[#0B2545] text-white px-4 py-2.5 text-xs sm:text-sm font-medium shadow-sm">
+      <div class="max-w-[88%] rounded-2xl rounded-tr-sm bg-[#0B2545] text-white px-4 py-2.5 text-xs sm:text-sm font-medium shadow-sm">
         ${escapeHtml(q)}
       </div>
     `;
     container.appendChild(userDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  // 2. Insertar burbuja de estado en vivo en el chat ("⚙️ Ejecutando análisis...")
+  let botDiv = null;
+  if (container) {
+    botDiv = document.createElement("div");
+    botDiv.className = "flex items-start gap-2.5";
+    botDiv.innerHTML = `
+      <div class="w-8 h-8 rounded-xl bg-[#0B2545] text-white flex items-center justify-center text-xs font-extrabold shrink-0 shadow-sm mt-0.5">
+        IA
+      </div>
+      <div class="flex-1 min-w-0 target-content-area">
+        <div class="ai-chat-exec-card">
+          <div class="ai-chat-exec-header">
+            <span class="ai-chat-status-pill ai-chat-status-running">
+              <span>⚙️</span>
+              <span>Ejecutando consulta sobre 101 posiciones...</span>
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">Procesando indicadores de sucesión y preparando gráficos y tablas en el panel izquierdo...</p>
+        </div>
+      </div>
+    `;
+    container.appendChild(botDiv);
     container.scrollTop = container.scrollHeight;
   }
 
@@ -1811,7 +2309,6 @@ async function sendChatQuestion(questionText) {
   let isLiveGeminiResponse = false;
 
   try {
-    // 1. Evaluar con el motor híbrido en cliente sobre los datos vivos
     const clientResult =
       typeof window.answerTalentQuestionClient === "function"
         ? window.answerTalentQuestionClient(q, state.records)
@@ -1823,7 +2320,6 @@ async function sendChatQuestion(questionText) {
       followUps = Array.isArray(clientResult.followUps) ? clientResult.followUps : [];
     }
 
-    // 2. Si es una consulta abierta/estratégica y el usuario tiene configurada su Gemini API Key:
     if (routeType === "OPEN_ANALYSIS" && storedKey) {
       try {
         const liveGeminiText = await callGeminiApiLive(q, state.chatHistory, state.records, storedKey);
@@ -1839,9 +2335,6 @@ async function sendChatQuestion(questionText) {
       }
     }
 
-// 3. En entorno estático sin servidor backend, continúa al motor analítico local
-
-    // 4. Si no se usó API externa o falló, utilizar la respuesta analítica del motor RAG
     if (!rawAnswer) {
       if (clientResult && clientResult.answer) {
         rawAnswer = clientResult.answer;
@@ -1864,67 +2357,66 @@ async function sendChatQuestion(questionText) {
   state.chatHistory.push({ role: "user", content: q });
   state.chatHistory.push({ role: "assistant", content: validated.html });
 
-  if (container) {
-    const botDiv = document.createElement("div");
+  const targetArea = botDiv ? botDiv.querySelector(".target-content-area") : null;
 
-    if (validated.isLinear) {
-      botDiv.className = "flex items-start gap-3";
-      botDiv.innerHTML = `
-        <div class="w-8 h-8 rounded-xl bg-[#0B2545] text-white flex items-center justify-center text-xs font-extrabold shrink-0 shadow-sm">
-          IA
-        </div>
-        <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-200/90 shadow-sm max-w-[90%] target-content-area"></div>
-      `;
-      container.appendChild(botDiv);
-      const targetArea = botDiv.querySelector(".target-content-area");
-      streamTypewriterContent(targetArea, validated.html, true);
-    } else {
-      const isOpenRoute = routeType === "OPEN_ANALYSIS";
-      const badgeClass = isLiveGeminiResponse
-        ? "ai-route-badge-open bg-gradient-to-r from-blue-700 to-indigo-700 text-white"
-        : isOpenRoute
-        ? "ai-route-badge-open"
-        : "ai-route-badge-template";
-      const badgeIcon = isLiveGeminiResponse ? "✨" : isOpenRoute ? "🧠" : "⚡";
+  if (validated.isLinear) {
+    // Respuesta puramente conversacional (ej. saludo o aclaración): se queda en el chat derecho
+    if (targetArea) {
+      targetArea.innerHTML = `<div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-200/90 shadow-sm"></div>`;
+      const innerBox = targetArea.firstElementChild;
+      streamTypewriterContent(innerBox, validated.html, true);
+    }
+  } else {
+    // Respuesta elaborada: separar análisis textual (derecha) y gráficos/tablas/reporte (izquierda)
+    const artifactId = "ART_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+    const splitResult = splitAgentResponseForWorkspace(
+      validated.html,
+      q,
+      routeType,
+      routeLabel,
+      isLiveGeminiResponse,
+      state.records,
+      artifactId
+    );
 
-      const apiKeyBanner = "";
+    const artifactObj = {
+      id: artifactId,
+      query: q,
+      title: splitResult.reportTitle || q,
+      routeType,
+      routeLabel,
+      isLiveGemini: isLiveGeminiResponse,
+      canvasHtml: splitResult.canvasVisualHtml,
+      followUps,
+    };
 
-      const followUpHtml =
-        followUps.length > 0
-          ? `<div class="ai-followup-bar px-1">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Profundizar:</span>
-              ${followUps
-                .map(
-                  (fq) =>
-                    `<button type="button" data-followup-question="${escapeHtml(fq)}" class="ai-followup-chip">
-                      <span>${isOpenRoute ? "⚡" : "🧠"}</span>
-                      <span>${escapeHtml(fq)}</span>
-                    </button>`
-                )
-                .join("")}
-            </div>`
-          : "";
+    state.canvasArtifacts.push(artifactObj);
+    renderActiveCanvasArtifact(artifactId);
 
-      botDiv.className = "space-y-1.5";
-      botDiv.innerHTML = `
-        <div class="flex items-center justify-between gap-2 px-1">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="${badgeClass}">
-              <span>${badgeIcon}</span>
-              <span>${escapeHtml(routeLabel)}</span>
-            </span>
-          </div>
-          <button type="button" data-expand-quick="true" class="text-[11px] font-bold text-blue-600 hover:underline whitespace-nowrap">
-            Mostrar sugerencias ▼
-          </button>
-        </div>
-        <div class="target-content-area"></div>
-        ${apiKeyBanner}
-        ${followUpHtml}
-      `;
-      container.appendChild(botDiv);
-      const targetArea = botDiv.querySelector(".target-content-area");
-      streamTypewriterContent(targetArea, validated.html, false);
+    const isOpenRoute = routeType === "OPEN_ANALYSIS";
+    const followUpChatHtml =
+      followUps.length > 0
+        ? `<div class="ai-followup-bar mt-1.5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Continuar:</span>
+            ${followUps
+              .slice(0, 2)
+              .map(
+                (fq) =>
+                  `<button type="button" data-followup-question="${escapeHtml(fq)}" class="ai-followup-chip">
+                    <span>${isOpenRoute ? "⚡" : "🧠"}</span>
+                    <span>${escapeHtml(fq)}</span>
+                  </button>`
+              )
+              .join("")}
+          </div>`
+        : "";
+
+    if (targetArea) {
+      streamTypewriterContent(
+        targetArea,
+        splitResult.chatConversationalHtml + followUpChatHtml,
+        false
+      );
     }
   }
 }
@@ -2581,12 +3073,39 @@ function bindEventListeners() {
     const panel = document.getElementById("chat-drawer-panel");
     if (!panel) return;
     state.drawerExpanded = !state.drawerExpanded;
-    if (state.drawerExpanded) {
-      panel.classList.remove("sm:w-[640px]", "lg:w-[720px]");
-      panel.classList.add("sm:w-[820px]", "lg:w-[960px]");
-    } else {
-      panel.classList.remove("sm:w-[820px]", "lg:w-[960px]");
-      panel.classList.add("sm:w-[640px]", "lg:w-[720px]");
+    panel.classList.toggle("ai-workspace-fullscreen", state.drawerExpanded);
+  });
+
+  // Controles de Vista Dividida (Conmutador móvil, Panorama Base e Historial de Reportes en el Lienzo Izquierdo)
+  document.getElementById("btn-mobile-view-chat")?.addEventListener("click", () => {
+    switchMobileWorkspaceTab("chat");
+  });
+  document.getElementById("btn-mobile-view-canvas")?.addEventListener("click", () => {
+    switchMobileWorkspaceTab("canvas");
+  });
+  document.getElementById("btn-canvas-home")?.addEventListener("click", () => {
+    renderCanvasHomeOverview();
+  });
+  document.getElementById("ai-canvas-history-list")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-artifact-id]");
+    if (!btn) return;
+    renderActiveCanvasArtifact(btn.getAttribute("data-artifact-id"));
+  });
+  document.getElementById("ai-canvas-body")?.addEventListener("click", (e) => {
+    const qBtn = e.target.closest("button[data-quick-question]");
+    if (qBtn) {
+      sendChatQuestion(qBtn.getAttribute("data-quick-question"));
+      return;
+    }
+    const fBtn = e.target.closest("button[data-followup-question]");
+    if (fBtn) {
+      sendChatQuestion(fBtn.getAttribute("data-followup-question"));
+    }
+  });
+  document.getElementById("ai-canvas-followups")?.addEventListener("click", (e) => {
+    const fBtn = e.target.closest("button[data-followup-question]");
+    if (fBtn) {
+      sendChatQuestion(fBtn.getAttribute("data-followup-question"));
     }
   });
 
@@ -2608,8 +3127,15 @@ function bindEventListeners() {
       toggleQuickActions(false);
       return;
     }
-    
-    
+    const focusBtn = e.target.closest("button[data-focus-artifact]");
+    if (focusBtn) {
+      const artId = focusBtn.getAttribute("data-focus-artifact");
+      renderActiveCanvasArtifact(artId);
+      if (window.innerWidth < 1024) {
+        switchMobileWorkspaceTab("canvas");
+      }
+      return;
+    }
     const followupBtn = e.target.closest("button[data-followup-question]");
     if (followupBtn) {
       sendChatQuestion(followupBtn.getAttribute("data-followup-question"));

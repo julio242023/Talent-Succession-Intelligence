@@ -610,20 +610,20 @@
   </div>
 
   <!-- ========================================================================
-       4. DRAWER LATERAL DEL AGENTE IA (Arquitectura Híbrida: Plantillas + Análisis Abierto Gemini IA)
+       4. VENTANA FLOTANTE DIVIDIDA DEL AGENTE IA (Izquierda: Lienzo de Resultados, Tablas y Gráficos | Derecha: Chat Conversacional y Análisis Textual)
        ======================================================================== -->
-  <div id="chat-drawer-overlay" class="fixed inset-0 z-50 hidden">
-    <!-- Backdrop (Al hacer clic minimiza/cierra y reinicia la sesión) -->
+  <div id="chat-drawer-overlay" class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4 lg:p-6">
+    <!-- Backdrop -->
     <div id="chat-drawer-backdrop" class="chat-drawer-backdrop absolute inset-0"></div>
 
-    <!-- Panel Lateral -->
+    <!-- Ventana Flotante Split-View (Estilo Canvas / Artifacts Ejecutivo) -->
     <aside
       id="chat-drawer-panel"
-      class="chat-drawer-panel absolute top-0 right-0 h-full w-full sm:w-[640px] lg:w-[720px] bg-white shadow-2xl flex flex-col z-10 border-l border-slate-200"
-      aria-label="Agente Conversacional de Talento y Sucesión"
+      class="ai-floating-workspace relative w-full max-w-[1440px] h-[94vh] sm:h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col z-10 border border-slate-200/90 overflow-hidden"
+      aria-label="Espacio de Trabajo del Agente IA de Talento y Sucesión"
     >
-      <!-- Fila 1: Cabecera Ejecutiva del Drawer (Sin saturación ni saltos de línea) -->
-      <div class="centria-header-gradient text-white px-5 py-3.5 flex items-center justify-between gap-3 shrink-0">
+      <!-- Cabecera Superior Unificada de la Ventana Flotante -->
+      <div class="centria-header-gradient text-white px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3 shrink-0">
         <div class="flex items-center gap-3 min-w-0">
           <div class="w-10 h-10 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shadow-inner shrink-0">
             <svg class="w-5 h-5 text-blue-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -632,14 +632,14 @@
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-nowrap">
-              <h2 class="text-sm sm:text-base font-extrabold text-white tracking-tight whitespace-nowrap">Agente IA de Talento</h2>
+              <h2 class="text-sm sm:text-base font-extrabold text-white tracking-tight whitespace-nowrap">Agente IA Centria · Workspace</h2>
               <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30 whitespace-nowrap">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
-                En línea
+                Vista Dividida Activa
               </span>
             </div>
             <p id="drawer-engine-badge" class="text-[11px] text-blue-100/85 mt-0.5 truncate">
-              Enrutador Híbrido: Plantillas + Gemini IA · 101 posiciones
+              Izquierda: Gráficos y Tablas Ejecutivas · Derecha: Chat y Análisis Textual · 101 posiciones
             </p>
           </div>
         </div>
@@ -657,31 +657,32 @@
             </svg>
             <span class="hidden sm:inline">Nueva sesión</span><span class="sm:hidden text-[11px]">Nueva</span>
           </button>
-          <!-- Expandir Ancho -->
+
+          <!-- Maximizar / Restaurar Ventana -->
           <button
             id="btn-expand-drawer"
             type="button"
             class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-blue-100 transition-colors hidden sm:inline-flex"
-            title="Ampliar o reducir ventana"
+            title="Maximizar o restaurar ventana flotante"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
             </svg>
           </button>
 
-          <!-- Minimizar Drawer (Oculta sin reiniciar la conversación) -->
+          <!-- Minimizar Ventana (Oculta sin reiniciar la conversación) -->
           <button
             id="btn-minimize-chat"
             type="button"
             class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-blue-100 transition-colors"
-            title="Minimizar chat (conserva la conversación activa)"
+            title="Minimizar ventana (conserva la conversación y los reportes)"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5" />
             </svg>
           </button>
 
-          <!-- Cerrar Drawer (Cierra y finaliza la sesión) -->
+          <!-- Cerrar Ventana (Cierra y finaliza la sesión) -->
           <button
             id="btn-close-chat"
             type="button"
@@ -695,111 +696,201 @@
         </div>
       </div>
 
-      <!-- Fila 2: Barra de Modos y Referencias (Plantillas Ejecutivas vs Análisis Abierto Gemini IA vs Catálogo) -->
-      <div class="chat-subheader-bar px-5 py-2 flex items-center justify-between gap-2 shrink-0">
-        <div class="flex items-center gap-1.5 flex-wrap">
-          <button
-            id="btn-mode-templates"
-            type="button"
-            class="chat-mode-tab chat-mode-tab-active"
-            title="Ver plantillas ejecutivas de reporte (Fichas, Comparaciones, Alertas)"
-          >
-            <span>⚡</span>
-            <span>Plantillas de Reporte (6)</span>
-          </button>
-          <button
-            id="btn-mode-open"
-            type="button"
-            class="chat-mode-tab"
-            title="Ver preguntas abiertas de análisis estratégico, causas y planes de acción con Gemini IA"
-          >
-            <span>🧠</span>
-            <span>Análisis Abierto IA (6)</span>
-          </button>
-          <button
-            id="btn-toggle-catalog"
-            type="button"
-            class="chat-mode-tab"
-            title="Explorar el catálogo completo de 33 consultas por categoría"
-          >
-            <span>📋</span>
-            <span>Catálogo (33)</span>
-          </button>
-        </div>
-
+      <!-- Conmutador Móvil / Tablet (< lg): Permite alternar entre el Chat y el Lienzo de Resultados en pantallas pequeñas -->
+      <div class="lg:hidden bg-slate-100 border-b border-slate-200 px-3 py-1.5 flex items-center gap-2 shrink-0">
         <button
-          id="btn-collapse-quick-actions"
+          id="btn-mobile-view-chat"
           type="button"
-          class="text-[11px] font-bold text-slate-500 hover:text-[#0B2545] px-2 py-1 rounded-md hover:bg-slate-200/60 transition-colors whitespace-nowrap shrink-0"
-          title="Mostrar u ocultar el panel de sugerencias rápidas"
+          class="flex-1 py-1.5 px-3 rounded-lg text-xs font-extrabold bg-[#0B2545] text-white shadow-sm transition-colors flex items-center justify-center gap-1.5"
         >
-          Ocultar ▲
+          <span>💬</span>
+          <span>Chat Conversacional</span>
+        </button>
+        <button
+          id="btn-mobile-view-canvas"
+          type="button"
+          class="flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-white text-slate-700 border border-slate-200/80 transition-colors flex items-center justify-center gap-1.5"
+        >
+          <span>📊</span>
+          <span>Resultados y Tablas</span>
+          <span id="mobile-canvas-badge" class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800">Vivo</span>
         </button>
       </div>
 
-      <!-- Sección de Sugerencias Rápidas (Conmuta entre 6 Plantillas y 6 Preguntas Abiertas de Análisis IA) -->
-      <div id="quick-actions-section" class="bg-slate-50/90 border-b border-slate-200 px-5 py-2.5 shrink-0">
-        <div class="flex items-center justify-between mb-2">
-          <span id="quick-actions-mode-desc" class="text-[11px] font-bold text-slate-600">
-            ⚡ Plantillas Ejecutivas de Reporte (1 clic para generar fichas, comparativas o tablas de riesgo)
-          </span>
-        </div>
-        <div id="quick-actions-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <!-- 6 tarjetas inyectadas dinámicamente por app.js según el modo activo -->
-        </div>
-      </div>
+      <!-- Cuerpo Principal en Vista Dividida (Izquierda: Resultados Visuales, Gráficos y Tablas | Derecha: Chat Conversacional) -->
+      <div class="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
 
-      <!-- Panel Desplegable del Catálogo de Preguntas de Referencia -->
-      <div id="catalog-panel" class="hidden bg-blue-50/90 border-b border-blue-200 px-5 py-3.5 max-h-72 overflow-y-auto shrink-0">
-        <div class="flex items-center justify-between mb-2.5">
-          <span class="text-xs font-extrabold text-[#0B2545]">Catálogo Completo: Plantillas de Reporte + Análisis Abierto Gemini IA</span>
-          <button id="btn-close-catalog" type="button" class="text-xs font-bold text-blue-700 hover:underline">Cerrar ✕</button>
-        </div>
-        <div id="catalog-questions-container" class="space-y-3 text-xs">
-          <!-- Categorías inyectadas por app.js -->
-        </div>
-      </div>
+        <!-- ==================================================================
+             LADO IZQUIERDO: LIENZO DE RESULTADOS ELABORADOS (GRÁFICOS, TABLAS, FICHAS Y MATRICES)
+             ================================================================== -->
+        <section
+          id="ai-canvas-panel"
+          class="hidden lg:flex lg:w-[58%] xl:w-[60%] h-full flex-col bg-[#F8FAFC] border-r border-slate-200/90 min-h-0"
+          aria-label="Lienzo de Resultados, Gráficos y Tablas Ejecutivas"
+        >
+          <!-- Barra Superior del Lienzo Izquierdo -->
+          <div class="bg-white border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span id="ai-canvas-route-badge" class="ai-route-badge-template shrink-0">
+                <span>📊</span>
+                <span>Lienzo Ejecutivo</span>
+              </span>
+              <h3 id="ai-canvas-title" class="text-xs sm:text-sm font-extrabold text-[#0B2545] truncate">
+                Panorama General de Sucesión (101 Posiciones)
+              </h3>
+            </div>
 
-      <!-- Contenedor de Conversación -->
-      <div id="chat-messages-container" class="flex-1 overflow-y-auto px-5 py-4 space-y-3.5 bg-[#F4F6F8]">
-        <!-- Mensajes renderizados y validados por app.js -->
-      </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button
+                id="btn-canvas-home"
+                type="button"
+                class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-bold text-slate-700 transition-colors inline-flex items-center gap-1"
+                title="Ver resumen visual general del Talent Pool"
+              >
+                <span>🏠</span>
+                <span>Panorama Base</span>
+              </button>
+            </div>
+          </div>
 
-      <!-- Indicador de Procesamiento IA -->
-      <div id="chat-typing-indicator" class="hidden px-5 py-2.5 bg-white border-t border-slate-100 flex items-center gap-2.5 text-xs text-slate-600 shrink-0">
-        <div class="flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-blue-600 typing-dot-1"></span>
-          <span class="w-2 h-2 rounded-full bg-blue-600 typing-dot-2"></span>
-          <span class="w-2 h-2 rounded-full bg-blue-600 typing-dot-3"></span>
-        </div>
-        <span id="chat-typing-text" class="font-medium">Analizando intención y estructurando respuesta...</span>
-      </div>
-
-      <!-- Barra Inferior Unificada de Consulta Libre (Composer Box) -->
-      <form id="chat-form" class="px-5 py-3 bg-white border-t border-slate-200 shrink-0">
-        <div class="chat-composer-box flex items-center gap-2 px-3.5 py-2">
-          <textarea
-            id="chat-input"
-            rows="1"
-            placeholder="Pregunta por un reporte (ej. ficha de Javier Carvalho) o haz una consulta abierta de análisis..."
-            class="flex-1 bg-transparent border-0 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none resize-none py-1 leading-relaxed max-h-24"
-          ></textarea>
-          <button
-            id="btn-send-chat"
-            type="submit"
-            class="px-4 py-2 rounded-xl bg-[#0B2545] hover:bg-blue-700 text-white font-bold text-xs sm:text-sm transition-colors inline-flex items-center gap-1.5 shrink-0 shadow-sm"
+          <!-- Historial de Reportes Generados en la Sesión (Píldoras de cambio rápido) -->
+          <div
+            id="ai-canvas-history-bar"
+            class="hidden bg-slate-100/90 border-b border-slate-200/80 px-5 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0"
           >
-            <span>Enviar</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </button>
-        </div>
-        <div class="flex items-center justify-between mt-1.5 px-1 text-[10px] text-slate-400">
-          <span>Enrutamiento automático: <strong class="text-slate-600">⚡ Plantilla de Reporte</strong> ó <strong class="text-blue-700">🧠 Análisis Abierto Gemini IA</strong></span>
-          <span class="hidden sm:inline">Enter para enviar</span>
-        </div>
-      </form>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mr-1 shrink-0">Reportes:</span>
+            <div id="ai-canvas-history-list" class="flex items-center gap-1.5">
+              <!-- Chips de reportes generados -->
+            </div>
+          </div>
+
+          <!-- Contenedor Principal de Resultados Elaborados (Gráficos SVG, KPIs, Tablas, Fichas y Planes) -->
+          <div id="ai-canvas-body" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
+            <!-- Inyectado dinámicamente por app.js -->
+          </div>
+
+          <!-- Barra Inferior del Lienzo: Sugerencias de Profundización -->
+          <div id="ai-canvas-followups" class="hidden bg-white border-t border-slate-200 px-5 py-2.5 shrink-0">
+            <!-- Chips de profundización inyectados por app.js -->
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             LADO DERECHO: CHAT CONVERSACIONAL, ESTADO DE EJECUCIÓN Y ANÁálisis TEXTUAL
+             ================================================================== -->
+        <section
+          id="ai-chat-panel"
+          class="flex w-full lg:w-[42%] xl:w-[40%] h-full flex-col bg-white min-h-0"
+          aria-label="Chat Conversacional y Análisis Textual"
+        >
+          <!-- Barra de Modos y Referencias (Plantillas Ejecutivas vs Análisis Abierto Gemini IA vs Catálogo) -->
+          <div class="chat-subheader-bar px-4 py-2 flex items-center justify-between gap-2 shrink-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button
+                id="btn-mode-templates"
+                type="button"
+                class="chat-mode-tab chat-mode-tab-active"
+                title="Ver plantillas ejecutivas de reporte (Fichas, Comparaciones, Alertas)"
+              >
+                <span>⚡</span>
+                <span>Plantillas (6)</span>
+              </button>
+              <button
+                id="btn-mode-open"
+                type="button"
+                class="chat-mode-tab"
+                title="Ver preguntas abiertas de análisis estratégico, causas y planes de acción con Gemini IA"
+              >
+                <span>🧠</span>
+                <span>Análisis IA (6)</span>
+              </button>
+              <button
+                id="btn-toggle-catalog"
+                type="button"
+                class="chat-mode-tab"
+                title="Explorar el catálogo completo de 33 consultas por categoría"
+              >
+                <span>📋</span>
+                <span>Catálogo (33)</span>
+              </button>
+            </div>
+
+            <button
+              id="btn-collapse-quick-actions"
+              type="button"
+              class="text-[11px] font-bold text-slate-500 hover:text-[#0B2545] px-2 py-1 rounded-md hover:bg-slate-200/60 transition-colors whitespace-nowrap shrink-0"
+              title="Mostrar u ocultar el panel de sugerencias rápidas"
+            >
+              Ocultar ▲
+            </button>
+          </div>
+
+          <!-- Sección de Sugerencias Rápidas (Conmuta entre 6 Plantillas y 6 Preguntas Abiertas de Análisis IA) -->
+          <div id="quick-actions-section" class="bg-slate-50/90 border-b border-slate-200 px-4 py-2.5 shrink-0">
+            <div class="flex items-center justify-between mb-2">
+              <span id="quick-actions-mode-desc" class="text-[11px] font-bold text-slate-600">
+                ⚡ Plantillas Ejecutivas de Reporte (1 clic para proyectar tablas y gráficos a la izquierda)
+              </span>
+            </div>
+            <div id="quick-actions-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              <!-- 6 tarjetas inyectadas dinámicamente por app.js según el modo activo -->
+            </div>
+          </div>
+
+          <!-- Panel Desplegable del Catálogo de Preguntas de Referencia -->
+          <div id="catalog-panel" class="hidden bg-blue-50/90 border-b border-blue-200 px-4 py-3 max-h-64 overflow-y-auto shrink-0">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-extrabold text-[#0B2545]">Catálogo Completo (33 Consultas)</span>
+              <button id="btn-close-catalog" type="button" class="text-xs font-bold text-blue-700 hover:underline">Cerrar ✕</button>
+            </div>
+            <div id="catalog-questions-container" class="space-y-2.5 text-xs">
+              <!-- Categorías inyectadas por app.js -->
+            </div>
+          </div>
+
+          <!-- Contenedor de Conversación (Solo mensajes conversacionales, estado "Ejecutando... Todo listo" y análisis textual) -->
+          <div id="chat-messages-container" class="flex-1 overflow-y-auto px-4 py-4 space-y-3.5 bg-[#F4F6F8]">
+            <!-- Mensajes conversacionales renderizados por app.js -->
+          </div>
+
+          <!-- Indicador de Procesamiento IA -->
+          <div id="chat-typing-indicator" class="hidden px-4 py-2.5 bg-white border-t border-slate-100 flex items-center gap-2.5 text-xs text-slate-600 shrink-0">
+            <div class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-blue-600 typing-dot-1"></span>
+              <span class="w-2 h-2 rounded-full bg-blue-600 typing-dot-2"></span>
+              <span class="w-2 h-2 rounded-full bg-blue-600 typing-dot-3"></span>
+            </div>
+            <span id="chat-typing-text" class="font-medium">Ejecutando consulta y proyectando resultados a la izquierda...</span>
+          </div>
+
+          <!-- Barra Inferior de Consulta Libre (Composer Box) -->
+          <form id="chat-form" class="px-4 py-3 bg-white border-t border-slate-200 shrink-0">
+            <div class="chat-composer-box flex items-center gap-2 px-3 py-1.5">
+              <textarea
+                id="chat-input"
+                rows="1"
+                placeholder="Escribe tu consulta... (El análisis textual irá aquí y las tablas/gráficos a la izquierda)"
+                class="flex-1 bg-transparent border-0 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none resize-none py-1 leading-relaxed max-h-24"
+              ></textarea>
+              <button
+                id="btn-send-chat"
+                type="submit"
+                class="px-3.5 py-2 rounded-xl bg-[#0B2545] hover:bg-blue-700 text-white font-bold text-xs transition-colors inline-flex items-center gap-1.5 shrink-0 shadow-sm"
+              >
+                <span>Enviar</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
+            <div class="flex items-center justify-between mt-1.5 px-1 text-[10px] text-slate-400">
+              <span>💬 <strong class="text-slate-600">Chat:</strong> Análisis textual · 📊 <strong class="text-blue-700">Izquierda:</strong> Gráficos y Tablas</span>
+              <span class="hidden sm:inline">Enter para enviar</span>
+            </div>
+          </form>
+        </section>
+
+      </div>
     </aside>
   </div>
 
