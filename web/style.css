@@ -1,0 +1,722 @@
+/* ==========================================================================
+   Centria Talent & Succession Intelligence — Executive Design System CSS
+   Basado en centria-ui-design-system + UX/UI Progressive Disclosure
+   Paleta: Navy #0B2545 | Blue #2563eb | Sky #3b82f6 | Magenta #C2185B | Bg #F4F6F8
+   ========================================================================== */
+
+:root {
+  --centria-navy: #0B2545;
+  --centria-navy-dark: #071930;
+  --centria-blue: #2563eb;
+  --centria-sky: #3b82f6;
+  --centria-magenta: #C2185B;
+  --centria-bg: #F4F6F8;
+  --centria-surface: #ffffff;
+  --centria-border: #e2e8f0;
+  --centria-text: #0f172a;
+  --centria-muted: #475569;
+  --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--centria-bg);
+  color: var(--centria-text);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Tipografía y Números Tabulares (UX Best Practice) */
+h1, h2, h3, h4 {
+  text-wrap: balance;
+  letter-spacing: -0.015em;
+}
+
+p, li {
+  text-wrap: pretty;
+}
+
+.tabular-nums,
+.centria-table td,
+.centria-table th,
+.ai-table td,
+.ai-table th {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   1. HEADER CORPORATIVO CENTRIA MEJORADO
+   ========================================================================== */
+.centria-header-gradient {
+  background: linear-gradient(125deg, #071930 0%, #0B2545 55%, #163d73 100%);
+}
+
+.centria-accent-bar {
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb 0%, #38bdf8 55%, #C2185B 100%);
+}
+
+.header-glass-pill {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+}
+
+.header-tab-btn {
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.header-tab-active {
+  background-color: #ffffff;
+  color: #0B2545;
+  box-shadow: 0 2px 8px -2px rgba(7, 25, 48, 0.35);
+}
+
+.header-tab-inactive {
+  color: rgba(219, 234, 254, 0.85);
+}
+
+.header-tab-inactive:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   2. TARJETAS EJECUTIVAS Y CONTENEDORES DE GRÁFICOS EN VIVO (CHART.JS)
+   ========================================================================== */
+.executive-card {
+  background-color: #ffffff;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 4px 16px -4px rgba(11, 37, 69, 0.045), 0 2px 6px -2px rgba(11, 37, 69, 0.025);
+}
+
+.chart-canvas-box {
+  position: relative;
+  width: 100%;
+  height: 260px;
+}
+
+.chart-canvas-box-lg {
+  position: relative;
+  width: 100%;
+  height: 310px;
+}
+
+/* Tarjetas KPI Interactivas */
+.kpi-card-interactive {
+  background-color: #ffffff;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 4px 14px -4px rgba(11, 37, 69, 0.045), 0 2px 5px -2px rgba(11, 37, 69, 0.025);
+  transition: transform 0.22s var(--ease-out-quart), box-shadow 0.22s var(--ease-out-quart), border-color 0.16s ease, background-color 0.16s ease;
+}
+
+.kpi-card-interactive:hover {
+  transform: translateY(-3px);
+  border-color: #cbd5e1;
+  box-shadow: 0 14px 26px -6px rgba(11, 37, 69, 0.09), 0 6px 12px -4px rgba(11, 37, 69, 0.04);
+}
+
+.kpi-card-interactive:active {
+  transform: scale(0.985);
+}
+
+.kpi-card-active {
+  border-color: #2563eb !important;
+  background-color: #f8fbff !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18), 0 10px 20px -4px rgba(11, 37, 69, 0.08);
+}
+
+/* Tarjetas de Preguntas de Referencia dentro del Agente IA */
+.ai-prompt-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(11, 37, 69, 0.03);
+  transition: transform 0.18s var(--ease-out-quart), box-shadow 0.18s var(--ease-out-quart), border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.ai-prompt-card:hover {
+  transform: translateY(-1.5px);
+  border-color: #93c5fd;
+  background-color: #f8fbff;
+  box-shadow: 0 6px 14px -4px rgba(37, 99, 235, 0.13);
+}
+
+.ai-prompt-card:active {
+  transform: scale(0.985);
+}
+
+.ai-prompt-card-open {
+  background: linear-gradient(180deg, #ffffff 0%, #fafaff 100%);
+  border: 1px solid #e0e7ff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(67, 56, 202, 0.04);
+  transition: transform 0.18s var(--ease-out-quart), box-shadow 0.18s var(--ease-out-quart), border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.ai-prompt-card-open:hover {
+  transform: translateY(-1.5px);
+  border-color: #a5b4fc;
+  background: #f5f7ff;
+  box-shadow: 0 6px 14px -4px rgba(79, 70, 229, 0.15);
+}
+
+.ai-prompt-card-open:active {
+  transform: scale(0.985);
+}
+
+/* Chips de Filtro Rápido */
+.preset-chip {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+
+.preset-chip:active {
+  transform: scale(0.97);
+}
+
+.preset-chip-active {
+  background-color: #0B2545 !important;
+  color: #ffffff !important;
+  border-color: #0B2545 !important;
+}
+
+/* Scrollbars ejecutivos */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Tabla Reactiva & Cabeceras Fijas */
+.centria-table-container {
+  max-height: 680px;
+  overflow: auto;
+}
+
+.centria-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #f8fafc;
+  box-shadow: inset 0 -1px 0 #e2e8f0;
+}
+
+.centria-table tbody tr {
+  transition: background-color 0.14s ease;
+}
+
+.centria-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Matriz 9-Box Interactiva (3x3 con Espaciado Amplio) */
+.ninebox-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.875rem;
+}
+
+.ninebox-cell {
+  transition: transform 0.22s var(--ease-out-quart), box-shadow 0.22s var(--ease-out-quart), border-color 0.16s ease;
+}
+.ninebox-cell:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 22px -4px rgba(11, 37, 69, 0.09), 0 4px 8px -4px rgba(11, 37, 69, 0.05);
+}
+.ninebox-cell-active {
+  outline: 2.5px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   3. BOTÓN FLOTANTE ÚNICO (FAB) Y DRAWER DEL AGENTE IA
+   ========================================================================== */
+.nexia-fab {
+  background: linear-gradient(135deg, #0B2545 0%, #1d4ed8 100%);
+  box-shadow: 0 16px 34px -6px rgba(11, 37, 69, 0.48), 0 6px 16px -2px rgba(37, 99, 235, 0.32);
+  transition: transform 0.22s var(--ease-out-quart), box-shadow 0.22s var(--ease-out-quart);
+}
+.nexia-fab:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 22px 40px -6px rgba(11, 37, 69, 0.56), 0 8px 20px -2px rgba(37, 99, 235, 0.4);
+}
+.nexia-fab:active {
+  transform: scale(0.98);
+}
+
+.chat-drawer-backdrop {
+  background-color: rgba(11, 37, 69, 0.45);
+  backdrop-filter: blur(3px);
+  transition: opacity 0.25s ease;
+}
+
+.chat-drawer-panel {
+  transition: transform 0.28s var(--ease-out-quart), width 0.25s var(--ease-out-quart);
+}
+
+/* Cabecera de 2 filas y barra de modos del Chat Drawer */
+.chat-subheader-bar {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.chat-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  background-color: transparent;
+  border: 1px solid transparent;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+}
+
+.chat-mode-tab:hover {
+  color: #0B2545;
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+.chat-mode-tab-active {
+  color: #0B2545;
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 3px rgba(11, 37, 69, 0.08);
+}
+
+.chat-mode-tab-open.chat-mode-tab-active {
+  color: #3730a3;
+  background-color: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+/* Caja unificada de entrada de mensaje (Prompt Composer) */
+.chat-composer-box {
+  background-color: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 1rem;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.chat-composer-box:focus-within {
+  background-color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14), 0 4px 12px -2px rgba(11, 37, 69, 0.06);
+}
+
+/* Badges del Enrutador Inteligente de Intención (Plantilla vs Análisis Abierto IA) */
+.ai-route-badge-template {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background-color: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.ai-route-badge-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, #312e81 0%, #4338ca 100%);
+  color: #ffffff;
+  border: 1px solid #4f46e5;
+  box-shadow: 0 2px 6px rgba(67, 56, 202, 0.22);
+}
+
+.ai-html-header-open {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #1d4ed8 100%);
+  color: #ffffff;
+  padding: 0.95rem 1.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ai-insight-banner {
+  background: linear-gradient(135deg, #f8faff 0%, #eef2ff 100%);
+  border: 1px solid #c7d2fe;
+  border-left: 4px solid #4f46e5;
+  border-radius: 0.75rem;
+  padding: 0.8rem 1rem;
+  color: #1e1b4b;
+  font-size: 0.82rem;
+  line-height: 1.58;
+}
+
+.ai-step-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.65rem;
+}
+
+.ai-step-card {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-top: 3px solid #2563eb;
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.9rem;
+}
+
+.ai-step-card-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #0B2545;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ai-step-card-text {
+  font-size: 0.77rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.ai-followup-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.ai-followup-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.32rem 0.68rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background-color: #ffffff;
+  color: #1e3a8a;
+  border: 1px solid #cbd5e1;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.ai-followup-chip:hover {
+  background-color: #eff6ff;
+  border-color: #60a5fa;
+  color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   4. SISTEMA DE ESTILOS PARA RESPUESTAS HTML ESTRUCTURADAS Y LINEALES DEL LLM
+   ========================================================================== */
+.ai-structured-response {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  color: #1e293b;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.ai-linear-response {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: #1e293b;
+  margin: 0;
+}
+
+.ai-html-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px -2px rgba(11, 37, 69, 0.04);
+}
+
+.ai-html-header {
+  background: linear-gradient(135deg, #0B2545 0%, #1e3a8a 100%);
+  color: #ffffff;
+  padding: 0.9rem 1.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ai-html-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.ai-html-subtitle {
+  font-size: 0.76rem;
+  color: #bfdbfe;
+  margin-top: 0.15rem;
+}
+
+.ai-html-body {
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.ai-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #0B2545;
+  margin: 0.25rem 0 0.1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ai-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 0.65rem;
+}
+
+.ai-kpi-box {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.7rem;
+  padding: 0.65rem 0.8rem;
+}
+
+.ai-kpi-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  margin-bottom: 0.2rem;
+}
+
+.ai-kpi-value {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0B2545;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Badges Semánticos del Agente IA */
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.18rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.ai-badge-red {
+  background-color: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.ai-badge-amber {
+  background-color: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.ai-badge-green {
+  background-color: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.ai-badge-blue {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.ai-badge-indigo {
+  background-color: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.ai-badge-navy {
+  background-color: #0B2545;
+  color: #ffffff;
+  border: 1px solid #1e3a8a;
+}
+
+/* Tablas HTML del Agente IA */
+.ai-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+}
+
+.ai-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.79rem;
+  text-align: left;
+}
+
+.ai-table thead {
+  background-color: #0B2545;
+  color: #ffffff;
+}
+
+.ai-table th {
+  padding: 0.6rem 0.75rem;
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.ai-table td {
+  padding: 0.58rem 0.75rem;
+  border-top: 1px solid #e2e8f0;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.ai-table tbody tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.ai-table tbody tr:hover {
+  background-color: #eff6ff;
+}
+
+/* Bloques de Alerta y Recomendación Ejecutiva */
+.ai-alert-box {
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.95rem;
+  font-size: 0.81rem;
+  line-height: 1.55;
+}
+
+.ai-alert-critical {
+  background-color: #fff1f2;
+  border-left: 4px solid #e11d48;
+  color: #881337;
+}
+
+.ai-alert-info {
+  background-color: #eff6ff;
+  border-left: 4px solid #2563eb;
+  color: #1e3a8a;
+}
+
+.ai-alert-success {
+  background-color: #ecfdf5;
+  border-left: 4px solid #10b981;
+  color: #065f46;
+}
+
+.ai-list {
+  padding-left: 1.2rem;
+  margin: 0.25rem 0;
+  list-style-type: disc;
+}
+
+.ai-list li {
+  margin-bottom: 0.35rem;
+}
+
+/* Soporte también para etiquetas semánticas estándar dentro de respuestas validadas */
+.nexia-markdown h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0B2545;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.nexia-markdown p {
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.nexia-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.65rem 0;
+  font-size: 0.8rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.65rem;
+  overflow: hidden;
+  display: block;
+  overflow-x: auto;
+}
+
+.nexia-markdown thead {
+  background-color: #0B2545;
+  color: #ffffff;
+}
+
+.nexia-markdown th {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.74rem;
+}
+
+.nexia-markdown td {
+  padding: 0.55rem 0.8rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Animación de escritura (Typing dots) */
+@keyframes pulseDot {
+  0%, 80%, 100% { transform: scale(0.65); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+.typing-dot-1 { animation: pulseDot 1.4s infinite ease-in-out both; animation-delay: -0.32s; }
+.typing-dot-2 { animation: pulseDot 1.4s infinite ease-in-out both; animation-delay: -0.16s; }
+.typing-dot-3 { animation: pulseDot 1.4s infinite ease-in-out both; }

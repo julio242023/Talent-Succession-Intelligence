@@ -1,0 +1,9 @@
+{
+    "active_provider": "google",
+    "GCP_PROJECT": "core-agentspace-prd",
+    "GCP_LOCATION": "us-central1",
+    "GEMINI_MODEL": "gemini-2.5-flash",
+    "GEMINI_API_KEY": "",
+    "GOOGLE_APPLICATION_CREDENTIALS": "google_credentials.json",
+    "groq_api_key": ""
+}

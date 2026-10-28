@@ -1,0 +1,29 @@
+# Credenciales privadas GCP / API Keys (NUNCA subir a GitHub)
+config.json
+google_credentials.json
+core-agentspace-prd-*.json
+*.key
+*.pem
+.env
+.env.*
+
+# Caché de Python y entornos virtuales
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Scratch y archivos temporales de pruebas
+scratch/
+temp/
+*.log
+
+# Archivos de sistema operativo e IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.bat
