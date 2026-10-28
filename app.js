@@ -1744,19 +1744,12 @@ function streamTypewriterContent(targetElement, fullHtml, isLinear = false, onCo
       }
     }, speed);
   } else {
-    // Para tarjetas estructuradas, transición fluida de fade-in y elevación
-    targetElement.style.opacity = "0";
-    targetElement.style.transform = "translateY(8px)";
-    targetElement.style.transition = "opacity 0.22s ease-out, transform 0.22s ease-out";
+    // Para tarjetas estructuradas, transición fluida mediante clase CSS
+    targetElement.classList.add("animate-fade-in");
     targetElement.innerHTML = fullHtml;
-    
-    requestAnimationFrame(() => {
-      targetElement.style.opacity = "1";
-      targetElement.style.transform = "translateY(0)";
-      const container = document.getElementById("chat-messages-container");
-      if (container) container.scrollTop = container.scrollHeight;
-      if (typeof onComplete === "function") onComplete();
-    });
+    const container = document.getElementById("chat-messages-container");
+    if (container) container.scrollTop = container.scrollHeight;
+    if (typeof onComplete === "function") onComplete();
   }
 }
 
@@ -1791,11 +1784,6 @@ async function sendChatQuestion(questionText) {
   if (typingText) {
     if (clientIntent.route === "OPEN_ANALYSIS") {
       typingText.textContent = "🧠 Gemini IA analizando causas, correlaciones y estrategia con documento digerido...";
-    } else {
-      typingText.textContent = "⚡ Estructurando plantilla ejecutiva de reporte...";
-    }
-  } else if (clientIntent.route === "OPEN_ANALYSIS") {
-      typingText.textContent = "🧠 Motor Analítico de Talento analizando causas, correlaciones y estrategia...";
     } else {
       typingText.textContent = "⚡ Estructurando plantilla ejecutiva de reporte...";
     }
