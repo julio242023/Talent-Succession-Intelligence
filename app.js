@@ -1539,7 +1539,7 @@ function splitAgentResponseForWorkspace(validatedHtml, query, routeType, routeLa
   if (tablesCount > 0) {
     const totalRows = doc.querySelectorAll("tbody tr").length;
     narrativeBlocks.push(
-      `<p>📊 Se ${tablesCount === 1 ? "ha generado <strong>1 tabla ejecutiva</strong>" : `han generado <strong>${tablesCount} tablas ejecutivas</strong>`} (${totalRows} registros detallados) junto con los gráficos de distribución en el lienzo izquierdo.</p>`
+      `<p>📊 Se ${tablesCount === 1 ? "ha generado <strong>1 tabla ejecutiva</strong>" : `han generado <strong>${tablesCount} tablas ejecutivas</strong>`} (${totalRows} registros detallados) en una nueva pestaña del panel izquierdo.</p>`
     );
   }
 
@@ -1558,17 +1558,16 @@ function splitAgentResponseForWorkspace(validatedHtml, query, routeType, routeLa
         ${narrativeHtml}
       </div>
       <button type="button" data-focus-artifact="${escapeHtml(artifactId)}" class="ai-chat-canvas-btn">
-        <span>📊 Ver gráficos y tablas en el panel izquierdo: <strong>${escapeHtml(reportTitle.slice(0, 48))}</strong></span>
+        <span>📄 Ver resultado en el panel izquierdo: <strong>${escapeHtml(reportTitle.slice(0, 48))}</strong></span>
         <span>→</span>
       </button>
     </div>
   `;
 
   // Construir el contenido visual elaborado para el Lienzo Izquierdo (#ai-canvas-body)
-  const visualChartBlock = buildQueryVisualChartHtml(query, routeType, records);
+  // Los 2 gráficos generales viven únicamente en la primera pestaña ("HOME"); cada pestaña generada muestra solo su resultado específico
   const canvasVisualHtml = `
     <div class="space-y-4 animate-fade-in">
-      ${visualChartBlock}
       ${validatedHtml}
     </div>
   `;
@@ -1595,14 +1594,23 @@ function updateCanvasHistoryBar() {
     mobileBadge.textContent = artifacts.length > 0 ? `${artifacts.length} rep.` : "Vivo";
   }
 
-  if (artifacts.length === 0) {
-    bar.classList.add("hidden");
-    list.innerHTML = "";
-    return;
-  }
-
   bar.classList.remove("hidden");
-  list.innerHTML = artifacts
+  const isHomeActive = !state.activeArtifactId || state.activeArtifactId === "HOME";
+  const homeTabHtml = `
+    <div class="ai-history-chip-group ${isHomeActive ? "ai-history-chip-active" : ""}">
+      <button
+        type="button"
+        data-artifact-id="HOME"
+        class="ai-history-chip-btn"
+        title="Primera pestaña: Resumen con los 2 gráficos generales"
+      >
+        <span>📊</span>
+        <span>Resumen</span>
+      </button>
+    </div>
+  `;
+
+  const generatedTabsHtml = artifacts
     .map((art, idx) => {
       const isActive = state.activeArtifactId === art.id;
       const shortLabel =
@@ -1631,6 +1639,8 @@ function updateCanvasHistoryBar() {
       `;
     })
     .join("");
+
+  list.innerHTML = homeTabHtml + generatedTabsHtml;
 }
 
 /**
