@@ -32,7 +32,7 @@ const state = {
   pageSize: 12,
   activeTab: "analytics",
   drawerExpanded: false,
-  quickActionsCollapsed: false,
+  quickActionsCollapsed: true,
   quickActionsMode: "templates",
   chatHistory: [],
   canvasArtifacts: [],
@@ -215,15 +215,15 @@ const QUESTION_CATALOG = [
 
 // Metadata semántica de los 9 cuadrantes 9-Box
 const NINE_BOX_META = {
-  9: { name: "Estrella / Top Talent", short: "Top Talent", badgeClass: "bg-emerald-50 text-emerald-800 border-emerald-200", cellClass: "bg-emerald-50/70 border-emerald-300 text-emerald-950" },
-  8: { name: "Alto Potencial", short: "Alto Potencial", badgeClass: "bg-teal-50 text-teal-800 border-teal-200", cellClass: "bg-teal-50/70 border-teal-300 text-teal-950" },
-  7: { name: "Enigma / Potencial", short: "Enigma", badgeClass: "bg-sky-50 text-sky-800 border-sky-200", cellClass: "bg-sky-50/70 border-sky-300 text-sky-950" },
-  6: { name: "Futuro Líder", short: "Futuro Líder", badgeClass: "bg-blue-50 text-blue-800 border-blue-200", cellClass: "bg-blue-50/70 border-blue-200 text-blue-950" },
-  5: { name: "Talento Clave (Core)", short: "Talento Clave", badgeClass: "bg-indigo-50 text-indigo-800 border-indigo-200", cellClass: "bg-indigo-50/60 border-indigo-200 text-indigo-950" },
-  4: { name: "Profesional Confiable", short: "Confiable", badgeClass: "bg-slate-100 text-slate-700 border-slate-200", cellClass: "bg-slate-50 border-slate-200 text-slate-800" },
-  3: { name: "Especialista Efectivo", short: "Especialista", badgeClass: "bg-amber-50 text-amber-800 border-amber-200", cellClass: "bg-amber-50/60 border-amber-200 text-amber-950" },
-  2: { name: "En Observación", short: "Observación", badgeClass: "bg-orange-50 text-orange-800 border-orange-200", cellClass: "bg-orange-50/60 border-orange-200 text-orange-950" },
-  1: { name: "Bajo Desempeño", short: "Bajo Desemp.", badgeClass: "bg-rose-50 text-rose-800 border-rose-200", cellClass: "bg-rose-50/60 border-rose-200 text-rose-950" },
+  9: { name: "Estrella / Top Talent", short: "Top Talent", badgeClass: "bg-[#0B2545] text-white border-[#0B2545]", cellClass: "bg-slate-50/90 border-slate-200 text-[#0B2545]" },
+  8: { name: "Alto Potencial", short: "Alto Potencial", badgeClass: "bg-[#0B2545]/10 text-[#0B2545] border-[#0B2545]/20", cellClass: "bg-slate-50/70 border-slate-200 text-[#0B2545]" },
+  7: { name: "Enigma / Potencial", short: "Enigma", badgeClass: "bg-slate-100 text-[#0B2545] border-slate-200", cellClass: "bg-white border-slate-200 text-[#0B2545]" },
+  6: { name: "Futuro Líder", short: "Futuro Líder", badgeClass: "bg-[#0B2545]/10 text-[#0B2545] border-[#0B2545]/20", cellClass: "bg-slate-50/70 border-slate-200 text-[#0B2545]" },
+  5: { name: "Talento Clave (Core)", short: "Talento Clave", badgeClass: "bg-slate-100 text-slate-700 border-slate-200", cellClass: "bg-white border-slate-200 text-slate-800" },
+  4: { name: "Profesional Confiable", short: "Confiable", badgeClass: "bg-slate-100 text-slate-600 border-slate-200", cellClass: "bg-white border-slate-200 text-slate-700" },
+  3: { name: "Especialista Efectivo", short: "Especialista", badgeClass: "bg-slate-100 text-slate-700 border-slate-200", cellClass: "bg-white border-slate-200 text-slate-700" },
+  2: { name: "En Observación", short: "Observación", badgeClass: "bg-slate-100 text-slate-600 border-slate-200", cellClass: "bg-slate-50/50 border-slate-200 text-slate-700" },
+  1: { name: "Bajo Desempeño", short: "Bajo Desemp.", badgeClass: "bg-slate-200/80 text-slate-700 border-slate-300", cellClass: "bg-slate-100/60 border-slate-200 text-slate-700" },
 };
 
 function escapeHtml(str) {
@@ -735,14 +735,14 @@ function updateLiveCharts(scope) {
             {
               label: "Con Sucesor",
               data: riskWithSucc,
-              backgroundColor: "#1E63E9",
+              backgroundColor: "#0B2545",
               borderRadius: 6,
               barPercentage: 0.58,
             },
             {
               label: "Sin Sucesor (Brecha)",
               data: riskNoSucc,
-              backgroundColor: "#E11D48",
+              backgroundColor: "#94A3B8",
               borderRadius: 6,
               barPercentage: 0.58,
             },
@@ -816,7 +816,7 @@ function updateLiveCharts(scope) {
           datasets: [
             {
               data: readinessCounts,
-              backgroundColor: ["#10B981", "#1E63E9", "#F59E0B", "#F97316", "#E11D48"],
+              backgroundColor: ["#0B2545", "#1E3A8A", "#475569", "#94A3B8", "#CBD5E1"],
               borderWidth: 2,
               borderColor: "#FFFFFF",
               hoverOffset: 6,
@@ -950,7 +950,7 @@ function updateLiveCharts(scope) {
             {
               label: "Con Sucesor",
               data: compWithSucc,
-              backgroundColor: "#1E63E9",
+              backgroundColor: "#0B2545",
               borderRadius: 5,
             },
             {
@@ -962,7 +962,7 @@ function updateLiveCharts(scope) {
             {
               label: "Riesgo Alto",
               data: compHighRisk,
-              backgroundColor: "#E11D48",
+              backgroundColor: "#64748B",
               borderRadius: 5,
             },
           ],
@@ -1178,8 +1178,11 @@ function renderTable() {
 // ============================================================================
 // AGENTE CONVERSACIONAL IA — ENRUTADOR HÍBRIDO, MODOS Y VALIDADOR HTML
 // ============================================================================
-function setQuickActionsMode(mode) {
-  state.quickActionsMode = mode === "open" ? "open" : "templates";
+function setQuickActionsMode(mode, keepCollapsedState = false) {
+  const targetMode = mode === "open" ? "open" : "templates";
+  const isSameModeAndOpen = state.quickActionsMode === targetMode && !state.quickActionsCollapsed;
+  state.quickActionsMode = targetMode;
+
   const btnTemplates = document.getElementById("btn-mode-templates");
   const btnOpen = document.getElementById("btn-mode-open");
   const desc = document.getElementById("quick-actions-mode-desc");
@@ -1197,12 +1200,14 @@ function setQuickActionsMode(mode) {
   if (desc) {
     desc.innerHTML =
       state.quickActionsMode === "open"
-        ? "🧠 <strong>Preguntas Abiertas de Análisis y Estrategia (Gemini IA):</strong> Razonamiento sobre causas, planes de retención, vulnerabilidad y movilidad"
-        : "⚡ <strong>Plantillas Ejecutivas de Reporte (Mayoría de Casos):</strong> 1 clic para generar fichas, comparativas o tablas de riesgo";
+        ? "🧠 <strong>Sugerencias de Análisis IA:</strong> Estrategia, retención y movilidad"
+        : "⚡ <strong>Plantillas Ejecutivas:</strong> Selecciona una consulta rápida";
   }
 
-  toggleQuickActions(false);
   renderQuickActions();
+  if (!keepCollapsedState) {
+    toggleQuickActions(isSameModeAndOpen ? true : false);
+  }
 }
 
 function renderQuickActions() {
@@ -1363,7 +1368,7 @@ function buildQueryVisualChartHtml(query, routeType, records) {
           <div class="relative w-24 h-24 shrink-0 flex items-center justify-center">
             <svg class="w-24 h-24 -rotate-90" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#e2e8f0" stroke-width="3.8"></circle>
-              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#10b981" stroke-width="3.8" stroke-dasharray="${covPct} ${100 - covPct}" stroke-dashoffset="0"></circle>
+              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#0B2545" stroke-width="3.6" stroke-dasharray="${covPct} ${100 - covPct}" stroke-dashoffset="0"></circle>
             </svg>
             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
               <span class="text-sm font-extrabold text-[#0B2545]">${covPct}%</span>
@@ -1405,7 +1410,7 @@ function buildQueryVisualChartHtml(query, routeType, records) {
               <span class="font-extrabold text-emerald-700">${readyNow} pos.</span>
             </div>
             <svg class="w-full h-2.5 rounded-full overflow-hidden bg-slate-100" viewBox="0 0 200 10" preserveAspectRatio="none">
-              <rect x="0" y="0" width="${barW(readyNow)}" height="10" rx="5" fill="#10b981"></rect>
+              <rect x="0" y="0" width="${barW(readyNow)}" height="10" rx="5" fill="#0B2545"></rect>
             </svg>
           </div>
           <div>
@@ -1414,7 +1419,7 @@ function buildQueryVisualChartHtml(query, routeType, records) {
               <span class="font-extrabold text-blue-700">${ready1to2} pos.</span>
             </div>
             <svg class="w-full h-2.5 rounded-full overflow-hidden bg-slate-100" viewBox="0 0 200 10" preserveAspectRatio="none">
-              <rect x="0" y="0" width="${barW(ready1to2)}" height="10" rx="5" fill="#2563eb"></rect>
+              <rect x="0" y="0" width="${barW(ready1to2)}" height="10" rx="5" fill="#334155"></rect>
             </svg>
           </div>
           <div>
@@ -1423,7 +1428,7 @@ function buildQueryVisualChartHtml(query, routeType, records) {
               <span class="font-extrabold text-amber-700">${ready3to5} pos.</span>
             </div>
             <svg class="w-full h-2.5 rounded-full overflow-hidden bg-slate-100" viewBox="0 0 200 10" preserveAspectRatio="none">
-              <rect x="0" y="0" width="${barW(ready3to5)}" height="10" rx="5" fill="#f59e0b"></rect>
+              <rect x="0" y="0" width="${barW(ready3to5)}" height="10" rx="5" fill="#94A3B8"></rect>
             </svg>
           </div>
         </div>
@@ -1442,117 +1447,38 @@ function renderCanvasHomeOverview() {
   const titleEl = document.getElementById("ai-canvas-title");
   const badgeEl = document.getElementById("ai-canvas-route-badge");
   const followupsEl = document.getElementById("ai-canvas-followups");
+  const closeBtn = document.getElementById("btn-close-active-artifact");
 
   if (!canvasBody) return;
 
   const records = state.records || [];
   const total = records.length || 101;
-  const withSuc = records.filter((r) => r.tiene_sucesor === "Sí").length;
-  const withoutSuc = total - withSuc;
-  const covPct = Math.round((withSuc / Math.max(total, 1)) * 1000) / 10;
-  const readyNow = records.filter((r) => r.readiness === "Inmediato").length;
-  const redAlerts = records.filter((r) => r.riesgo === "Alto" && r.tiene_sucesor !== "Sí").length;
+  const companiesCount = new Set(records.map((r) => r.empresa).filter(Boolean)).size || 12;
 
   if (titleEl) {
-    titleEl.textContent = `Panorama General de Sucesión (${total} Posiciones · 12 Empresas)`;
+    titleEl.textContent = `Resumen Ejecutivo (${total} posiciones · ${companiesCount} empresas)`;
   }
   if (badgeEl) {
     badgeEl.className = "ai-route-badge-template shrink-0";
-    badgeEl.innerHTML = `<span>📊</span><span>Lienzo Ejecutivo en Vivo</span>`;
+    badgeEl.innerHTML = "<span>📊</span><span>Resumen</span>";
+  }
+  if (closeBtn) {
+    closeBtn.classList.add("hidden");
+    closeBtn.classList.remove("inline-flex");
   }
   if (followupsEl) {
     followupsEl.classList.add("hidden");
     followupsEl.innerHTML = "";
   }
 
-  // Agrupar resumen por empresa
-  const companyMap = {};
-  records.forEach((r) => {
-    const c = r.empresa || "Sin Empresa";
-    if (!companyMap[c]) {
-      companyMap[c] = { empresa: c, total: 0, conSucesor: 0, sinSucesor: 0, riesgoAlto: 0, alertasRojas: 0, topTalent: 0 };
-    }
-    companyMap[c].total += 1;
-    if (r.tiene_sucesor === "Sí") companyMap[c].conSucesor += 1;
-    else companyMap[c].sinSucesor += 1;
-    if (r.riesgo === "Alto") companyMap[c].riesgoAlto += 1;
-    if (r.riesgo === "Alto" && r.tiene_sucesor !== "Sí") companyMap[c].alertasRojas += 1;
-    if (Number(r.nine_box) >= 8) companyMap[c].topTalent += 1;
-  });
-
-  const companyRows = Object.values(companyMap)
-    .sort((a, b) => b.total - a.total)
-    .map((c) => {
-      const pct = Math.round((c.conSucesor / Math.max(c.total, 1)) * 100);
-      const badgeClass = pct >= 70 ? "ai-badge-green" : pct >= 50 ? "ai-badge-amber" : "ai-badge-red";
-      return `
-        <tr>
-          <td class="font-bold text-[#0B2545]">
-            <button type="button" data-quick-question="Comparación de empresas: foco en ${escapeHtml(c.empresa)}" class="hover:text-blue-700 hover:underline text-left font-bold">
-              ${escapeHtml(c.empresa)}
-            </button>
-          </td>
-          <td><strong>${c.total}</strong></td>
-          <td><span class="ai-badge ${badgeClass}">${c.conSucesor} (${pct}%)</span></td>
-          <td>${c.sinSucesor}</td>
-          <td>${c.alertasRojas > 0 ? `<span class="ai-badge ai-badge-red">${c.alertasRojas} crítica(s)</span>` : `<span class="ai-badge ai-badge-green">0</span>`}</td>
-          <td><span class="ai-badge ai-badge-indigo">${c.topTalent}</span></td>
-        </tr>
-      `;
-    })
-    .join("");
+  const chartsHtml = buildQueryVisualChartHtml("", "TEMPLATE", records);
 
   canvasBody.innerHTML = `
-    <div class="ai-structured-response">
-      ${buildQueryVisualChartHtml("", "TEMPLATE", records)}
-
-      <div class="ai-html-card">
-        <div class="ai-html-header">
-          <div>
-            <h4 class="ai-html-title">Resumen Consolidado del Talent Pool · Grupo Breca</h4>
-            <p class="ai-html-subtitle">Selecciona cualquier consulta en el chat derecho para proyectar aquí fichas, tablas, gráficos y planes de acción</p>
-          </div>
-          <span class="ai-badge ai-badge-navy">${total} Posiciones</span>
-        </div>
-        <div class="ai-html-body">
-          <div class="ai-kpi-grid">
-            <div class="ai-kpi-box">
-              <span class="ai-kpi-label">Total Evaluados</span>
-              <span class="ai-kpi-value">${total}</span>
-            </div>
-            <div class="ai-kpi-box">
-              <span class="ai-kpi-label">Cobertura Sucesión</span>
-              <span class="ai-kpi-value">${covPct}% (${withSuc})</span>
-            </div>
-            <div class="ai-kpi-box">
-              <span class="ai-kpi-label">Sucesión Inmediata</span>
-              <span class="ai-kpi-value">${readyNow} Ready Now</span>
-            </div>
-            <div class="ai-kpi-box">
-              <span class="ai-kpi-label">Alertas Rojas</span>
-              <span class="ai-kpi-value">${redAlerts} Críticas</span>
-            </div>
-          </div>
-
-          <div class="ai-section-title">🏢 Matriz Comparativa por Empresa (Haz clic en una empresa para profundizar)</div>
-          <div class="ai-table-wrap">
-            <table class="ai-table">
-              <thead>
-                <tr>
-                  <th>Empresa</th>
-                  <th>Posiciones</th>
-                  <th>Cobertura</th>
-                  <th>Sin Sucesor</th>
-                  <th>Alerta Roja (Alto s/suc)</th>
-                  <th>Top Talent (8-9)</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${companyRows}
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <div class="space-y-4">
+      ${chartsHtml}
+      <div class="px-4 py-3 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between gap-3 text-xs text-slate-500">
+        <span>Escribe una consulta en el chat para abrir tablas o análisis detallados en nuevas ventanas.</span>
+        <span class="text-[11px] font-semibold text-[#0B2545] shrink-0">${total} registros</span>
       </div>
     </div>
   `;
@@ -1560,11 +1486,6 @@ function renderCanvasHomeOverview() {
   updateCanvasHistoryBar();
 }
 
-/**
- * Separa la respuesta generada por el Agente IA en dos componentes complementarios:
- * 1. chatConversationalHtml (Lado Derecho): Estado de ejecución ("¡Todo listo!") + Análisis textual conversacional (sin tablas ni grillas pesadas) + botón para enfocar el reporte en el lienzo izquierdo.
- * 2. canvasVisualHtml (Lado Izquierdo): Gráficos SVG contextuales + Tarjetas KPI + Tablas ejecutivas + Fichas detalladas + Planes de acción.
- */
 function splitAgentResponseForWorkspace(validatedHtml, query, routeType, routeLabel, isLiveGemini, records, artifactId) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(validatedHtml, "text/html");
@@ -1681,25 +1602,58 @@ function updateCanvasHistoryBar() {
   }
 
   bar.classList.remove("hidden");
-  const homeActive = state.activeArtifactId === "HOME" ? "ai-history-chip-active" : "";
-  const chipsHtml = [
-    `<button type="button" data-artifact-id="HOME" class="ai-history-chip ${homeActive}">
-      <span>🏠</span>
-      <span>Base</span>
-    </button>`,
-    ...artifacts.map((art, idx) => {
-      const isActive = state.activeArtifactId === art.id ? "ai-history-chip-active" : "";
-      const shortTitle = art.title.length > 26 ? art.title.slice(0, 26) + "…" : art.title;
+  list.innerHTML = artifacts
+    .map((art, idx) => {
+      const isActive = state.activeArtifactId === art.id;
+      const shortLabel =
+        art.title.length > 26 ? art.title.slice(0, 24) + "…" : art.title;
       return `
-        <button type="button" data-artifact-id="${escapeHtml(art.id)}" class="ai-history-chip ${isActive}" title="${escapeHtml(art.query)}">
-          <span>#${idx + 1}</span>
-          <span>${escapeHtml(shortTitle)}</span>
-        </button>
+        <div class="ai-history-chip-group ${isActive ? "ai-history-chip-active" : ""}">
+          <button
+            type="button"
+            data-artifact-id="${escapeHtml(art.id)}"
+            class="ai-history-chip-btn"
+            title="${escapeHtml(art.query || art.title)}"
+          >
+            <span>#${idx + 1}</span>
+            <span>${escapeHtml(shortLabel)}</span>
+          </button>
+          <button
+            type="button"
+            data-delete-artifact="${escapeHtml(art.id)}"
+            class="ai-history-chip-close"
+            title="Cerrar ventana"
+            aria-label="Cerrar ventana ${escapeHtml(shortLabel)}"
+          >
+            ✕
+          </button>
+        </div>
       `;
-    }),
-  ].join("");
+    })
+    .join("");
+}
 
-  list.innerHTML = chipsHtml;
+/**
+ * Elimina/cierra una ventana de resultado generada en el Lienzo Izquierdo.
+ * Si era la ventana activa, pasa a la anterior disponible o regresa a los 2 gráficos base ("HOME").
+ */
+function deleteCanvasArtifact(artifactId) {
+  if (!Array.isArray(state.canvasArtifacts)) return;
+  const idx = state.canvasArtifacts.findIndex((a) => a.id === artifactId);
+  if (idx === -1) return;
+
+  state.canvasArtifacts.splice(idx, 1);
+
+  if (state.activeArtifactId === artifactId) {
+    if (state.canvasArtifacts.length > 0) {
+      const nextArt = state.canvasArtifacts[Math.max(0, idx - 1)];
+      renderActiveCanvasArtifact(nextArt.id);
+    } else {
+      renderCanvasHomeOverview();
+    }
+  } else {
+    updateCanvasHistoryBar();
+  }
 }
 
 /**
@@ -1722,12 +1676,17 @@ function renderActiveCanvasArtifact(artifactId) {
   const titleEl = document.getElementById("ai-canvas-title");
   const badgeEl = document.getElementById("ai-canvas-route-badge");
   const followupsEl = document.getElementById("ai-canvas-followups");
+  const closeBtn = document.getElementById("btn-close-active-artifact");
 
   if (titleEl) titleEl.textContent = art.title || art.query;
+  if (closeBtn) {
+    closeBtn.classList.remove("hidden");
+    closeBtn.classList.add("inline-flex");
+  }
   if (badgeEl) {
     const isOpen = art.routeType === "OPEN_ANALYSIS";
     badgeEl.className = isOpen ? "ai-route-badge-open shrink-0" : "ai-route-badge-template shrink-0";
-    badgeEl.innerHTML = `<span>${art.isLiveGemini ? "✨" : isOpen ? "🧠" : "⚡"}</span><span>${escapeHtml(art.routeLabel)}</span>`;
+    badgeEl.innerHTML = `<span>${art.isLiveGemini ? "✨" : isOpen ? "🧠" : "⚡"}</span><span>${escapeHtml(art.routeLabel || "Reporte")}</span>`;
   }
 
   if (canvasBody) {
@@ -1741,7 +1700,7 @@ function renderActiveCanvasArtifact(artifactId) {
       followupsEl.classList.remove("hidden");
       followupsEl.innerHTML = `
         <div class="ai-followup-bar">
-          <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mr-1">Profundizar análisis:</span>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Profundizar:</span>
           ${art.followUps
             .map(
               (fq) =>
@@ -1762,54 +1721,53 @@ function renderActiveCanvasArtifact(artifactId) {
   updateCanvasHistoryBar();
 }
 
-/**
- * Reinicia la sesión de conversación y el Lienzo Izquierdo, mostrando el saludo conversacional
- * a la derecha y el Panorama Ejecutivo Base (gráficos y tabla de 12 empresas) a la izquierda.
- */
 function startNewChatSession() {
   state.chatHistory = [];
+  state.lastEntityPerson = null;
   state.canvasArtifacts = [];
   state.activeArtifactId = "HOME";
-
-  const catalogPanel = document.getElementById("catalog-panel");
-  if (catalogPanel) catalogPanel.classList.add("hidden");
-  toggleQuickActions(false);
-
-  const input = document.getElementById("chat-input");
-  if (input) input.value = "";
-
-  renderCanvasHomeOverview();
-
   const container = document.getElementById("chat-messages-container");
   if (!container) return;
 
+  const total = state.records.length || 101;
+  const companiesCount = new Set(state.records.map((r) => r.empresa)).size || 12;
+
+  setQuickActionsMode("templates", true);
+  toggleQuickActions(true);
+  renderCanvasHomeOverview();
+
   container.innerHTML = `
-    <div class="flex items-start gap-3">
-      <div class="w-8 h-8 rounded-xl bg-[#0B2545] text-white flex items-center justify-center text-xs font-extrabold shrink-0 shadow-sm">
+    <div class="flex items-start gap-2.5">
+      <div class="w-7 h-7 rounded-lg bg-[#0B2545] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
         IA
       </div>
-      <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-200/90 shadow-sm max-w-[94%]">
-        <p class="ai-linear-response">
-          ¡Hola! 👋 Bienvenido al <strong>Espacio de Trabajo Dividido</strong> del Agente IA. Aquí en el <strong>chat derecho</strong> conversaremos con el estado de ejecución y el <strong>análisis textual</strong>, mientras que en el <strong>lienzo izquierdo</strong> se proyectarán automáticamente los <strong>gráficos, tablas ejecutivas, fichas y matrices</strong>.
+      <div class="chat-bubble-ai rounded-2xl rounded-tl-sm px-4 py-3 text-xs text-slate-700 max-w-[94%] leading-relaxed">
+        <p class="font-bold text-[#0B2545] mb-1">Asistente Ejecutivo (${total} posiciones · ${companiesCount} empresas)</p>
+        <p class="text-slate-600">
+          Escribe tu consulta abajo o haz clic en <button type="button" data-expand-quick="true" class="font-semibold text-[#0B2545] underline hover:text-blue-700">Ver plantillas</button> si deseas revisar sugerencias rápidas.
         </p>
       </div>
     </div>
   `;
 }
 
-function toggleQuickActions(forceState) {
+function toggleQuickActions(forceCollapse) {
   const section = document.getElementById("quick-actions-section");
-  const collapseBtn = document.getElementById("btn-collapse-quick-actions");
+  const btnCollapse = document.getElementById("btn-collapse-quick-actions");
   if (!section) return;
-  state.quickActionsCollapsed =
-    typeof forceState === "boolean" ? forceState : !state.quickActionsCollapsed;
+
+  if (typeof forceCollapse === "boolean") {
+    state.quickActionsCollapsed = forceCollapse;
+  } else {
+    state.quickActionsCollapsed = !state.quickActionsCollapsed;
+  }
 
   if (state.quickActionsCollapsed) {
     section.classList.add("hidden");
-    if (collapseBtn) collapseBtn.textContent = "Mostrar sugerencias ▼";
+    if (btnCollapse) btnCollapse.textContent = "Ver plantillas ▼";
   } else {
     section.classList.remove("hidden");
-    if (collapseBtn) collapseBtn.textContent = "Ocultar ▲";
+    if (btnCollapse) btnCollapse.textContent = "Ocultar ▲";
   }
 }
 
@@ -3086,7 +3044,18 @@ function bindEventListeners() {
   document.getElementById("btn-canvas-home")?.addEventListener("click", () => {
     renderCanvasHomeOverview();
   });
+  document.getElementById("btn-close-active-artifact")?.addEventListener("click", () => {
+    if (state.activeArtifactId && state.activeArtifactId !== "HOME") {
+      deleteCanvasArtifact(state.activeArtifactId);
+    }
+  });
   document.getElementById("ai-canvas-history-list")?.addEventListener("click", (e) => {
+    const delBtn = e.target.closest("button[data-delete-artifact]");
+    if (delBtn) {
+      e.stopPropagation();
+      deleteCanvasArtifact(delBtn.getAttribute("data-delete-artifact"));
+      return;
+    }
     const btn = e.target.closest("button[data-artifact-id]");
     if (!btn) return;
     renderActiveCanvasArtifact(btn.getAttribute("data-artifact-id"));

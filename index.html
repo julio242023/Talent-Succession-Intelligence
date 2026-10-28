@@ -36,7 +36,7 @@
       <!-- Identidad Corporativa Centria + Título del Módulo -->
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-3 header-glass-pill rounded-2xl px-3.5 py-2">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-400 via-blue-600 to-[#C2185B] flex items-center justify-center font-extrabold text-white text-base shadow-inner">
+          <div class="w-9 h-9 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center font-extrabold text-white text-base">
             C
           </div>
           <div class="leading-none pr-1">
@@ -57,9 +57,7 @@
               <span id="header-live-doc-badge">Reporte 2026 · 101 posiciones</span>
             </span>
           </div>
-          <p class="text-xs text-blue-100/80 hidden md:block mt-0.5">
-            Dashboard analítico en vivo y directorio corporativo de talento clave y sucesión
-          </p>
+
         </div>
       </div>
 
@@ -120,7 +118,7 @@
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 class="text-xs font-extrabold uppercase tracking-widest text-slate-400">
-            Indicadores Clave en Tiempo Real (Conectados a 2026_Reporte_Sucesion.xlsx)
+            Resumen Ejecutivo · 101 Posiciones
           </h2>
         </div>
 
@@ -184,12 +182,12 @@
         <button id="kpi-card-coverage" type="button" class="kpi-card-interactive p-3.5 sm:p-5 lg:p-6 text-left flex items-start justify-between group" title="Clic para filtrar posiciones sin sucesor">
           <div>
             <span class="text-xs font-semibold text-slate-500">Cobertura de Sucesión</span>
-            <div id="kpi-coverage" class="text-3xl sm:text-4xl font-extrabold text-blue-600 mt-1.5 tabular-nums">77.2%</div>
+            <div id="kpi-coverage" class="text-3xl sm:text-4xl font-extrabold text-[#0B2545] mt-1.5 tabular-nums">77.2%</div>
             <p id="kpi-coverage-sub" class="text-xs text-slate-500 mt-3 font-medium tabular-nums">
               78 con sucesor · <span class="text-rose-600 font-semibold">23 sin sucesor</span>
             </p>
           </div>
-          <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+          <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-slate-100 text-[#0B2545] flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -201,14 +199,14 @@
           <div>
             <span class="text-xs font-semibold text-slate-500">Sucesión Inmediata</span>
             <div class="flex items-baseline gap-2.5 mt-1.5">
-              <span id="kpi-ready-now" class="text-3xl sm:text-4xl font-extrabold text-emerald-600 tabular-nums">16</span>
+              <span id="kpi-ready-now" class="text-3xl sm:text-4xl font-extrabold text-[#0B2545] tabular-nums">16</span>
               <span id="kpi-ready-pct" class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg tabular-nums">15.8% Ready Now</span>
             </div>
             <p class="text-xs text-slate-500 mt-3 font-medium tabular-nums">
               Talento 9-Box 8 y 9: <span id="kpi-top-talent" class="font-bold text-slate-700">24</span> (<span id="kpi-top-talent-sub">23.8%</span>)
             </p>
           </div>
-          <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-slate-100 text-[#0B2545] flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -220,7 +218,7 @@
           <div>
             <span class="text-xs font-semibold text-slate-500">Riesgo de Pérdida Alto</span>
             <div class="flex items-baseline gap-2 mt-1.5">
-              <span id="kpi-high-risk" class="text-3xl sm:text-4xl font-extrabold text-rose-600 tabular-nums">31</span>
+              <span id="kpi-high-risk" class="text-3xl sm:text-4xl font-extrabold text-[#0B2545] tabular-nums">31</span>
               <span class="text-xs text-slate-400 font-medium">posiciones</span>
             </div>
             <div class="mt-3">
@@ -229,7 +227,7 @@
               </span>
             </div>
           </div>
-          <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+          <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-slate-100 text-[#0B2545] flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -252,12 +250,12 @@
           <div>
             <div class="flex flex-wrap items-start justify-between gap-3 mb-5">
               <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 block mb-0.5">
+                <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 block mb-0.5">
                   Mapa de Talento · Desempeño vs. Potencial
                 </span>
                 <h2 class="text-lg font-bold text-[#0B2545]">Matriz Corporativa 9-Box</h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                  Haz clic en cualquier cuadrante para explorar las posiciones en la base de datos
+                  Clic en un cuadrante para filtrar
                 </p>
               </div>
               <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-[#0B2545]">
@@ -282,12 +280,12 @@
         <div class="lg:col-span-5 executive-card p-6 sm:p-7 flex flex-col justify-between">
           <div>
             <div class="mb-4">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-rose-600 block mb-0.5">
+              <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 block mb-0.5">
                 Vulnerabilidad de Retención
               </span>
               <h2 class="text-lg font-bold text-[#0B2545]">Riesgo de Pérdida vs. Cobertura</h2>
               <p class="text-xs text-slate-500 mt-0.5">
-                Comparativa en vivo de posiciones con y sin sucesor según nivel de riesgo de fuga
+                Posiciones con y sin sucesor por nivel de riesgo
               </p>
             </div>
 
@@ -313,12 +311,12 @@
           <div>
             <div class="flex items-start justify-between gap-3 mb-4">
               <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 block mb-0.5">
+                <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 block mb-0.5">
                   Madurez de Reemplazo
                 </span>
                 <h2 class="text-lg font-bold text-[#0B2545]">Pipeline por Horizonte de Readiness</h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                  Distribución del tiempo requerido para que los sucesores asuman el rol
+                  Disponibilidad temporal de sucesores
                 </p>
               </div>
             </div>
@@ -339,12 +337,12 @@
           <div>
             <div class="flex items-start justify-between gap-3 mb-4">
               <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 block mb-0.5">
+                <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 block mb-0.5">
                   Arquitectura Organizacional
                 </span>
                 <h2 class="text-lg font-bold text-[#0B2545]">Nivel Jerárquico y Cargos de Valor</h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                  Concentración de posiciones críticas (Cargos de Valor) frente a roles estándar por nivel
+                  Cargos críticos vs. roles estándar por nivel
                 </p>
               </div>
             </div>
@@ -370,12 +368,12 @@
           <div>
             <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
               <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 block mb-0.5">
+                <span class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 block mb-0.5">
                   Benchmarking Grupo Breca
                 </span>
                 <h2 class="text-lg font-bold text-[#0B2545]">Cobertura y Riesgo por Unidad de Negocio</h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                  Comparativa en vivo de posiciones con sucesor, brechas y riesgo alto por empresa
+                  Cobertura y riesgo alto por empresa
                 </p>
               </div>
             </div>
@@ -402,7 +400,7 @@
                 </span>
                 <h2 class="text-lg font-bold text-[#0B2545]">Posiciones con Riesgo Alto Sin Sucesor</h2>
                 <p class="text-xs text-slate-500 mt-0.5">
-                  Talentos con alta probabilidad de salida y sin reemplazo identificado
+                  Prioridad inmediata de retención y reemplazo
                 </p>
               </div>
             </div>
@@ -639,7 +637,7 @@
               </span>
             </div>
             <p id="drawer-engine-badge" class="text-[11px] text-blue-100/85 mt-0.5 truncate">
-              Izquierda: Gráficos y Tablas Ejecutivas · Derecha: Chat y Análisis Textual · 101 posiciones
+              Panel visual y asistente ejecutivo · 101 posiciones
             </p>
           </div>
         </div>
@@ -742,13 +740,22 @@
 
             <div class="flex items-center gap-1.5 shrink-0">
               <button
+                id="btn-close-active-artifact"
+                type="button"
+                class="hidden px-2.5 py-1 rounded-lg border border-rose-200/80 bg-rose-50 hover:bg-rose-100 text-[11px] font-semibold text-rose-700 transition-colors items-center gap-1"
+                title="Cerrar esta ventana de resultado"
+              >
+                <span>✕</span>
+                <span>Cerrar ventana</span>
+              </button>
+              <button
                 id="btn-canvas-home"
                 type="button"
-                class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-bold text-slate-700 transition-colors inline-flex items-center gap-1"
-                title="Ver resumen visual general del Talent Pool"
+                class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[11px] font-semibold text-[#0B2545] transition-colors inline-flex items-center gap-1"
+                title="Volver a los dos gráficos iniciales"
               >
-                <span>🏠</span>
-                <span>Panorama Base</span>
+                <span>📊</span>
+                <span>Inicio</span>
               </button>
             </div>
           </div>
@@ -818,18 +825,18 @@
             <button
               id="btn-collapse-quick-actions"
               type="button"
-              class="text-[11px] font-bold text-slate-500 hover:text-[#0B2545] px-2 py-1 rounded-md hover:bg-slate-200/60 transition-colors whitespace-nowrap shrink-0"
-              title="Mostrar u ocultar el panel de sugerencias rápidas"
+              class="text-[11px] font-semibold text-slate-500 hover:text-[#0B2545] px-2 py-1 rounded-md hover:bg-slate-200/60 transition-colors whitespace-nowrap shrink-0"
+              title="Mostrar u ocultar plantillas sugeridas"
             >
-              Ocultar ▲
+              Ver plantillas ▼
             </button>
           </div>
 
-          <!-- Sección de Sugerencias Rápidas (Conmuta entre 6 Plantillas y 6 Preguntas Abiertas de Análisis IA) -->
-          <div id="quick-actions-section" class="bg-slate-50/90 border-b border-slate-200 px-4 py-2.5 shrink-0">
+          <!-- Sección de Sugerencias Rápidas (Oculta por defecto para mantener diseño minimalista) -->
+          <div id="quick-actions-section" class="hidden bg-slate-50/90 border-b border-slate-200 px-4 py-2.5 shrink-0">
             <div class="flex items-center justify-between mb-2">
-              <span id="quick-actions-mode-desc" class="text-[11px] font-bold text-slate-600">
-                ⚡ Plantillas Ejecutivas de Reporte (1 clic para proyectar tablas y gráficos a la izquierda)
+              <span id="quick-actions-mode-desc" class="text-[11px] font-semibold text-slate-500">
+                ⚡ Selecciona una plantilla para abrir su reporte a la izquierda
               </span>
             </div>
             <div id="quick-actions-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -869,7 +876,7 @@
               <textarea
                 id="chat-input"
                 rows="1"
-                placeholder="Escribe tu consulta... (El análisis textual irá aquí y las tablas/gráficos a la izquierda)"
+                placeholder="Escribe tu consulta sobre talento o sucesión..."
                 class="flex-1 bg-transparent border-0 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none resize-none py-1 leading-relaxed max-h-24"
               ></textarea>
               <button
@@ -884,7 +891,7 @@
               </button>
             </div>
             <div class="flex items-center justify-between mt-1.5 px-1 text-[10px] text-slate-400">
-              <span>💬 <strong class="text-slate-600">Chat:</strong> Análisis textual · 📊 <strong class="text-blue-700">Izquierda:</strong> Gráficos y Tablas</span>
+              <span>Resultados visuales en el panel izquierdo</span>
               <span class="hidden sm:inline">Enter para enviar</span>
             </div>
           </form>

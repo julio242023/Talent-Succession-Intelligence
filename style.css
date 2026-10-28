@@ -58,8 +58,8 @@ p, li {
 }
 
 .centria-accent-bar {
-  height: 3px;
-  background: linear-gradient(90deg, #2563eb 0%, #38bdf8 55%, #C2185B 100%);
+  height: 2px;
+  background: linear-gradient(90deg, #0b2545 0%, #1e3a8a 60%, #475569 100%);
 }
 
 .header-glass-pill {
@@ -1041,4 +1041,108 @@ p, li {
   .ai-canvas-visual-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ============================================================================
+   REFINAMIENTO MINIMALISTA UX/UI (AZUL PROFUNDO #0B2545 + BLANCO + GRIS SUAVE)
+   ============================================================================ */
+body {
+  background-color: #f4f6f9;
+  color: #0b2545;
+}
+
+.executive-card,
+.kpi-card-interactive {
+  background: #ffffff;
+  border-radius: 1.15rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(11, 37, 69, 0.03);
+}
+
+.kpi-card-interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -4px rgba(11, 37, 69, 0.06);
+  border-color: #cbd5e1;
+}
+
+.ai-floating-workspace {
+  border-radius: 1.25rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 24px 48px -12px rgba(11, 37, 69, 0.22);
+}
+
+.ai-canvas-chart-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.15rem 1.25rem;
+  box-shadow: 0 1px 2px rgba(11, 37, 69, 0.03);
+}
+
+.ai-html-card {
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(11, 37, 69, 0.03);
+}
+
+.ai-html-card-header {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.ai-history-chip-group {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  transition: all 0.15s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ai-history-chip-group:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.ai-history-chip-group.ai-history-chip-active {
+  background: #0b2545;
+  color: #ffffff;
+  border-color: #0b2545;
+  box-shadow: 0 2px 6px rgba(11, 37, 69, 0.16);
+}
+
+.ai-history-chip-btn {
+  padding: 0.25rem 0.55rem 0.25rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: inherit;
+}
+
+.ai-history-chip-close {
+  padding: 0.25rem 0.6rem 0.25rem 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  color: inherit;
+  opacity: 0.65;
+  transition: all 0.15s ease;
+  border-left: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.ai-history-chip-close:hover {
+  opacity: 1;
+  background: rgba(225, 29, 72, 0.14);
+  color: #e11d48;
+}
+
+.ai-history-chip-group.ai-history-chip-active .ai-history-chip-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fecdd3;
 }
