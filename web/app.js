@@ -1406,6 +1406,282 @@ function validateAndSanitizeAgentHtml(rawResponse, isLinearHint = false) {
   };
 }
 
+
+// ============================================================================
+// GESTIÓN DE GOOGLE GEMINI API KEY & CONSULTA EN VIVO EN CLIENTE (GITHUB PAGES)
+// ============================================================================
+const GEMINI_STORAGE_KEY = "centria_gemini_api_key";
+
+function getStoredGeminiKey() {
+  try {
+    return localStorage.getItem(GEMINI_STORAGE_KEY) || "";
+  } catch (_e) {
+    return "";
+  }
+}
+
+function setStoredGeminiKey(key) {
+  try {
+    if (key && key.trim()) {
+      localStorage.setItem(GEMINI_STORAGE_KEY, key.trim());
+    } else {
+      localStorage.removeItem(GEMINI_STORAGE_KEY);
+    }
+  } catch (_e) {}
+}
+
+function openGeminiKeyModal() {
+  const overlay = document.getElementById("gemini-key-modal-overlay");
+  const input = document.getElementById("gemini-api-key-input");
+  const statusEl = document.getElementById("gemini-key-status");
+  const resultEl = document.getElementById("gemini-test-result");
+  if (!overlay) return;
+
+  const currentKey = getStoredGeminiKey();
+  if (input) input.value = currentKey;
+  if (resultEl) {
+    resultEl.className = "hidden text-xs p-3 rounded-xl";
+    resultEl.textContent = "";
+  }
+  if (statusEl) {
+    if (currentKey) {
+      statusEl.textContent = "Activa (guardada localmente)";
+      statusEl.className = "text-emerald-600 font-bold";
+    } else {
+      statusEl.textContent = "No configurada";
+      statusEl.className = "text-slate-400 font-medium";
+    }
+  }
+
+  overlay.classList.remove("hidden");
+}
+
+function closeGeminiKeyModal() {
+  const overlay = document.getElementById("gemini-key-modal-overlay");
+  if (overlay) overlay.classList.add("hidden");
+}
+
+async function testGeminiKeyConnection(apiKey) {
+  const key = (apiKey || "").trim();
+  if (!key) throw new Error("Por favor ingresa una API Key.");
+
+  const model = "gemini-2.5-flash";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+  
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ role: "user", parts: [{ text: "Responde únicamente la palabra CONECTADO para verificar la API." }] }],
+      generationConfig: { maxOutputTokens: 20, temperature: 0.1 }
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}: Clave inválida o sin permisos.`);
+  }
+
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  return text.trim() || "CONECTADO";
+}
+
+function sliceRecordsForClient(query, records) {
+  const qNorm = String(query || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const allRecords = Array.isArray(records) ? records : [];
+  
+  const companies = [...new Set(allRecords.map(r => r.empresa).filter(Boolean))];
+  const matchedCompany = companies.find(c => {
+    const cNorm = c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    return qNorm.includes(cNorm);
+  });
+
+  let filtered = allRecords;
+  if (matchedCompany) {
+    filtered = allRecords.filter(r => r.empresa === matchedCompany);
+  }
+
+  const mentioned = allRecords.filter(r => {
+    const nameNorm = (r.nombre || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const parts = nameNorm.split(/\s+/).filter(p => p.length >= 4);
+    return parts.some(p => qNorm.includes(p));
+  });
+
+  let sliced = [];
+  if (mentioned.length > 0) {
+    const mentionedNames = new Set(mentioned.map(m => m.nombre));
+    const extra = allRecords.filter(r => mentionedNames.has(r.sucesor));
+    sliced = [...new Set([...mentioned, ...extra])];
+  } else if (matchedCompany) {
+    sliced = filtered.slice(0, 30);
+  } else if (qNorm.includes("riesgo alto") || qNorm.includes("sin sucesor") || qNorm.includes("alerta")) {
+    sliced = allRecords.filter(r => r.riesgo === "Alto" || r.tiene_sucesor === "No").slice(0, 25);
+  } else if (qNorm.includes("inmediato") || qNorm.includes("ready now")) {
+    sliced = allRecords.filter(r => r.readiness === "Inmediato").slice(0, 25);
+  } else if (qNorm.includes("9box") || qNorm.includes("top talent") || qNorm.includes("estrella")) {
+    sliced = allRecords.filter(r => Number(r.nine_box) >= 8).slice(0, 25);
+  } else {
+    const critical = allRecords.filter(r => r.cargo_valor === "Sí");
+    const highRisk = allRecords.filter(r => r.riesgo === "Alto" && r.tiene_sucesor === "No");
+    const top9 = allRecords.filter(r => Number(r.nine_box) >= 8);
+    sliced = [...new Set([...highRisk, ...critical.slice(0, 10), ...top9.slice(0, 10)])].slice(0, 25);
+  }
+
+  const compactRecords = sliced.map(r => ({
+    empresa: r.empresa,
+    nombre: r.nombre,
+    posicion: r.posicion,
+    nivel: r.nivel,
+    ggs: r.ggs,
+    nine_box: r.nine_box,
+    riesgo: r.riesgo,
+    cargo_valor: r.cargo_valor,
+    tiempo_posicion: r.tiempo_posicion,
+    tiene_sucesor: r.tiene_sucesor,
+    sucesor: r.sucesor,
+    readiness: r.readiness,
+    motivacion_sucesor: r.motivacion_sucesor
+  }));
+
+  const total = allRecords.length;
+  const criticalCount = allRecords.filter(r => r.cargo_valor === "Sí").length;
+  const withSuccCount = allRecords.filter(r => r.tiene_sucesor === "Sí").length;
+  const highRiskCount = allRecords.filter(r => r.riesgo === "Alto").length;
+  const highRiskNoSucc = allRecords.filter(r => r.riesgo === "Alto" && r.tiene_sucesor === "No").length;
+  const readyNowCount = allRecords.filter(r => r.readiness === "Inmediato").length;
+
+  const stats = {
+    total_evaluados: total,
+    cargos_de_valor: `${criticalCount} (${Math.round((criticalCount / Math.max(total, 1)) * 1000) / 10}%)`,
+    cobertura_sucesion: `${withSuccCount} con sucesor (${Math.round((withSuccCount / Math.max(total, 1)) * 1000) / 10}%)`,
+    sin_sucesor: total - withSuccCount,
+    riesgo_alto_total: highRiskCount,
+    riesgo_alto_sin_sucesor_alerta: highRiskNoSucc,
+    ready_now_inmediato: readyNowCount,
+    empresas_evaluadas: companies.length
+  };
+
+  return { sliced: compactRecords, stats };
+}
+
+async function callGeminiApiLive(userQuery, history = [], records = [], apiKey = "") {
+  const key = (apiKey || "").trim();
+  if (!key) throw new Error("No hay API Key configurada.");
+
+  const model = "gemini-2.5-flash";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+
+  const { sliced, stats } = sliceRecordsForClient(userQuery, records);
+
+  const systemPrompt = `Eres el Agente Inteligente de Talento y Sucesión de Centria (Grupo Breca).
+Tu objetivo es analizar la base de datos oficial 2026_Reporte_Sucesion.xlsx y proveer diagnósticos ejecutivos, estratégicos, planes de acción y recomendaciones para el Comité de Talento.
+
+DATOS FILTRADOS RELEVANTES (${sliced.length} de ${records.length} registros totales):
+${JSON.stringify(sliced, null, 1)}
+
+ESTADÍSTICAS OFICIALES DEL TALENT POOL:
+${JSON.stringify(stats, null, 1)}
+
+DIRECTIVAS OBLIGATORIAS:
+1. Responde en español formal, ejecutivo, consultivo y con lenguaje de Comité de Talento.
+2. Utiliza nombres de personas, posiciones y empresas EXACTAMENTE como figuran en los datos. No inventes nombres.
+3. Formato de salida: Genera HTML semántico limpio y visual (usa <div class="ai-structured-response"><div class="ai-html-card"><div class="ai-html-body nexia-markdown">...</div></div></div>).
+   - Puedes usar <h3>, <h4>, <p>, <ul>, <li>, <strong>, <span> con clases ai-badge, ai-kpi-grid, ai-kpi-box, o <table class="ai-table"> dentro de <div class="ai-table-wrap">.
+   - NUNCA uses atributos inline 'style='. Usa exclusivamente las clases de Tailwind y Centria.
+4. Si es un análisis abierto o estratégico, incluye:
+   - 📌 Diagnóstico Ejecutivo & Hallazgos
+   - 🔍 Causas de Riesgo y Descalces Identificados
+   - 🎯 Plan de Acción y Medidas Recomendadas para el Comité de Talento.`;
+
+  const contents = [];
+  if (Array.isArray(history)) {
+    for (const h of history.slice(-4)) {
+      if (h.role === "user") {
+        contents.push({ role: "user", parts: [{ text: h.content }] });
+      } else if (h.role === "assistant") {
+        const clean = h.content.replace(/<[^>]+>/g, " ").trim().slice(0, 300);
+        if (clean) contents.push({ role: "model", parts: [{ text: clean }] });
+      }
+    }
+  }
+  contents.push({ role: "user", parts: [{ text: userQuery }] });
+
+  const body = {
+    system_instruction: { parts: [{ text: systemPrompt }] },
+    contents: contents,
+    generationConfig: {
+      temperature: 0.2,
+      maxOutputTokens: 2048
+    }
+  };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData.error?.message || `HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+  const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  return replyText;
+}
+
+/**
+ * Renderiza fluidamente la respuesta con animación progresiva y cursor activo,
+ * asegurando una experiencia dinámica y conversacional.
+ */
+function streamTypewriterContent(targetElement, fullHtml, isLinear = false, onComplete = null) {
+  if (!targetElement) return;
+
+  if (isLinear) {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = fullHtml;
+    const text = tempDiv.textContent || tempDiv.innerText || "";
+    
+    targetElement.innerHTML = `<p class="ai-linear-response"><span class="typewriter-text"></span><span class="ai-streaming-cursor">|</span></p>`;
+    const textSpan = targetElement.querySelector(".typewriter-text");
+    const cursor = targetElement.querySelector(".ai-streaming-cursor");
+    const container = document.getElementById("chat-messages-container");
+
+    let idx = 0;
+    const speed = Math.max(8, Math.min(22, Math.floor(1200 / Math.max(text.length, 1))));
+    
+    const interval = setInterval(() => {
+      if (idx < text.length) {
+        idx += 2;
+        if (textSpan) textSpan.textContent = text.slice(0, idx);
+        if (container) container.scrollTop = container.scrollHeight;
+      } else {
+        clearInterval(interval);
+        if (cursor) cursor.remove();
+        targetElement.innerHTML = fullHtml;
+        if (container) container.scrollTop = container.scrollHeight;
+        if (typeof onComplete === "function") onComplete();
+      }
+    }, speed);
+  } else {
+    // Para tarjetas estructuradas, transición fluida de fade-in y elevación
+    targetElement.style.opacity = "0";
+    targetElement.style.transform = "translateY(8px)";
+    targetElement.style.transition = "opacity 0.22s ease-out, transform 0.22s ease-out";
+    targetElement.innerHTML = fullHtml;
+    
+    requestAnimationFrame(() => {
+      targetElement.style.opacity = "1";
+      targetElement.style.transform = "translateY(0)";
+      const container = document.getElementById("chat-messages-container");
+      if (container) container.scrollTop = container.scrollHeight;
+      if (typeof onComplete === "function") onComplete();
+    });
+  }
+}
+
 async function sendChatQuestion(questionText) {
   const q = String(questionText || "").trim();
   if (!q) return;
@@ -1431,11 +1707,17 @@ async function sendChatQuestion(questionText) {
       ? window.classifyTalentQueryIntent(q, state.records)
       : { route: "TEMPLATE", routeLabel: "Plantilla Ejecutiva de Reporte" };
 
+  const storedKey = getStoredGeminiKey();
+  const willUseGeminiLive = Boolean(storedKey && clientIntent.route === "OPEN_ANALYSIS");
+
   if (typingText) {
-    typingText.textContent =
-      clientIntent.route === "OPEN_ANALYSIS"
-        ? "🧠 Gemini IA analizando causas, correlaciones y estrategia..."
-        : "⚡ Estructurando plantilla ejecutiva de reporte...";
+    if (willUseGeminiLive) {
+      typingText.textContent = "🧠 Gemini 2.5 Flash conectado en vivo analizando causas y estrategia...";
+    } else if (clientIntent.route === "OPEN_ANALYSIS") {
+      typingText.textContent = "🧠 Motor Analítico de Talento analizando causas, correlaciones y estrategia...";
+    } else {
+      typingText.textContent = "⚡ Estructurando plantilla ejecutiva de reporte...";
+    }
   }
 
   if (container) {
@@ -1457,9 +1739,10 @@ async function sendChatQuestion(questionText) {
   let routeType = clientIntent.route || "TEMPLATE";
   let routeLabel = clientIntent.routeLabel || "Plantilla Ejecutiva de Reporte";
   let followUps = [];
+  let isLiveGeminiResponse = false;
 
   try {
-    // 1. Evaluar con el motor híbrido en cliente sobre los datos vivos (Plantillas + Análisis Abierto IA)
+    // 1. Evaluar con el motor híbrido en cliente sobre los datos vivos
     const clientResult =
       typeof window.answerTalentQuestionClient === "function"
         ? window.answerTalentQuestionClient(q, state.records)
@@ -1471,45 +1754,68 @@ async function sendChatQuestion(questionText) {
       followUps = Array.isArray(clientResult.followUps) ? clientResult.followUps : [];
     }
 
-    // 2. Intentar consultar el backend local si está disponible y conectado en vivo a Gemini
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        question: q,
-        records: state.records,
-        prefer_live_api: true,
-        history: state.chatHistory.slice(-6),
-      }),
-    });
-
-    if (!res.ok) throw new Error("Modo estático GitHub Pages");
-    const data = await res.json();
-
-    if (data.source === "gemini_live" && (data.answer || data.reply)) {
-      rawAnswer = data.answer || data.reply;
-      isLinear = Boolean(data.isLinear);
-      if (data.route) routeType = data.route;
-      if (data.routeLabel) routeLabel = data.routeLabel;
-    } else if (clientResult && clientResult.answer) {
-      rawAnswer = clientResult.answer;
-      isLinear = Boolean(clientResult.isLinear);
-    } else {
-      rawAnswer = data.answer || data.reply || "";
-      isLinear = Boolean(data.isLinear);
+    // 2. Si es una consulta abierta/estratégica y el usuario tiene configurada su Gemini API Key:
+    if (routeType === "OPEN_ANALYSIS" && storedKey) {
+      try {
+        const liveGeminiText = await callGeminiApiLive(q, state.chatHistory, state.records, storedKey);
+        if (liveGeminiText) {
+          rawAnswer = liveGeminiText;
+          routeLabel = "Gemini 2.5 Flash · Conectado en Vivo (Google AI Studio)";
+          isLiveGeminiResponse = true;
+          isLinear = false;
+        }
+      } catch (geminiErr) {
+        console.warn("Fallo temporal en Gemini Live API:", geminiErr);
+        showToast("Gemini Live: " + (geminiErr.message || "Error de conexión") + ". Usando RAG local.", "info");
+      }
     }
-  } catch (_err) {
-    if (typeof window.answerTalentQuestionClient === "function") {
-      const clientRes = window.answerTalentQuestionClient(q, state.records);
-      rawAnswer = clientRes.answer || "";
-      isLinear = Boolean(clientRes.isLinear);
-      routeType = clientRes.route || routeType;
-      routeLabel = clientRes.routeLabel || routeLabel;
-      followUps = Array.isArray(clientRes.followUps) ? clientRes.followUps : [];
-    } else {
-      rawAnswer = '<p class="ai-linear-response">No se pudo procesar la consulta en este momento.</p>';
-      isLinear = true;
+
+    // 3. Si aún no tenemos respuesta viva de Gemini, intentar backend FastAPI local
+    if (!rawAnswer) {
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: q,
+            records: state.records,
+            prefer_live_api: true,
+            history: state.chatHistory.slice(-6),
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.source === "gemini_live" && (data.answer || data.reply)) {
+            rawAnswer = data.answer || data.reply;
+            isLinear = Boolean(data.isLinear);
+            if (data.route) routeType = data.route;
+            if (data.routeLabel) routeLabel = data.routeLabel;
+            isLiveGeminiResponse = true;
+          } else if (data.answer || data.reply) {
+            rawAnswer = data.answer || data.reply;
+            isLinear = Boolean(data.isLinear);
+          }
+        }
+      } catch (_backendErr) {
+        // En GitHub Pages estático el fetch falla normalmente con 404, continuando al motor RAG local
+      }
     }
+
+    // 4. Si no se usó API externa o falló, utilizar la respuesta analítica del motor RAG
+    if (!rawAnswer) {
+      if (clientResult && clientResult.answer) {
+        rawAnswer = clientResult.answer;
+        isLinear = Boolean(clientResult.isLinear);
+      } else {
+        rawAnswer = '<p class="ai-linear-response">No se pudo procesar la consulta en este momento.</p>';
+        isLinear = true;
+      }
+    }
+  } catch (err) {
+    console.error("Error procesando consulta:", err);
+    rawAnswer = '<p class="ai-linear-response">Ocurrió un error al procesar la consulta en este momento.</p>';
+    isLinear = true;
   } finally {
     if (typing) typing.classList.add("hidden");
   }
@@ -1521,21 +1827,39 @@ async function sendChatQuestion(questionText) {
 
   if (container) {
     const botDiv = document.createElement("div");
+
     if (validated.isLinear) {
-      // Respuesta lineal/conversacional breve: burbuja limpia sin tarjeta compleja
       botDiv.className = "flex items-start gap-3";
       botDiv.innerHTML = `
         <div class="w-8 h-8 rounded-xl bg-[#0B2545] text-white flex items-center justify-center text-xs font-extrabold shrink-0 shadow-sm">
           IA
         </div>
-        <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-200/90 shadow-sm max-w-[90%]">
-          ${validated.html}
-        </div>
+        <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-200/90 shadow-sm max-w-[90%] target-content-area"></div>
       `;
+      container.appendChild(botDiv);
+      const targetArea = botDiv.querySelector(".target-content-area");
+      streamTypewriterContent(targetArea, validated.html, true);
     } else {
       const isOpenRoute = routeType === "OPEN_ANALYSIS";
-      const badgeClass = isOpenRoute ? "ai-route-badge-open" : "ai-route-badge-template";
-      const badgeIcon = isOpenRoute ? "🧠" : "⚡";
+      const badgeClass = isLiveGeminiResponse
+        ? "ai-route-badge-open bg-gradient-to-r from-blue-700 to-indigo-700 text-white"
+        : isOpenRoute
+        ? "ai-route-badge-open"
+        : "ai-route-badge-template";
+      const badgeIcon = isLiveGeminiResponse ? "✨" : isOpenRoute ? "🧠" : "⚡";
+
+      // Si es análisis abierto y aún no tiene API Key configurada, ofrecer invitación sutil de 1 clic
+      const apiKeyBanner = (!storedKey && isOpenRoute)
+        ? `<div class="mt-2.5 p-2.5 bg-blue-50/80 rounded-xl border border-blue-200/70 flex items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2 text-slate-700">
+              <span class="text-sm">💡</span>
+              <span>¿Deseas activar respuestas en tiempo real con <strong>Gemini 2.5 Flash</strong>?</span>
+            </div>
+            <button type="button" data-action="configure-gemini-key" class="px-3 py-1 rounded-lg bg-[#0B2545] hover:bg-blue-900 text-white font-bold text-[11px] whitespace-nowrap shadow-sm">
+              Conectar API Key
+            </button>
+          </div>`
+        : "";
 
       const followUpHtml =
         followUps.length > 0
@@ -1566,12 +1890,14 @@ async function sendChatQuestion(questionText) {
             Mostrar sugerencias ▼
           </button>
         </div>
-        ${validated.html}
+        <div class="target-content-area"></div>
+        ${apiKeyBanner}
         ${followUpHtml}
       `;
+      container.appendChild(botDiv);
+      const targetArea = botDiv.querySelector(".target-content-area");
+      streamTypewriterContent(targetArea, validated.html, false);
     }
-    container.appendChild(botDiv);
-    container.scrollTop = container.scrollHeight;
   }
 }
 
@@ -2204,6 +2530,66 @@ function bindEventListeners() {
   document.getElementById("talent-crud-form")?.addEventListener("submit", saveTalentFromModal);
 
   // Agente IA: FAB abre/reanuda, Minimizar o clic fuera preserva, Cerrar/Nueva sesión reinicia
+  
+  // Modal de Configuración Google Gemini API Key
+  document.getElementById("btn-gemini-key")?.addEventListener("click", openGeminiKeyModal);
+  document.getElementById("btn-close-gemini-key-modal")?.addEventListener("click", closeGeminiKeyModal);
+  document.getElementById("gemini-key-modal-overlay")?.addEventListener("click", (e) => {
+    if (e.target.id === "gemini-key-modal-overlay") closeGeminiKeyModal();
+  });
+
+  document.getElementById("btn-toggle-key-visibility")?.addEventListener("click", () => {
+    const input = document.getElementById("gemini-api-key-input");
+    if (!input) return;
+    input.type = input.type === "password" ? "text" : "password";
+  });
+
+  document.getElementById("btn-save-gemini-key")?.addEventListener("click", () => {
+    const input = document.getElementById("gemini-api-key-input");
+    const val = input ? input.value.trim() : "";
+    if (!val) {
+      showToast("Ingresa una API Key válida", "error");
+      return;
+    }
+    setStoredGeminiKey(val);
+    showToast("Google Gemini API Key activada exitosamente", "success");
+    closeGeminiKeyModal();
+  });
+
+  document.getElementById("btn-remove-gemini-key")?.addEventListener("click", () => {
+    setStoredGeminiKey("");
+    const input = document.getElementById("gemini-api-key-input");
+    if (input) input.value = "";
+    showToast("API Key eliminada. Motor RAG local activo.", "info");
+    closeGeminiKeyModal();
+  });
+
+  document.getElementById("btn-test-gemini-key")?.addEventListener("click", async () => {
+    const input = document.getElementById("gemini-api-key-input");
+    const resultEl = document.getElementById("gemini-test-result");
+    const val = input ? input.value.trim() : "";
+    if (!val) {
+      showToast("Ingresa una API Key para probar", "error");
+      return;
+    }
+    if (resultEl) {
+      resultEl.className = "text-xs p-3 rounded-xl bg-blue-50 text-blue-800 font-semibold";
+      resultEl.textContent = "Probando conexión con Google Gemini 2.5 Flash...";
+    }
+    try {
+      await testGeminiKeyConnection(val);
+      if (resultEl) {
+        resultEl.className = "text-xs p-3 rounded-xl bg-emerald-50 text-emerald-800 font-bold border border-emerald-200";
+        resultEl.textContent = "✅ ¡Conexión exitosa con Gemini 2.5 Flash!";
+      }
+    } catch (err) {
+      if (resultEl) {
+        resultEl.className = "text-xs p-3 rounded-xl bg-rose-50 text-rose-800 font-semibold border border-rose-200";
+        resultEl.textContent = "❌ Error: " + (err.message || "Fallo en la prueba");
+      }
+    }
+  });
+
   document.getElementById("btn-fab-chat")?.addEventListener("click", openChatDrawer);
   document.getElementById("btn-minimize-chat")?.addEventListener("click", minimizeChatDrawer);
   document.getElementById("chat-drawer-backdrop")?.addEventListener("click", minimizeChatDrawer);
@@ -2265,6 +2651,12 @@ function bindEventListeners() {
     const btn = e.target.closest("button[data-expand-quick]");
     if (btn) {
       toggleQuickActions(false);
+      return;
+    }
+    
+    const configKeyBtn = e.target.closest("button[data-action='configure-gemini-key']");
+    if (configKeyBtn) {
+      openGeminiKeyModal();
       return;
     }
     const followupBtn = e.target.closest("button[data-followup-question]");

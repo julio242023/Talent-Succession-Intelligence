@@ -720,3 +720,165 @@ p, li {
 .typing-dot-1 { animation: pulseDot 1.4s infinite ease-in-out both; animation-delay: -0.32s; }
 .typing-dot-2 { animation: pulseDot 1.4s infinite ease-in-out both; animation-delay: -0.16s; }
 .typing-dot-3 { animation: pulseDot 1.4s infinite ease-in-out both; }
+
+/* Cursor parpadeante para efecto streaming / typewriter */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.ai-streaming-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  background-color: #2563eb;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-radius: 1px;
+  animation: cursorBlink 0.8s infinite;
+}
+
+/* Utilidades para desplazamiento táctil horizontal en móviles */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.touch-pan-x {
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ==========================================================================
+   5. ADAPTABILIDAD RESPONSIVE A DISPOSITIVOS MÓVILES (SMARTPHONES & TABLETS)
+   ========================================================================== */
+
+/* Tablets y Smartphones grandes (<= 768px) */
+@media (max-width: 768px) {
+  .executive-card {
+    border-radius: 1rem;
+    padding: 1.15rem !important;
+  }
+  .chart-canvas-box {
+    height: 230px;
+  }
+  .chart-canvas-box-lg {
+    height: 260px;
+  }
+}
+
+/* Smartphones (<= 640px) */
+@media (max-width: 640px) {
+  /* Header compacto en móviles */
+  header .max-w-\[1480px\] {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+  }
+
+  .header-tab-btn {
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Drawer del Chat IA a pantalla completa en móviles */
+  #chat-drawer-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-left: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Sugerencias rápidas en 1 columna en teléfonos para mayor legibilidad */
+  #quick-actions-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Tarjetas KPI compactas para visualización en 2 columnas */
+  .kpi-card-interactive {
+    padding: 0.85rem !important;
+    border-radius: 0.95rem !important;
+  }
+  .kpi-card-interactive .text-3xl,
+  .kpi-card-interactive .text-4xl {
+    font-size: 1.6rem !important;
+    line-height: 1.15 !important;
+  }
+  .kpi-card-interactive .w-11 {
+    width: 2.1rem !important;
+    height: 2.1rem !important;
+  }
+  .kpi-card-interactive .w-5 {
+    width: 1.1rem !important;
+    height: 1.1rem !important;
+  }
+
+  /* Matriz 9-Box en pantallas móviles: ultra legible y sin desborde */
+  .ninebox-grid {
+    gap: 0.45rem !important;
+  }
+  .ninebox-cell {
+    padding: 0.65rem 0.5rem !important;
+    min-height: 94px !important;
+    border-radius: 0.65rem !important;
+  }
+  .ninebox-cell .text-3xl {
+    font-size: 1.35rem !important;
+  }
+  .ninebox-cell .text-xs {
+    font-size: 0.68rem !important;
+  }
+  .ninebox-cell .text-\[11px\] {
+    font-size: 0.62rem !important;
+  }
+
+  /* Tablas responsivas dentro de respuestas IA */
+  .ai-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    display: block;
+  }
+  .ai-table th, .ai-table td {
+    padding: 0.5rem 0.6rem !important;
+    font-size: 0.72rem !important;
+  }
+  .ai-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.45rem !important;
+  }
+
+  /* Botón Flotante FAB en móvil: discreto y cómodo al tacto */
+  .nexia-fab {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    padding: 0.55rem 0.95rem !important;
+  }
+  .nexia-fab .w-10 {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+  }
+}
+
+/* Dispositivos muy estrechos (<= 380px) */
+@media (max-width: 380px) {
+  .header-tab-btn span {
+    font-size: 0.7rem !important;
+  }
+  .ninebox-cell .text-3xl {
+    font-size: 1.15rem !important;
+  }
+  .kpi-card-interactive .text-3xl,
+  .kpi-card-interactive .text-4xl {
+    font-size: 1.35rem !important;
+  }
+}

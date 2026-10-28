@@ -1447,9 +1447,10 @@ def _try_external_gemini(
     if config.get("FORCE_LOCAL_RAG", False):
         return None, "Local RAG Mode"
 
-    # Si ya comprobamos en esta sesión que el firewall corporativo bloquea `google-gemini-models`,
-    # pasamos directo al motor en memoria en 0 ms.
-    if _FIREWALL_STATUS["checked"] and not _FIREWALL_STATUS["live_reachable"]:
+    # Si ya comprobamos en esta sesión que el firewall corporativo bloquea Vertex AI,
+    # solo pasamos directo al motor en memoria si NO hay GEMINI_API_KEY configurada.
+    has_direct_key = bool(os.environ.get("GEMINI_API_KEY") or config.get("GEMINI_API_KEY"))
+    if _FIREWALL_STATUS["checked"] and not _FIREWALL_STATUS["live_reachable"] and not has_direct_key:
         return None, _FIREWALL_STATUS["reason"]
 
     result_q: "queue.Queue[Tuple[Optional[str], str]]" = queue.Queue()
@@ -1619,7 +1620,7 @@ def call_talent_agent(
             history=history,
             company_filter=company_filter,
             query_intent=intent,
-            timeout_sec=3.5,
+            timeout_sec=12.0,
         )
         if llm_reply:
             is_lin = 'class="ai-linear-response"' in llm_reply
