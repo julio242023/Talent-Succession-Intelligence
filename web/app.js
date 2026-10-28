@@ -1414,155 +1414,240 @@ const GEMINI_STORAGE_KEY = "centria_gemini_api_key";
 
 function getStoredGeminiKey() {
   try {
-    return localStorage.getItem(GEMINI_STORAGE_KEY) || "";
+    // 1. Obtener de parámetro URL (?key=... o ?gemini_key=... o ?api_key=...) para pruebas directas silenciosas
+    const params = new URLSearchParams(window.location.search);
+    const paramKey = params.get("key") || params.get("gemini_key") || params.get("api_key");
+    if (paramKey && paramKey.trim().length > 10) {
+      localStorage.setItem("centria_gemini_api_key", paramKey.trim());
+      return paramKey.trim();
+    }
+    // 2. Obtener de configuración global embebida
+    if (window.CENTRIA_CONFIG && window.CENTRIA_CONFIG.GEMINI_API_KEY) {
+      return String(window.CENTRIA_CONFIG.GEMINI_API_KEY).trim();
+    }
+    if (window.GEMINI_API_KEY) {
+      return String(window.GEMINI_API_KEY).trim();
+    }
+    // 3. Obtener de almacenamiento local previo (configurado por detrás)
+    return localStorage.getItem("centria_gemini_api_key") || "";
   } catch (_e) {
     return "";
   }
 }
 
-function setStoredGeminiKey(key) {
-  try {
-    if (key && key.trim()) {
-      localStorage.setItem(GEMINI_STORAGE_KEY, key.trim());
-    } else {
-      localStorage.removeItem(GEMINI_STORAGE_KEY);
-    }
-  } catch (_e) {}
-}
-
-function openGeminiKeyModal() {
-  const overlay = document.getElementById("gemini-key-modal-overlay");
-  const input = document.getElementById("gemini-api-key-input");
-  const statusEl = document.getElementById("gemini-key-status");
-  const resultEl = document.getElementById("gemini-test-result");
-  if (!overlay) return;
-
-  const currentKey = getStoredGeminiKey();
-  if (input) input.value = currentKey;
-  if (resultEl) {
-    resultEl.className = "hidden text-xs p-3 rounded-xl";
-    resultEl.textContent = "";
-  }
-  if (statusEl) {
-    if (currentKey) {
-      statusEl.textContent = "Activa (guardada localmente)";
-      statusEl.className = "text-emerald-600 font-bold";
-    } else {
-      statusEl.textContent = "No configurada";
-      statusEl.className = "text-slate-400 font-medium";
-    }
-  }
-
-  overlay.classList.remove("hidden");
-}
-
-function closeGeminiKeyModal() {
-  const overlay = document.getElementById("gemini-key-modal-overlay");
-  if (overlay) overlay.classList.add("hidden");
-}
-
-async function testGeminiKeyConnection(apiKey) {
-  const key = (apiKey || "").trim();
-  if (!key) throw new Error("Por favor ingresa una API Key.");
-
-  const model = "gemini-2.5-flash";
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
-  
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: "Responde únicamente la palabra CONECTADO para verificar la API." }] }],
-      generationConfig: { maxOutputTokens: 20, temperature: 0.1 }
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `HTTP ${res.status}: Clave inválida o sin permisos.`);
-  }
-
-  const data = await res.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  return text.trim() || "CONECTADO";
-}
-
-function sliceRecordsForClient(query, records) {
+/**
+ * Smart Document Digester (Digestor Inteligente de Datos de Sucesión)
+ * Pre-procesa, sintetiza y digiere las 14 columnas de 2026_Reporte_Sucesion.xlsx
+ * antes de pasarlas a Google Gemini 2.5 Flash o al motor analítico de talento.
+ * 
+ * Genera una estructura ejecutiva de alta densidad analítica para que el LLM
+ * realice diagnósticos causales, cruces multifactoriales y hojas de ruta sin perderse
+ * en registros brutos repetitivos.
+ */
+function digestTalentDocumentForLLM(query, records) {
   const qNorm = String(query || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   const allRecords = Array.isArray(records) ? records : [];
-  
+  const total = allRecords.length || 1;
+
+  // 1. Métricas Macro Consolidadas del Grupo Breca
   const companies = [...new Set(allRecords.map(r => r.empresa).filter(Boolean))];
-  const matchedCompany = companies.find(c => {
-    const cNorm = c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    return qNorm.includes(cNorm);
+  const criticalRoles = allRecords.filter(r => r.cargo_valor === "Sí");
+  const withSuccessor = allRecords.filter(r => r.tiene_sucesor === "Sí");
+  const withoutSuccessor = allRecords.filter(r => r.tiene_sucesor !== "Sí");
+  const criticalNoSuccessor = allRecords.filter(r => r.cargo_valor === "Sí" && r.tiene_sucesor !== "Sí");
+
+  const highRisk = allRecords.filter(r => r.riesgo === "Alto");
+  const medRisk = allRecords.filter(r => r.riesgo === "Medio");
+  const lowRisk = allRecords.filter(r => r.riesgo === "Bajo");
+
+  // Alertas Rojas Inminentes: Riesgo Alto sin Sucesor
+  const imminentRedAlerts = allRecords.filter(r => r.riesgo === "Alto" && r.tiene_sucesor !== "Sí");
+
+  // Pipeline de Madurez (Readiness)
+  const readyNow = allRecords.filter(r => r.readiness === "Inmediato");
+  const ready1to2 = allRecords.filter(r => r.readiness === "1 a 2 años");
+  const ready3to5 = allRecords.filter(r => r.readiness === "3 a 5 años" || r.readiness === "+ de 5 años");
+
+  // Distribución 9-Box
+  const topTalentBox9 = allRecords.filter(r => Number(r.nine_box) === 9);
+  const topTalentBox8 = allRecords.filter(r => Number(r.nine_box) === 8);
+  const keyPlayersBox5 = allRecords.filter(r => Number(r.nine_box) === 5);
+
+  // Motivación de Sucesores
+  const motHigh = allRecords.filter(r => r.motivacion_sucesor === "Alta");
+  const motMed = allRecords.filter(r => r.motivacion_sucesor === "Media");
+  const motLow = allRecords.filter(r => r.motivacion_sucesor === "Baja");
+
+  // 2. Resumen Comparativo por Empresa
+  const companyDigest = companies.map(c => {
+    const subset = allRecords.filter(r => r.empresa === c);
+    const subWithSuc = subset.filter(r => r.tiene_sucesor === "Sí").length;
+    const subCriticalNoSuc = subset.filter(r => r.cargo_valor === "Sí" && r.tiene_sucesor !== "Sí").length;
+    const subHighRisk = subset.filter(r => r.riesgo === "Alto").length;
+    return {
+      empresa: c,
+      total_posiciones: subset.length,
+      cobertura_pct: `${Math.round((subWithSuc / Math.max(subset.length, 1)) * 1000) / 10}%`,
+      cargos_criticos_sin_sucesor: subCriticalNoSuc,
+      riesgos_altos_fuga: subHighRisk
+    };
   });
 
-  let filtered = allRecords;
-  if (matchedCompany) {
-    filtered = allRecords.filter(r => r.empresa === matchedCompany);
-  }
-
-  const mentioned = allRecords.filter(r => {
+  // 3. Foco Contextual según entidades de la consulta
+  const mentionedTalents = allRecords.filter(r => {
     const nameNorm = (r.nombre || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const parts = nameNorm.split(/\s+/).filter(p => p.length >= 4);
     return parts.some(p => qNorm.includes(p));
   });
 
-  let sliced = [];
-  if (mentioned.length > 0) {
-    const mentionedNames = new Set(mentioned.map(m => m.nombre));
-    const extra = allRecords.filter(r => mentionedNames.has(r.sucesor));
-    sliced = [...new Set([...mentioned, ...extra])];
+  const matchedCompany = companies.find(c => {
+    const cNorm = c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    return qNorm.includes(cNorm);
+  });
+
+  let focusDetails = {};
+
+  if (mentionedTalents.length > 0) {
+    focusDetails.tipo = "FOCO_TALENTO_INDIVIDUAL";
+    focusDetails.talentos_en_foco = mentionedTalents.map(t => {
+      const isSuccessorOf = allRecords.filter(r => r.sucesor === t.nombre).map(r => `${r.nombre} (${r.posicion} - ${r.empresa})`);
+      const internalBench = allRecords.filter(r =>
+        r.id !== t.id &&
+        Number(r.nine_box) >= 8 &&
+        r.riesgo !== "Alto" &&
+        (r.nivel === t.nivel || Math.abs(Number(r.ggs) - Number(t.ggs)) <= 1)
+      ).slice(0, 4).map(b => ({
+        nombre: b.nombre,
+        empresa: b.empresa,
+        posicion: b.posicion,
+        ggs: b.ggs,
+        nine_box: b.nine_box,
+        riesgo: b.riesgo,
+        sucesor_propio: b.tiene_sucesor === "Sí" ? `${b.sucesor} (${b.readiness})` : "Sin sucesor"
+      }));
+
+      return {
+        perfil: {
+          nombre: t.nombre,
+          empresa: t.empresa,
+          posicion: t.posicion,
+          nivel: t.nivel,
+          ggs: t.ggs,
+          nine_box: t.nine_box,
+          riesgo_perdida: t.riesgo,
+          cargo_de_valor: t.cargo_valor,
+          tiempo_en_posicion: t.tiempo_posicion,
+          tiene_sucesor: t.tiene_sucesor,
+          sucesor_designado: t.sucesor || "Ninguno",
+          readiness_sucesor: t.readiness || "N/A",
+          motivacion_sucesor: t.motivacion_sucesor || "N/A"
+        },
+        impacto_efecto_domino: isSuccessorOf.length > 0 ? `Es sucesor designado de: ${isSuccessorOf.join(", ")}` : "No es sucesor de ninguna otra posición",
+        banco_interno_candidatos_puente: internalBench
+      };
+    });
   } else if (matchedCompany) {
-    sliced = filtered.slice(0, 30);
-  } else if (qNorm.includes("riesgo alto") || qNorm.includes("sin sucesor") || qNorm.includes("alerta")) {
-    sliced = allRecords.filter(r => r.riesgo === "Alto" || r.tiene_sucesor === "No").slice(0, 25);
-  } else if (qNorm.includes("inmediato") || qNorm.includes("ready now")) {
-    sliced = allRecords.filter(r => r.readiness === "Inmediato").slice(0, 25);
-  } else if (qNorm.includes("9box") || qNorm.includes("top talent") || qNorm.includes("estrella")) {
-    sliced = allRecords.filter(r => Number(r.nine_box) >= 8).slice(0, 25);
+    focusDetails.tipo = "FOCO_EMPRESA";
+    const compRecords = allRecords.filter(r => r.empresa === matchedCompany);
+    focusDetails.empresa = matchedCompany;
+    focusDetails.posiciones_evaluadas = compRecords.length;
+    focusDetails.posiciones_sin_sucesor = compRecords.filter(r => r.tiene_sucesor !== "Sí").map(r => ({
+      nombre: r.nombre,
+      posicion: r.posicion,
+      cargo_valor: r.cargo_valor,
+      riesgo: r.riesgo,
+      tiempo_posicion: r.tiempo_posicion
+    }));
+    focusDetails.top_talent_box8_9 = compRecords.filter(r => Number(r.nine_box) >= 8).map(r => ({
+      nombre: r.nombre,
+      posicion: r.posicion,
+      nine_box: r.nine_box,
+      riesgo: r.riesgo,
+      sucesor: r.sucesor || "Sin sucesor",
+      readiness: r.readiness
+    }));
+  } else if (qNorm.includes("aceler") || qNorm.includes("pipeline") || qNorm.includes("ready now") || qNorm.includes("inmediato")) {
+    focusDetails.tipo = "FOCO_PIPELINE_ACELERACION";
+    focusDetails.sucesores_1_a_2_anos_para_acelerar = ready1to2.slice(0, 12).map(r => ({
+      posicion_cubierta: `${r.nombre} (${r.posicion} - ${r.empresa})`,
+      sucesor_designado: r.sucesor,
+      readiness_actual: r.readiness,
+      motivacion: r.motivacion_sucesor,
+      cargo_valor: r.cargo_valor
+    }));
+  } else if (qNorm.includes("retenc") || qNorm.includes("fuga") || qNorm.includes("riesgo") || qNorm.includes("vulnerab")) {
+    focusDetails.tipo = "FOCO_RETENCION_Y_VULNERABILIDAD";
+    focusDetails.casos_criticos_inminentes = imminentRedAlerts.map(r => ({
+      nombre: r.nombre,
+      empresa: r.empresa,
+      posicion: r.posicion,
+      nivel: r.nivel,
+      tiempo_posicion: r.tiempo_posicion,
+      nine_box: r.nine_box
+    }));
+    focusDetails.top_talents_con_riesgo_fuga = allRecords.filter(r => Number(r.nine_box) >= 8 && r.riesgo !== "Bajo").slice(0, 8).map(r => ({
+      nombre: r.nombre,
+      empresa: r.empresa,
+      posicion: r.posicion,
+      nine_box: r.nine_box,
+      riesgo: r.riesgo,
+      tiene_sucesor: r.tiene_sucesor
+    }));
   } else {
-    const critical = allRecords.filter(r => r.cargo_valor === "Sí");
-    const highRisk = allRecords.filter(r => r.riesgo === "Alto" && r.tiene_sucesor === "No");
-    const top9 = allRecords.filter(r => Number(r.nine_box) >= 8);
-    sliced = [...new Set([...highRisk, ...critical.slice(0, 10), ...top9.slice(0, 10)])].slice(0, 25);
+    focusDetails.tipo = "FOCO_ESTRATEGICO_GLOBAL";
+    focusDetails.alertas_rojas_inminentes = imminentRedAlerts.slice(0, 8).map(r => ({
+      nombre: r.nombre,
+      empresa: r.empresa,
+      posicion: r.posicion,
+      nivel: r.nivel,
+      tiempo_posicion: r.tiempo_posicion
+    }));
   }
 
-  const compactRecords = sliced.map(r => ({
-    empresa: r.empresa,
-    nombre: r.nombre,
-    posicion: r.posicion,
-    nivel: r.nivel,
-    ggs: r.ggs,
-    nine_box: r.nine_box,
-    riesgo: r.riesgo,
-    cargo_valor: r.cargo_valor,
-    tiempo_posicion: r.tiempo_posicion,
-    tiene_sucesor: r.tiene_sucesor,
-    sucesor: r.sucesor,
-    readiness: r.readiness,
-    motivacion_sucesor: r.motivacion_sucesor
-  }));
-
-  const total = allRecords.length;
-  const criticalCount = allRecords.filter(r => r.cargo_valor === "Sí").length;
-  const withSuccCount = allRecords.filter(r => r.tiene_sucesor === "Sí").length;
-  const highRiskCount = allRecords.filter(r => r.riesgo === "Alto").length;
-  const highRiskNoSucc = allRecords.filter(r => r.riesgo === "Alto" && r.tiene_sucesor === "No").length;
-  const readyNowCount = allRecords.filter(r => r.readiness === "Inmediato").length;
-
-  const stats = {
-    total_evaluados: total,
-    cargos_de_valor: `${criticalCount} (${Math.round((criticalCount / Math.max(total, 1)) * 1000) / 10}%)`,
-    cobertura_sucesion: `${withSuccCount} con sucesor (${Math.round((withSuccCount / Math.max(total, 1)) * 1000) / 10}%)`,
-    sin_sucesor: total - withSuccCount,
-    riesgo_alto_total: highRiskCount,
-    riesgo_alto_sin_sucesor_alerta: highRiskNoSucc,
-    ready_now_inmediato: readyNowCount,
-    empresas_evaluadas: companies.length
+  return {
+    documento_fuente: "2026_Reporte_Sucesion.xlsx (Talent Pool Oficial Grupo Breca)",
+    metricas_macro_grupo_breca: {
+      total_posiciones_evaluadas: total,
+      total_empresas: companies.length,
+      cobertura_sucesion: {
+        con_sucesor: withSuccessor.length,
+        pct_cobertura: `${Math.round((withSuccessor.length / total) * 1000) / 10}%`,
+        sin_sucesor: withoutSuccessor.length,
+        pct_sin_sucesor: `${Math.round((withoutSuccessor.length / total) * 1000) / 10}%`
+      },
+      cargos_de_valor_criticos: {
+        total: criticalRoles.length,
+        cubiertos: criticalRoles.filter(r => r.tiene_sucesor === "Sí").length,
+        sin_sucesor_alerta: criticalNoSuccessor.length,
+        pct_cubiertos: `${Math.round((criticalRoles.filter(r => r.tiene_sucesor === "Sí").length / Math.max(criticalRoles.length, 1)) * 1000) / 10}%`
+      },
+      distribucion_riesgo_fuga: {
+        riesgo_alto: highRisk.length,
+        riesgo_medio: medRisk.length,
+        riesgo_bajo: lowRisk.length,
+        alertas_rojas_alto_sin_sucesor: imminentRedAlerts.length
+      },
+      pipeline_madurez_readiness: {
+        inmediato_ready_now: readyNow.length,
+        un_a_dos_anos: ready1to2.length,
+        tres_a_cinco_anos: ready3to5.length
+      },
+      distribucion_9box_resumen: {
+        box_9_futuro_lider: topTalentBox9.length,
+        box_8_alto_potencial: topTalentBox8.length,
+        box_5_profesional_clave: keyPlayersBox5.length,
+        total_top_talent_box_8_y_9: topTalentBox8.length + topTalentBox9.length
+      },
+      calidad_motivacional_sucesores: {
+        alta: motHigh.length,
+        media_atencion: motMed.length,
+        baja_alerta_roja: motLow.length
+      }
+    },
+    resumen_empresas: companyDigest,
+    alertas_rojas_inminentes: imminentRedAlerts.map(r => `${r.nombre} | ${r.empresa} | ${r.posicion} | GGS ${r.ggs} | ${r.tiempo_posicion}`),
+    foco_especifico_consulta: focusDetails
   };
-
-  return { sliced: compactRecords, stats };
 }
 
 async function callGeminiApiLive(userQuery, history = [], records = [], apiKey = "") {
@@ -1572,27 +1657,28 @@ async function callGeminiApiLive(userQuery, history = [], records = [], apiKey =
   const model = "gemini-2.5-flash";
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
 
-  const { sliced, stats } = sliceRecordsForClient(userQuery, records);
+  // Digestión Inteligente del Documento antes de llamar a Gemini
+  const digestedDoc = digestTalentDocumentForLLM(userQuery, records);
 
-  const systemPrompt = `Eres el Agente Inteligente de Talento y Sucesión de Centria (Grupo Breca).
-Tu objetivo es analizar la base de datos oficial 2026_Reporte_Sucesion.xlsx y proveer diagnósticos ejecutivos, estratégicos, planes de acción y recomendaciones para el Comité de Talento.
+  const systemPrompt = `Eres el Director de Talento & Asesor Estratégico Senior de Sucesión para Grupo Breca y Centria.
+Tu misión es asesorar al Comité de Talento y a los Directores Ejecutivos analizando el documento oficial digerido de 2026_Reporte_Sucesion.xlsx.
 
-DATOS FILTRADOS RELEVANTES (${sliced.length} de ${records.length} registros totales):
-${JSON.stringify(sliced, null, 1)}
-
-ESTADÍSTICAS OFICIALES DEL TALENT POOL:
-${JSON.stringify(stats, null, 1)}
+DOCUMENTO DIGERIDO OFICIAL DE SUCESIÓN (GRUPO BRECA 2026):
+${JSON.stringify(digestedDoc, null, 2)}
 
 DIRECTIVAS OBLIGATORIAS:
-1. Responde en español formal, ejecutivo, consultivo y con lenguaje de Comité de Talento.
-2. Utiliza nombres de personas, posiciones y empresas EXACTAMENTE como figuran en los datos. No inventes nombres.
-3. Formato de salida: Genera HTML semántico limpio y visual (usa <div class="ai-structured-response"><div class="ai-html-card"><div class="ai-html-body nexia-markdown">...</div></div></div>).
-   - Puedes usar <h3>, <h4>, <p>, <ul>, <li>, <strong>, <span> con clases ai-badge, ai-kpi-grid, ai-kpi-box, o <table class="ai-table"> dentro de <div class="ai-table-wrap">.
-   - NUNCA uses atributos inline 'style='. Usa exclusivamente las clases de Tailwind y Centria.
-4. Si es un análisis abierto o estratégico, incluye:
-   - 📌 Diagnóstico Ejecutivo & Hallazgos
-   - 🔍 Causas de Riesgo y Descalces Identificados
-   - 🎯 Plan de Acción y Medidas Recomendadas para el Comité de Talento.`;
+1. Lenguaje: Responde en español formal, estratégico y ejecutivo para el Comité de Talento.
+2. Fidelidad de Datos: Utiliza nombres exactos de personas, posiciones, empresas, niveles GGS y puntuaciones 9-Box que figuran en el documento digerido. NUNCA inventes nombres ni métricas.
+3. Estructura de Análisis Abierto:
+   - 📌 Diagnóstico Ejecutivo & Hallazgos Clave (respaldo con métricas y causas raíz).
+   - ⚠️ Evaluación de Impacto y Riesgos Ocultos (continuidad operacional, efecto dominó de vacantes, pérdida de conocimiento crítico).
+   - 🚀 Plan de Acción Priorizado (Inmediato 30 días, Corto plazo 90 días, Mediano plazo 6 meses).
+   - 💡 Recomendación Estratégica para el Comité de Talento.
+4. Formato Visual Centria:
+   - Genera HTML semántico limpio y visual:
+     <div class="ai-structured-response"><div class="ai-html-card"><div class="ai-html-body nexia-markdown">...</div></div></div>
+   - Puedes usar <div class="ai-kpi-grid"> con <div class="ai-kpi-box">, badges como <span class="ai-badge ai-badge-navy">, y tablas con <div class="ai-table-wrap"><table class="ai-table">.
+   - NUNCA uses atributos inline 'style='.`;
 
   const contents = [];
   if (Array.isArray(history)) {
@@ -1611,7 +1697,7 @@ DIRECTIVAS OBLIGATORIAS:
     system_instruction: { parts: [{ text: systemPrompt }] },
     contents: contents,
     generationConfig: {
-      temperature: 0.2,
+      temperature: 0.25,
       maxOutputTokens: 2048
     }
   };
@@ -1711,9 +1797,12 @@ async function sendChatQuestion(questionText) {
   const willUseGeminiLive = Boolean(storedKey && clientIntent.route === "OPEN_ANALYSIS");
 
   if (typingText) {
-    if (willUseGeminiLive) {
-      typingText.textContent = "🧠 Gemini 2.5 Flash conectado en vivo analizando causas y estrategia...";
-    } else if (clientIntent.route === "OPEN_ANALYSIS") {
+    if (clientIntent.route === "OPEN_ANALYSIS") {
+      typingText.textContent = "🧠 Gemini IA analizando causas, correlaciones y estrategia con documento digerido...";
+    } else {
+      typingText.textContent = "⚡ Estructurando plantilla ejecutiva de reporte...";
+    }
+  } else if (clientIntent.route === "OPEN_ANALYSIS") {
       typingText.textContent = "🧠 Motor Analítico de Talento analizando causas, correlaciones y estrategia...";
     } else {
       typingText.textContent = "⚡ Estructurando plantilla ejecutiva de reporte...";
@@ -1760,7 +1849,7 @@ async function sendChatQuestion(questionText) {
         const liveGeminiText = await callGeminiApiLive(q, state.chatHistory, state.records, storedKey);
         if (liveGeminiText) {
           rawAnswer = liveGeminiText;
-          routeLabel = "Gemini 2.5 Flash · Conectado en Vivo (Google AI Studio)";
+          routeLabel = "Gemini 2.5 Flash · Análisis Estratégico en Vivo";
           isLiveGeminiResponse = true;
           isLinear = false;
         }
@@ -1848,18 +1937,7 @@ async function sendChatQuestion(questionText) {
         : "ai-route-badge-template";
       const badgeIcon = isLiveGeminiResponse ? "✨" : isOpenRoute ? "🧠" : "⚡";
 
-      // Si es análisis abierto y aún no tiene API Key configurada, ofrecer invitación sutil de 1 clic
-      const apiKeyBanner = (!storedKey && isOpenRoute)
-        ? `<div class="mt-2.5 p-2.5 bg-blue-50/80 rounded-xl border border-blue-200/70 flex items-center justify-between gap-3 text-xs">
-            <div class="flex items-center gap-2 text-slate-700">
-              <span class="text-sm">💡</span>
-              <span>¿Deseas activar respuestas en tiempo real con <strong>Gemini 2.5 Flash</strong>?</span>
-            </div>
-            <button type="button" data-action="configure-gemini-key" class="px-3 py-1 rounded-lg bg-[#0B2545] hover:bg-blue-900 text-white font-bold text-[11px] whitespace-nowrap shadow-sm">
-              Conectar API Key
-            </button>
-          </div>`
-        : "";
+      const apiKeyBanner = "";
 
       const followUpHtml =
         followUps.length > 0
@@ -2531,65 +2609,7 @@ function bindEventListeners() {
 
   // Agente IA: FAB abre/reanuda, Minimizar o clic fuera preserva, Cerrar/Nueva sesión reinicia
   
-  // Modal de Configuración Google Gemini API Key
-  document.getElementById("btn-gemini-key")?.addEventListener("click", openGeminiKeyModal);
-  document.getElementById("btn-close-gemini-key-modal")?.addEventListener("click", closeGeminiKeyModal);
-  document.getElementById("gemini-key-modal-overlay")?.addEventListener("click", (e) => {
-    if (e.target.id === "gemini-key-modal-overlay") closeGeminiKeyModal();
-  });
-
-  document.getElementById("btn-toggle-key-visibility")?.addEventListener("click", () => {
-    const input = document.getElementById("gemini-api-key-input");
-    if (!input) return;
-    input.type = input.type === "password" ? "text" : "password";
-  });
-
-  document.getElementById("btn-save-gemini-key")?.addEventListener("click", () => {
-    const input = document.getElementById("gemini-api-key-input");
-    const val = input ? input.value.trim() : "";
-    if (!val) {
-      showToast("Ingresa una API Key válida", "error");
-      return;
-    }
-    setStoredGeminiKey(val);
-    showToast("Google Gemini API Key activada exitosamente", "success");
-    closeGeminiKeyModal();
-  });
-
-  document.getElementById("btn-remove-gemini-key")?.addEventListener("click", () => {
-    setStoredGeminiKey("");
-    const input = document.getElementById("gemini-api-key-input");
-    if (input) input.value = "";
-    showToast("API Key eliminada. Motor RAG local activo.", "info");
-    closeGeminiKeyModal();
-  });
-
-  document.getElementById("btn-test-gemini-key")?.addEventListener("click", async () => {
-    const input = document.getElementById("gemini-api-key-input");
-    const resultEl = document.getElementById("gemini-test-result");
-    const val = input ? input.value.trim() : "";
-    if (!val) {
-      showToast("Ingresa una API Key para probar", "error");
-      return;
-    }
-    if (resultEl) {
-      resultEl.className = "text-xs p-3 rounded-xl bg-blue-50 text-blue-800 font-semibold";
-      resultEl.textContent = "Probando conexión con Google Gemini 2.5 Flash...";
-    }
-    try {
-      await testGeminiKeyConnection(val);
-      if (resultEl) {
-        resultEl.className = "text-xs p-3 rounded-xl bg-emerald-50 text-emerald-800 font-bold border border-emerald-200";
-        resultEl.textContent = "✅ ¡Conexión exitosa con Gemini 2.5 Flash!";
-      }
-    } catch (err) {
-      if (resultEl) {
-        resultEl.className = "text-xs p-3 rounded-xl bg-rose-50 text-rose-800 font-semibold border border-rose-200";
-        resultEl.textContent = "❌ Error: " + (err.message || "Fallo en la prueba");
-      }
-    }
-  });
-
+  // Modal de Configuración Google Gemini API Key (Manejado por detrás)
   document.getElementById("btn-fab-chat")?.addEventListener("click", openChatDrawer);
   document.getElementById("btn-minimize-chat")?.addEventListener("click", minimizeChatDrawer);
   document.getElementById("chat-drawer-backdrop")?.addEventListener("click", minimizeChatDrawer);
@@ -2654,11 +2674,7 @@ function bindEventListeners() {
       return;
     }
     
-    const configKeyBtn = e.target.closest("button[data-action='configure-gemini-key']");
-    if (configKeyBtn) {
-      openGeminiKeyModal();
-      return;
-    }
+    
     const followupBtn = e.target.closest("button[data-followup-question]");
     if (followupBtn) {
       sendChatQuestion(followupBtn.getAttribute("data-followup-question"));
