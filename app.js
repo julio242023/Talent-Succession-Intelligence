@@ -322,17 +322,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function loadInitialData() {
-  try {
-    const res = await fetch("/api/data");
-    if (!res.ok) throw new Error("Modo estático activo");
-    const data = await res.json();
-    state.records = normalizeClientRecords(data.records || []);
-  } catch (_err) {
-    // Modo estático autónomo para GitHub Pages (datos embebidos del Excel oficial)
-    const fallbackData = Array.isArray(window.CENTRIA_INITIAL_DATA) ? window.CENTRIA_INITIAL_DATA : [];
-    state.records = normalizeClientRecords(fallbackData);
-  }
-
+  // Carga instantánea de los 101 registros oficiales desde los datos embebidos (100% estático)
+  const initial = Array.isArray(window.CENTRIA_INITIAL_DATA) ? window.CENTRIA_INITIAL_DATA : [];
+  state.records = normalizeClientRecords(initial);
   refreshMetadataLists();
   applyFiltersAndRender();
   updateDrawerBadge();
@@ -1859,37 +1851,7 @@ async function sendChatQuestion(questionText) {
       }
     }
 
-    // 3. Si aún no tenemos respuesta viva de Gemini, intentar backend FastAPI local
-    if (!rawAnswer) {
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: q,
-            records: state.records,
-            prefer_live_api: true,
-            history: state.chatHistory.slice(-6),
-          }),
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (data.source === "gemini_live" && (data.answer || data.reply)) {
-            rawAnswer = data.answer || data.reply;
-            isLinear = Boolean(data.isLinear);
-            if (data.route) routeType = data.route;
-            if (data.routeLabel) routeLabel = data.routeLabel;
-            isLiveGeminiResponse = true;
-          } else if (data.answer || data.reply) {
-            rawAnswer = data.answer || data.reply;
-            isLinear = Boolean(data.isLinear);
-          }
-        }
-      } catch (_backendErr) {
-        // En GitHub Pages estático el fetch falla normalmente con 404, continuando al motor RAG local
-      }
-    }
+// 3. En entorno estático sin servidor backend, continúa al motor analítico local
 
     // 4. Si no se usó API externa o falló, utilizar la respuesta analítica del motor RAG
     if (!rawAnswer) {
@@ -2111,15 +2073,7 @@ function mapExcelRowsToRecords(rows) {
 }
 
 async function syncRecordsToBackendIfAvailable() {
-  try {
-    await fetch("/api/talents/sync", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ records: state.records }),
-    });
-  } catch (_err) {
-    // En modo estático (GitHub Pages) se mantiene en memoria local
-  }
+  // Operación local en memoria (100% estático para GitHub Pages)
 }
 
 // ============================================================================
@@ -2586,16 +2540,9 @@ function bindEventListeners() {
   });
   document.getElementById("excel-file-input")?.addEventListener("change", handleExcelUpload);
   document.getElementById("btn-export-excel")?.addEventListener("click", exportToExcel);
-  document.getElementById("btn-reload-source")?.addEventListener("click", async () => {
-    try {
-      const res = await fetch("/api/reload", { method: "POST" });
-      if (!res.ok) throw new Error("Modo estático");
-      const data = await res.json();
-      state.records = normalizeClientRecords(data.records || []);
-    } catch (_err) {
-      const fallbackData = Array.isArray(window.CENTRIA_INITIAL_DATA) ? window.CENTRIA_INITIAL_DATA : [];
-      state.records = normalizeClientRecords(fallbackData);
-    }
+  document.getElementById("btn-reload-source")?.addEventListener("click", () => {
+    const initial = Array.isArray(window.CENTRIA_INITIAL_DATA) ? window.CENTRIA_INITIAL_DATA : [];
+    state.records = normalizeClientRecords(initial);
     refreshMetadataLists();
     clearAllFilters();
     showToast("Restaurados los 101 registros originales del reporte", "success");
