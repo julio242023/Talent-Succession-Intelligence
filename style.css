@@ -1,472 +1,1178 @@
 /* ==========================================================================
-   Centria Talent & Succession Intelligence — Executive Design System CSS
-   Basado en centria-ui-design-system + UX/UI Progressive Disclosure
-   Paleta: Navy #0B2545 | Blue #2563eb | Sky #3b82f6 | Magenta #C2185B | Bg #F4F6F8
+   GRUPO BRECA · TALENT & SUCCESSION INTELLIGENCE
+   Arquitectura Modular de Diseño Minimalista Corporativo (Design System)
+   --------------------------------------------------------------------------
+   FUENTE ÚNICA DE VERDAD (:root):
+   Paleta Oficial Breca (7 tonos + Acento Cargo de Valor):
+   1. Gris Claro Neutro : rgb(178, 177, 177) -> #B2B1B1
+   2. Gris Pizarra Medio: rgb(101, 103, 107) -> #65676B
+   3. Carbón Oscuro     : rgb(29, 36, 44)    -> #1D242C
+   4. Negro Puro        : rgb(0, 0, 0)       -> #000000
+   5. Verde Salvia      : rgb(77, 111, 97)   -> #4D6F61
+   6. Azul Acero / Teal : rgb(70, 112, 128)  -> #467080
+   7. Azul Petróleo     : rgb(0, 94, 133)    -> #005E85
+   +  Amarillo Corporativo (Cargo de Valor)  -> #F2B705
    ========================================================================== */
 
 :root {
-  --centria-navy: #0B2545;
-  --centria-navy-dark: #071930;
-  --centria-blue: #2563eb;
-  --centria-sky: #3b82f6;
-  --centria-magenta: #C2185B;
-  --centria-bg: #F4F6F8;
-  --centria-surface: #ffffff;
-  --centria-border: #e2e8f0;
-  --centria-text: #0f172a;
-  --centria-muted: #475569;
-  --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
-}
+  /* 1. Paleta Base Oficial Breca */
+  --breca-gray: #B2B1B1;
+  --breca-slate: #65676B;
+  --breca-charcoal: #1D242C;
+  --breca-black: #000000;
+  --breca-sage: #4D6F61;
+  --breca-teal: #467080;
+  --breca-petrol: #005E85;
+  --breca-gold: #F2B705;
 
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
-}
+  /* 2. Tokens de Superficie y Fondos */
+  --breca-bg-canvas: #F3F4F5;
+  --breca-bg-surface: #FFFFFF;
+  --breca-bg-subtle: #F7F8F9;
+  --breca-bg-muted: #EFEFEF;
+  --breca-bg-hover: #F1F3F5;
+  --breca-bg-avatar: #E6E7E8;
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--centria-bg);
-  color: var(--centria-text);
-  overflow-x: hidden;
-  line-height: 1.6;
-}
+  /* 3. Tokens de Texto Jerárquico */
+  --breca-text-primary: var(--breca-charcoal);
+  --breca-text-secondary: var(--breca-slate);
+  --breca-text-muted: var(--breca-gray);
+  --breca-text-inverse: #FFFFFF;
 
-/* Tipografía y Números Tabulares (UX Best Practice) */
-h1, h2, h3, h4 {
-  text-wrap: balance;
-  letter-spacing: -0.015em;
-}
+  /* 4. Tokens de Bordes y Divisores */
+  --breca-border-default: #D5D6D8;
+  --breca-border-subtle: #E4E6E8;
+  --breca-border-strong: var(--breca-gray);
 
-p, li {
-  text-wrap: pretty;
-}
+  /* 5. Tokens Semánticos de Tintes (Fondos Suaves y Bordes de Estado) */
+  --breca-tint-charcoal-bg: rgba(29, 36, 44, 0.07);
+  --breca-tint-charcoal-border: rgba(29, 36, 44, 0.24);
 
-.tabular-nums,
-.centria-table td,
-.centria-table th,
-.ai-table td,
-.ai-table th {
-  font-variant-numeric: tabular-nums;
+  --breca-tint-petrol-bg: rgba(0, 94, 133, 0.08);
+  --breca-tint-petrol-border: rgba(0, 94, 133, 0.26);
+
+  --breca-tint-sage-bg: rgba(77, 111, 97, 0.10);
+  --breca-tint-sage-border: rgba(77, 111, 97, 0.30);
+
+  --breca-tint-teal-bg: rgba(70, 112, 128, 0.10);
+  --breca-tint-teal-border: rgba(70, 112, 128, 0.28);
+
+  --breca-tint-gold-bg: rgba(242, 183, 5, 0.24);
+  --breca-tint-gold-border: rgba(242, 183, 5, 0.55);
+
+  /* 6. Tokens de Ficha "Valoración Ejecutiva Ecualizada" */
+  --breca-fit-strong: #0A2538;
+  --breca-fit-good: #3E84D4;
+  --breca-fit-partial: #9FC2EA;
+  --breca-fit-low-border: var(--breca-teal);
+  --breca-ficha-slate-header: #65707A;
+
+  /* 7. Tipografía, Radios, Sombras y Proporciones del Workspace IA */
+  --breca-font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --breca-font-serif: Georgia, 'Times New Roman', serif;
+  --breca-radius-sm: 0.375rem;
+  --breca-radius-md: 0.5rem;
+  --breca-radius-lg: 0.625rem;
+  --breca-radius-xl: 0.75rem;
+  --breca-shadow-card: 0 1px 2px rgba(29, 36, 44, 0.04);
+  --breca-shadow-hover: 0 6px 16px -4px rgba(29, 36, 44, 0.08);
+  --breca-shadow-modal: 0 24px 48px -12px rgba(29, 36, 44, 0.28);
+
+  /* Proporción modular de Vista Dividida (Lienzo amplio vs Chat estilizado y contenido) */
+  --breca-split-canvas-lg: 62%;
+  --breca-split-chat-lg: 38%;
+  --breca-split-canvas-xl: 64%;
+  --breca-split-chat-xl: 36%;
 }
 
 /* ==========================================================================
-   1. HEADER CORPORATIVO CENTRIA MEJORADO
+   BASE Y RESETEO CORPORATIVO
    ========================================================================== */
-.centria-header-gradient {
-  background: linear-gradient(125deg, #071930 0%, #0B2545 55%, #163d73 100%);
+html {
+  font-family: var(--breca-font-sans);
+  scroll-behavior: smooth;
+  color: var(--breca-text-primary);
+  background-color: var(--breca-bg-canvas);
 }
 
-.centria-accent-bar {
-  height: 2px;
-  background: linear-gradient(90deg, #0b2545 0%, #1e3a8a 60%, #475569 100%);
+body,
+.breca-app-body {
+  background-color: var(--breca-bg-canvas);
+  color: var(--breca-text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar minimalista */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--breca-bg-canvas);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--breca-gray);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--breca-slate);
+}
+
+/* ==========================================================================
+   SISTEMA MODULAR DE TIPOGRAFÍA Y CABECERAS
+   ========================================================================== */
+.breca-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  border-bottom: 1px solid rgba(178, 177, 177, 0.22);
+}
+
+.breca-brand-mark {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--breca-radius-sm);
+  background-color: var(--breca-petrol);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--breca-text-inverse);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+  flex-shrink: 0;
+}
+
+.breca-brand-kicker {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--breca-gray);
+}
+
+.breca-brand-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--breca-text-inverse);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.breca-header-divider {
+  height: 1.5rem;
+  width: 1px;
+  background-color: rgba(178, 177, 177, 0.28);
 }
 
 .header-glass-pill {
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(178, 177, 177, 0.22);
+}
+
+.centria-accent-bar {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--breca-petrol) 0%, var(--breca-teal) 50%, var(--breca-sage) 100%);
+}
+
+.breca-header .breca-tab-group {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(178, 177, 177, 0.22);
+}
+
+.breca-header .header-tab-active {
+  background-color: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+}
+
+.breca-header .header-tab-inactive {
+  color: var(--breca-gray);
+}
+
+.breca-header .header-tab-inactive:hover {
+  color: var(--breca-text-inverse);
   background-color: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(8px);
 }
 
-.header-tab-btn {
-  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+.breca-header .breca-pill-sage {
+  background-color: rgba(77, 111, 97, 0.28);
+  color: #E2EFEA;
+  border-color: rgba(77, 111, 97, 0.55);
 }
 
-.header-tab-active {
-  background-color: #ffffff;
-  color: #0B2545;
-  box-shadow: 0 2px 8px -2px rgba(7, 25, 48, 0.35);
+.breca-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--breca-text-secondary);
 }
 
-.header-tab-inactive {
-  color: rgba(219, 234, 254, 0.85);
+.breca-kicker-petrol {
+  color: var(--breca-petrol);
 }
 
-.header-tab-inactive:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+.breca-kicker-sage {
+  color: var(--breca-sage);
+}
+
+.breca-kicker-teal {
+  color: var(--breca-teal);
+}
+
+.breca-kicker-charcoal {
+  color: var(--breca-charcoal);
+}
+
+.breca-section-title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--breca-text-primary);
+  letter-spacing: -0.015em;
+  margin-top: 0.125rem;
+}
+
+.breca-section-desc {
+  font-size: 0.75rem;
+  color: var(--breca-text-secondary);
+  margin-top: 0.125rem;
+}
+
+.breca-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--breca-border-subtle);
 }
 
 /* ==========================================================================
-   2. TARJETAS EJECUTIVAS Y CONTENEDORES DE GRÁFICOS EN VIVO (CHART.JS)
+   SISTEMA MODULAR DE SUPERFICIES Y TARJETAS (.executive-card, .card-surface, .kpi-card)
    ========================================================================== */
-.executive-card {
-  background-color: #ffffff;
-  border-radius: 1.25rem;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  box-shadow: 0 4px 16px -4px rgba(11, 37, 69, 0.045), 0 2px 6px -2px rgba(11, 37, 69, 0.025);
+.executive-card,
+.card-surface {
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-lg);
+  box-shadow: var(--breca-shadow-card);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.executive-card:hover,
+.card-surface:hover {
+  box-shadow: var(--breca-shadow-hover);
+}
+
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-md);
+  padding: 1rem 1.25rem;
+  text-align: left;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--breca-charcoal);
+  opacity: 0.85;
+  transition: background-color 0.16s ease, width 0.16s ease;
+}
+
+.kpi-card-sage::before {
+  background: var(--breca-sage);
+}
+
+.kpi-card-petrol::before {
+  background: var(--breca-petrol);
+}
+
+.kpi-card-teal::before {
+  background: var(--breca-teal);
+}
+
+.kpi-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--breca-petrol);
+  box-shadow: var(--breca-shadow-hover);
+}
+
+.kpi-card-active {
+  border-color: var(--breca-petrol) !important;
+  box-shadow: 0 0 0 2px rgba(0, 94, 133, 0.18);
+}
+
+.breca-kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--breca-text-secondary);
+}
+
+.breca-kpi-value {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--breca-text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.breca-kpi-value-sage {
+  color: var(--breca-sage);
+}
+
+.breca-kpi-value-petrol {
+  color: var(--breca-petrol);
+}
+
+.breca-kpi-sub {
+  font-size: 0.75rem;
+  color: var(--breca-text-secondary);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.breca-kpi-highlight {
+  color: var(--breca-text-primary);
+  font-weight: 700;
+}
+
+.breca-kpi-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--breca-radius-sm);
+  background-color: var(--breca-bg-subtle);
+  color: var(--breca-charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.breca-kpi-icon-sage {
+  color: var(--breca-sage);
+}
+
+.breca-kpi-icon-petrol {
+  color: var(--breca-petrol);
+}
+
+/* ==========================================================================
+   SISTEMA MODULAR DE BOTONES Y TABS (.breca-btn-*, .header-tab-*)
+   ========================================================================== */
+.breca-tab-group {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--breca-bg-subtle);
+  padding: 0.25rem;
+  border-radius: var(--breca-radius-md);
+  border: 1px solid var(--breca-border-default);
+}
+
+.header-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--breca-radius-sm);
+  font-size: 0.75rem;
+  transition: all 0.16s ease;
+}
+
+.header-tab-active {
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.header-tab-inactive {
+  color: var(--breca-text-secondary);
+  font-weight: 600;
+}
+
+.header-tab-inactive:hover {
+  color: var(--breca-text-primary);
+  background-color: rgba(178, 177, 177, 0.22);
+}
+
+.breca-tab-badge {
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 10px;
+  font-weight: 800;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: currentColor;
+}
+
+:where(.breca-btn) {
+  display: inline-flex;
+}
+
+.breca-btn {
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--breca-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.breca-btn-primary {
+  background-color: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+  border: 1px solid var(--breca-petrol);
+  box-shadow: var(--breca-shadow-card);
+}
+
+.breca-btn-primary:hover {
+  background-color: var(--breca-charcoal);
+  border-color: var(--breca-charcoal);
+}
+
+.breca-btn-dark {
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  border: 1px solid var(--breca-charcoal);
+  box-shadow: var(--breca-shadow-card);
+}
+
+.breca-btn-dark:hover {
+  background-color: var(--breca-petrol);
+  border-color: var(--breca-petrol);
+}
+
+.breca-btn-secondary {
+  background-color: var(--breca-bg-surface);
+  color: var(--breca-text-primary);
+  border: 1px solid var(--breca-border-default);
+}
+
+.breca-btn-secondary:hover {
+  background-color: var(--breca-bg-subtle);
+  border-color: var(--breca-border-strong);
+}
+
+.breca-btn-ghost {
+  background-color: transparent;
+  color: var(--breca-text-secondary);
+  border: 1px solid transparent;
+}
+
+.breca-btn-ghost:hover {
+  color: var(--breca-text-primary);
+  background-color: var(--breca-bg-subtle);
+}
+
+.breca-btn-ficha {
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--breca-radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  background-color: var(--breca-tint-petrol-bg);
+  color: var(--breca-petrol);
+  border: 1px solid var(--breca-tint-petrol-border);
+  transition: all 0.15s ease;
+}
+
+.breca-btn-ficha:hover {
+  background-color: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+  border-color: var(--breca-petrol);
+}
+
+.breca-btn-icon {
+  padding: 0.375rem;
+  border-radius: var(--breca-radius-sm);
+  color: var(--breca-text-secondary);
+  background: transparent;
+  transition: all 0.15s ease;
+}
+
+.breca-btn-icon:hover {
+  color: var(--breca-text-primary);
+  background-color: var(--breca-bg-subtle);
+}
+
+.breca-btn-page {
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--breca-radius-sm);
+  border: 1px solid var(--breca-border-default);
+  background-color: var(--breca-bg-surface);
+  color: var(--breca-text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.breca-btn-page:hover:not(:disabled) {
+  background-color: var(--breca-bg-subtle);
+  border-color: var(--breca-border-strong);
+}
+
+.breca-btn-page:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   SISTEMA MODULAR DE CONTROLES DE FORMULARIO (.breca-input, .breca-select)
+   ========================================================================== */
+.breca-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--breca-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.breca-input,
+.breca-select {
+  width: 100%;
+  background-color: var(--breca-bg-subtle);
+  border: 1px solid var(--breca-border-default);
+  color: var(--breca-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--breca-radius-md);
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.breca-input::placeholder {
+  color: var(--breca-text-secondary);
+}
+
+.breca-input:focus,
+.breca-select:focus {
+  outline: none;
+  background-color: var(--breca-bg-surface);
+  border-color: var(--breca-petrol);
+  box-shadow: 0 0 0 2px rgba(0, 94, 133, 0.15);
+}
+
+.breca-select-sm {
+  background-color: var(--breca-bg-subtle);
+  border: 1px solid var(--breca-border-default);
+  color: var(--breca-text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--breca-radius-sm);
+  padding: 0.4rem 0.65rem;
+  transition: border-color 0.15s ease;
+}
+
+.breca-select-sm:focus {
+  outline: none;
+  border-color: var(--breca-petrol);
+}
+
+.breca-search-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.breca-search-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--breca-text-secondary);
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.breca-input-search {
+  padding-left: 2.5rem;
+  padding-right: 1rem;
+  font-size: 0.75rem;
+}
+
+/* ==========================================================================
+   SISTEMA MODULAR DE PÍLDORAS, BADGES Y CHIPS DE FILTRO (.breca-pill-*, .breca-chip-*)
+   ========================================================================== */
+:where(.breca-pill) {
+  display: inline-flex;
+}
+
+.breca-pill {
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.breca-pill-sm {
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--breca-radius-sm);
+  font-size: 10px;
+}
+
+.breca-pill-valor {
+  background-color: var(--breca-gold);
+  color: var(--breca-charcoal);
+  border-color: var(--breca-tint-gold-border);
+  font-weight: 800;
+}
+
+.breca-pill-charcoal {
+  background-color: var(--breca-tint-charcoal-bg);
+  color: var(--breca-charcoal);
+  border-color: var(--breca-tint-charcoal-border);
+}
+
+.breca-pill-petrol {
+  background-color: var(--breca-tint-petrol-bg);
+  color: var(--breca-petrol);
+  border-color: var(--breca-tint-petrol-border);
+}
+
+.breca-pill-sage {
+  background-color: var(--breca-tint-sage-bg);
+  color: var(--breca-sage);
+  border-color: var(--breca-tint-sage-border);
+}
+
+.breca-pill-teal {
+  background-color: var(--breca-tint-teal-bg);
+  color: var(--breca-teal);
+  border-color: var(--breca-tint-teal-border);
+}
+
+.breca-pill-neutral {
+  background-color: var(--breca-bg-subtle);
+  color: var(--breca-text-secondary);
+  border-color: var(--breca-border-default);
+}
+
+.breca-pill-outline {
+  background-color: var(--breca-bg-surface);
+  color: var(--breca-text-primary);
+  border-color: var(--breca-border-default);
+}
+
+.breca-status-dot {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 9999px;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+.breca-dot-charcoal {
+  background-color: var(--breca-charcoal);
+}
+
+.breca-dot-teal {
+  background-color: var(--breca-teal);
+}
+
+.breca-dot-sage {
+  background-color: var(--breca-sage);
+}
+
+.breca-dot-petrol {
+  background-color: var(--breca-petrol);
+}
+
+.breca-dot-slate {
+  background-color: var(--breca-slate);
+}
+
+/* Chips de Filtros Rápidos (Presets) */
+.breca-chip,
+.preset-chip,
+.preset-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--breca-radius-sm);
+  border: 1px solid var(--breca-border-default);
+  background-color: var(--breca-bg-subtle);
+  color: var(--breca-text-primary);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.breca-chip:hover {
+  border-color: var(--breca-charcoal);
+  background-color: var(--breca-tint-charcoal-bg);
+}
+
+.breca-chip-valor {
+  background-color: var(--breca-tint-gold-bg);
+  border-color: var(--breca-tint-gold-border);
+  color: var(--breca-charcoal);
+}
+
+.breca-chip-valor:hover {
+  background-color: rgba(242, 183, 5, 0.38);
+}
+
+.breca-chip-sage {
+  background-color: var(--breca-tint-sage-bg);
+  border-color: var(--breca-tint-sage-border);
+  color: var(--breca-sage);
+}
+
+.breca-chip-sage:hover {
+  background-color: rgba(77, 111, 97, 0.18);
+}
+
+.breca-chip-petrol {
+  background-color: var(--breca-tint-petrol-bg);
+  border-color: var(--breca-tint-petrol-border);
+  color: var(--breca-petrol);
+}
+
+.breca-chip-petrol:hover {
+  background-color: rgba(0, 94, 133, 0.16);
+}
+
+.preset-chip-active {
+  background-color: var(--breca-charcoal) !important;
+  color: var(--breca-text-inverse) !important;
+  border-color: var(--breca-charcoal) !important;
+}
+
+/* ==========================================================================
+   MATRIZ 9-BOX CALIBRADA, CONTENEDORES DE GRÁFICOS Y MOSAICOS (.ninebox-*, .chart-canvas-box)
+   ========================================================================== */
+.ninebox-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .ninebox-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .chart-canvas-box {
   position: relative;
   width: 100%;
-  height: 260px;
+  height: 250px;
 }
 
 .chart-canvas-box-lg {
   position: relative;
   width: 100%;
-  height: 310px;
+  height: 295px;
 }
 
-/* Tarjetas KPI Interactivas */
-.kpi-card-interactive {
-  background-color: #ffffff;
-  border-radius: 1.25rem;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  box-shadow: 0 4px 14px -4px rgba(11, 37, 69, 0.045), 0 2px 5px -2px rgba(11, 37, 69, 0.025);
-  transition: transform 0.22s var(--ease-out-quart), box-shadow 0.22s var(--ease-out-quart), border-color 0.16s ease, background-color 0.16s ease;
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.kpi-card-interactive:hover {
-  transform: translateY(-3px);
-  border-color: #cbd5e1;
-  box-shadow: 0 14px 26px -6px rgba(11, 37, 69, 0.09), 0 6px 12px -4px rgba(11, 37, 69, 0.04);
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-.kpi-card-interactive:active {
-  transform: scale(0.985);
-}
-
-.kpi-card-active {
-  border-color: #2563eb !important;
-  background-color: #f8fbff !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18), 0 10px 20px -4px rgba(11, 37, 69, 0.08);
-}
-
-/* Tarjetas de Preguntas de Referencia dentro del Agente IA */
-.ai-prompt-card {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 2px rgba(11, 37, 69, 0.03);
-  transition: transform 0.18s var(--ease-out-quart), box-shadow 0.18s var(--ease-out-quart), border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.ai-prompt-card:hover {
-  transform: translateY(-1.5px);
-  border-color: #93c5fd;
-  background-color: #f8fbff;
-  box-shadow: 0 6px 14px -4px rgba(37, 99, 235, 0.13);
-}
-
-.ai-prompt-card:active {
-  transform: scale(0.985);
-}
-
-.ai-prompt-card-open {
-  background: linear-gradient(180deg, #ffffff 0%, #fafaff 100%);
-  border: 1px solid #e0e7ff;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 2px rgba(67, 56, 202, 0.04);
-  transition: transform 0.18s var(--ease-out-quart), box-shadow 0.18s var(--ease-out-quart), border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.ai-prompt-card-open:hover {
-  transform: translateY(-1.5px);
-  border-color: #a5b4fc;
-  background: #f5f7ff;
-  box-shadow: 0 6px 14px -4px rgba(79, 70, 229, 0.15);
-}
-
-.ai-prompt-card-open:active {
-  transform: scale(0.985);
-}
-
-/* Chips de Filtro Rápido */
-.preset-chip {
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
-}
-
-.preset-chip:active {
-  transform: scale(0.97);
-}
-
-.preset-chip-active {
-  background-color: #0B2545 !important;
-  color: #ffffff !important;
-  border-color: #0B2545 !important;
-}
-
-/* Scrollbars ejecutivos */
-::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Tabla Reactiva & Cabeceras Fijas */
-.centria-table-container {
-  max-height: 680px;
-  overflow: auto;
-}
-
-.centria-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #f8fafc;
-  box-shadow: inset 0 -1px 0 #e2e8f0;
-}
-
-.centria-table tbody tr {
-  transition: background-color 0.14s ease;
-}
-
-.centria-table tbody tr:hover {
-  background-color: #f8fafc;
-}
-
-/* Matriz 9-Box Interactiva (3x3 con Espaciado Amplio) */
-.ninebox-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.875rem;
-}
-
 .ninebox-cell {
-  transition: transform 0.22s var(--ease-out-quart), box-shadow 0.22s var(--ease-out-quart), border-color 0.16s ease;
+  position: relative;
+  border-radius: var(--breca-radius-lg);
+  padding: 1rem 1.15rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 124px;
+  border: 1px solid var(--breca-border-default);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
 }
+
 .ninebox-cell:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 22px -4px rgba(11, 37, 69, 0.09), 0 4px 8px -4px rgba(11, 37, 69, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px -4px rgba(29, 36, 44, 0.12);
 }
+
 .ninebox-cell-active {
-  outline: 2.5px solid #2563eb;
+  outline: 2.5px solid var(--breca-charcoal);
   outline-offset: 2px;
 }
 
-/* ==========================================================================
-   3. BOTÓN FLOTANTE ÚNICO (FAB) Y DRAWER DEL AGENTE IA
-   ========================================================================== */
-.nexia-fab {
-  background: linear-gradient(135deg, #0B2545 0%, #1d4ed8 100%);
-  box-shadow: 0 16px 34px -6px rgba(11, 37, 69, 0.48), 0 6px 16px -2px rgba(37, 99, 235, 0.32);
-  transition: transform 0.22s var(--ease-out-quart), box-shadow 0.22s var(--ease-out-quart);
-}
-.nexia-fab:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 22px 40px -6px rgba(11, 37, 69, 0.56), 0 8px 20px -2px rgba(37, 99, 235, 0.4);
-}
-.nexia-fab:active {
-  transform: scale(0.98);
+/* Variantes semánticas de celdas y badges 9-Box con la paleta Breca */
+.ninebox-cell-top,
+.ninebox-badge-top {
+  background-color: var(--breca-tint-petrol-bg);
+  border-color: var(--breca-tint-petrol-border);
+  color: var(--breca-petrol);
 }
 
-.chat-drawer-backdrop {
-  background-color: rgba(11, 37, 69, 0.45);
-  backdrop-filter: blur(3px);
-  transition: opacity 0.25s ease;
+.ninebox-cell-high,
+.ninebox-badge-high {
+  background-color: var(--breca-tint-teal-bg);
+  border-color: var(--breca-tint-teal-border);
+  color: var(--breca-teal);
 }
 
-.chat-drawer-panel {
-  transition: transform 0.28s var(--ease-out-quart), width 0.25s var(--ease-out-quart);
+.ninebox-cell-sage,
+.ninebox-badge-sage {
+  background-color: var(--breca-tint-sage-bg);
+  border-color: var(--breca-tint-sage-border);
+  color: var(--breca-sage);
 }
 
-/* Cabecera de 2 filas y barra de modos del Chat Drawer */
-.chat-subheader-bar {
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  border-bottom: 1px solid #e2e8f0;
+.ninebox-cell-core,
+.ninebox-badge-core {
+  background-color: var(--breca-bg-subtle);
+  border-color: var(--breca-border-strong);
+  color: var(--breca-charcoal);
 }
 
-.chat-mode-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: 0.5rem;
-  font-size: 0.72rem;
+.ninebox-cell-muted,
+.ninebox-badge-muted {
+  background-color: var(--breca-bg-subtle);
+  border-color: var(--breca-border-default);
+  color: var(--breca-slate);
+}
+
+.ninebox-cell-low,
+.ninebox-badge-low {
+  background-color: var(--breca-tint-charcoal-bg);
+  border-color: var(--breca-tint-charcoal-border);
+  color: var(--breca-charcoal);
+}
+
+.ninebox-pct-pill {
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #475569;
-  background-color: transparent;
-  border: 1px solid transparent;
-  transition: all 0.16s ease;
-  white-space: nowrap;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--breca-radius-sm);
+  background-color: rgba(255, 255, 255, 0.88);
+  font-variant-numeric: tabular-nums;
+  box-shadow: var(--breca-shadow-card);
 }
 
-.chat-mode-tab:hover {
-  color: #0B2545;
-  background-color: rgba(255, 255, 255, 0.75);
+/* Mini-mosaicos de resumen debajo de los gráficos en vivo */
+.breca-stat-tile {
+  padding: 0.625rem;
+  border-radius: var(--breca-radius-md);
+  border: 1px solid var(--breca-border-default);
+  background-color: var(--breca-bg-subtle);
+  color: var(--breca-text-primary);
+  text-align: center;
 }
 
-.chat-mode-tab-active {
-  color: #0B2545;
-  background-color: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 1px 3px rgba(11, 37, 69, 0.08);
+.breca-stat-tile-charcoal {
+  background-color: var(--breca-tint-charcoal-bg);
+  border-color: var(--breca-tint-charcoal-border);
+  color: var(--breca-charcoal);
 }
 
-.chat-mode-tab-open.chat-mode-tab-active {
-  color: #3730a3;
-  background-color: #eef2ff;
-  border-color: #c7d2fe;
+.breca-stat-tile-petrol {
+  background-color: var(--breca-tint-petrol-bg);
+  border-color: var(--breca-tint-petrol-border);
+  color: var(--breca-petrol);
 }
 
-/* Caja unificada de entrada de mensaje (Prompt Composer) */
-.chat-composer-box {
-  background-color: #f8fafc;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 1rem;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+.breca-stat-tile-sage {
+  background-color: var(--breca-tint-sage-bg);
+  border-color: var(--breca-tint-sage-border);
+  color: var(--breca-sage);
 }
 
-.chat-composer-box:focus-within {
-  background-color: #ffffff;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14), 0 4px 12px -2px rgba(11, 37, 69, 0.06);
+.breca-stat-tile-teal {
+  background-color: var(--breca-tint-teal-bg);
+  border-color: var(--breca-tint-teal-border);
+  color: var(--breca-teal);
 }
 
-/* Badges del Enrutador Inteligente de Intención (Plantilla vs Análisis Abierto IA) */
-.ai-route-badge-template {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: 0.45rem;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  background-color: #eff6ff;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
+.breca-stat-tile-neutral {
+  background-color: var(--breca-bg-subtle);
+  border-color: var(--breca-border-default);
+  color: var(--breca-slate);
 }
 
-.ai-route-badge-open {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 0.45rem;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  background: linear-gradient(135deg, #312e81 0%, #4338ca 100%);
-  color: #ffffff;
-  border: 1px solid #4f46e5;
-  box-shadow: 0 2px 6px rgba(67, 56, 202, 0.22);
-}
-
-.ai-html-header-open {
-  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #1d4ed8 100%);
-  color: #ffffff;
-  padding: 0.95rem 1.15rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.ai-insight-banner {
-  background: linear-gradient(135deg, #f8faff 0%, #eef2ff 100%);
-  border: 1px solid #c7d2fe;
-  border-left: 4px solid #4f46e5;
-  border-radius: 0.75rem;
-  padding: 0.8rem 1rem;
-  color: #1e1b4b;
-  font-size: 0.82rem;
-  line-height: 1.58;
-}
-
-.ai-step-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 0.65rem;
-}
-
-.ai-step-card {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-top: 3px solid #2563eb;
-  border-radius: 0.75rem;
-  padding: 0.75rem 0.9rem;
-}
-
-.ai-step-card-title {
-  font-size: 0.76rem;
-  font-weight: 800;
-  color: #0B2545;
-  margin-bottom: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.ai-step-card-text {
-  font-size: 0.77rem;
-  color: #334155;
-  line-height: 1.5;
-}
-
-.ai-followup-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.35rem;
-}
-
-.ai-followup-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.32rem 0.68rem;
-  border-radius: 9999px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  background-color: #ffffff;
-  color: #1e3a8a;
-  border: 1px solid #cbd5e1;
+/* Chips de empresa en el gráfico 4 */
+.breca-company-chip {
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--breca-radius-sm);
+  border: 1px solid var(--breca-border-default);
+  background-color: var(--breca-bg-subtle);
+  color: var(--breca-text-primary);
+  font-size: 11px;
+  font-weight: 700;
   transition: all 0.15s ease;
   cursor: pointer;
 }
 
-.ai-followup-chip:hover {
-  background-color: #eff6ff;
-  border-color: #60a5fa;
-  color: #1d4ed8;
-  transform: translateY(-1px);
+.breca-company-chip:hover {
+  background-color: var(--breca-tint-petrol-bg);
+  color: var(--breca-petrol);
+  border-color: var(--breca-tint-petrol-border);
+}
+
+.breca-company-chip-active {
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  border-color: var(--breca-charcoal);
+}
+
+/* Tarjetas de Radar de Atención Prioritaria */
+.breca-alert-card {
+  padding: 1rem;
+  border-radius: var(--breca-radius-md);
+  background-color: var(--breca-bg-subtle);
+  border: 1px solid var(--breca-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 /* ==========================================================================
-   4. SISTEMA DE ESTILOS PARA RESPUESTAS HTML ESTRUCTURADAS Y LINEALES DEL LLM
+   TABLA EJECUTIVA DE DIRECTORIO (.centria-table, .executive-table)
    ========================================================================== */
+.centria-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.breca-table-head {
+  background-color: var(--breca-bg-subtle);
+  border-bottom: 1px solid var(--breca-border-default);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--breca-text-secondary);
+}
+
+.centria-table tbody tr,
+.executive-table tbody tr {
+  transition: background-color 0.14s ease;
+}
+
+.centria-table tbody tr:hover,
+.executive-table tbody tr:hover {
+  background-color: var(--breca-bg-hover);
+}
+
+.breca-avatar-circle {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  background-color: var(--breca-bg-avatar);
+  color: var(--breca-text-primary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--breca-border-default);
+}
+
+.breca-person-link {
+  font-weight: 700;
+  color: var(--breca-text-primary);
+  text-align: left;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.breca-person-link:hover {
+  color: var(--breca-petrol);
+}
+
+/* ==========================================================================
+   MODAL CRUD Y TOASTS (.breca-modal-*, .breca-toast-*)
+   ========================================================================== */
+.breca-modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 42rem;
+  background-color: var(--breca-bg-surface);
+  border-radius: var(--breca-radius-lg);
+  box-shadow: var(--breca-shadow-modal);
+  border: 1px solid var(--breca-border-strong);
+  overflow: hidden;
+}
+
+.breca-modal-header {
+  padding: 1rem 1.5rem;
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.breca-toast {
+  pointer-events: auto;
+  padding: 0.625rem 1rem;
+  border-radius: var(--breca-radius-lg);
+  box-shadow: var(--breca-shadow-hover);
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: opacity 0.3s ease;
+}
+
+.breca-toast-info,
+.breca-toast-error {
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  border: 1px solid rgba(178, 177, 177, 0.35);
+}
+
+.breca-toast-success {
+  background-color: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+  border: 1px solid var(--breca-petrol);
+}
+
+/* Conmutador Móvil de Vista Dividida */
+.breca-mobile-tab {
+  flex: 1;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--breca-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: var(--breca-bg-surface);
+  color: var(--breca-text-secondary);
+  border: 1px solid var(--breca-border-default);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+}
+
+.breca-mobile-tab-active {
+  flex: 1;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--breca-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 800;
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  border: 1px solid var(--breca-charcoal);
+  box-shadow: var(--breca-shadow-card);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+}
+
+/* ==========================================================================
+   SISTEMA DE COMPONENTES HTML DEL AGENTE IA (SIN ATRIBUTOS STYLE INLINE)
+   ========================================================================== */
+.chat-bubble-ai {
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-border-default);
+  box-shadow: var(--breca-shadow-card);
+}
+
+.breca-chat-user-bubble {
+  max-width: 88%;
+  border-radius: var(--breca-radius-lg);
+  border-top-right-radius: 0.125rem;
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: var(--breca-shadow-card);
+}
+
+.breca-ai-avatar {
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: var(--breca-radius-sm);
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
 .ai-structured-response {
   display: flex;
   flex-direction: column;
-  gap: 0.875rem;
-  color: #1e293b;
+  gap: 0.85rem;
+  color: var(--breca-text-primary);
   font-size: 0.85rem;
   line-height: 1.55;
 }
 
 .ai-linear-response {
-  font-size: 0.9rem;
-  line-height: 1.65;
-  color: #1e293b;
   margin: 0;
+  color: var(--breca-text-primary);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.ai-linear-response strong {
+  color: var(--breca-black);
+  font-weight: 700;
 }
 
 .ai-html-card {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.9rem;
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-md);
   overflow: hidden;
-  box-shadow: 0 2px 8px -2px rgba(11, 37, 69, 0.04);
+  box-shadow: var(--breca-shadow-card);
 }
 
 .ai-html-header {
-  background: linear-gradient(135deg, #0B2545 0%, #1e3a8a 100%);
-  color: #ffffff;
-  padding: 0.9rem 1.15rem;
+  background: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  padding: 0.85rem 1.1rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -475,674 +1181,1680 @@ p, li {
 }
 
 .ai-html-title {
-  font-size: 0.98rem;
-  font-weight: 700;
-  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--breca-text-inverse);
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .ai-html-subtitle {
-  font-size: 0.76rem;
-  color: #bfdbfe;
+  font-size: 0.74rem;
+  color: var(--breca-gray);
+  font-weight: 500;
   margin-top: 0.15rem;
 }
 
 .ai-html-body {
-  padding: 1rem 1.15rem;
+  padding: 1rem 1.1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-}
-
-.ai-section-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #0B2545;
-  margin: 0.25rem 0 0.1rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  gap: 0.9rem;
 }
 
 .ai-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
-  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 0.6rem;
 }
 
 .ai-kpi-box {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.7rem;
+  background: var(--breca-bg-subtle);
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-sm);
   padding: 0.65rem 0.8rem;
 }
 
 .ai-kpi-label {
   display: block;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #64748b;
-  margin-bottom: 0.2rem;
+  letter-spacing: 0.06em;
+  color: var(--breca-text-secondary);
 }
 
 .ai-kpi-value {
-  font-size: 0.95rem;
+  margin-top: 0.2rem;
+  font-size: 0.92rem;
   font-weight: 800;
-  color: #0B2545;
-  font-variant-numeric: tabular-nums;
+  color: var(--breca-text-primary);
 }
 
-/* Badges Semánticos del Agente IA */
-.ai-badge {
-  display: inline-flex;
+.ai-section-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--breca-text-primary);
+  margin: 0.2rem 0 0.1rem 0;
+  display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.18rem 0.55rem;
-  border-radius: 9999px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--breca-border-subtle);
+  padding-bottom: 0.3rem;
 }
 
-.ai-badge-red {
-  background-color: #fff1f2;
-  color: #be123c;
-  border: 1px solid #fecdd3;
-}
-
-.ai-badge-amber {
-  background-color: #fffbeb;
-  color: #b45309;
-  border: 1px solid #fde68a;
-}
-
-.ai-badge-green {
-  background-color: #ecfdf5;
-  color: #047857;
-  border: 1px solid #a7f3d0;
-}
-
-.ai-badge-blue {
-  background-color: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
-}
-
-.ai-badge-indigo {
-  background-color: #eef2ff;
-  color: #4338ca;
-  border: 1px solid #c7d2fe;
-}
-
-.ai-badge-navy {
-  background-color: #0B2545;
-  color: #ffffff;
-  border: 1px solid #1e3a8a;
-}
-
-/* Tablas HTML del Agente IA */
 .ai-table-wrap {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  background-color: #ffffff;
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-sm);
 }
 
 .ai-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.79rem;
+  font-size: 0.78rem;
   text-align: left;
 }
 
-.ai-table thead {
-  background-color: #0B2545;
-  color: #ffffff;
-}
-
-.ai-table th {
-  padding: 0.6rem 0.75rem;
+.ai-table thead th {
+  background: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: 0.69rem;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--breca-charcoal);
   white-space: nowrap;
 }
 
-.ai-table td {
-  padding: 0.58rem 0.75rem;
-  border-top: 1px solid #e2e8f0;
-  color: #1e293b;
+.ai-table tbody td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--breca-border-subtle);
+  color: var(--breca-text-primary);
   vertical-align: middle;
+}
+
+.ai-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .ai-table tbody tr:nth-child(even) {
-  background-color: #f8fafc;
+  background-color: var(--breca-bg-subtle);
 }
 
 .ai-table tbody tr:hover {
-  background-color: #eff6ff;
+  background-color: var(--breca-bg-hover);
 }
 
-/* Bloques de Alerta y Recomendación Ejecutiva */
+/* Badges semánticos en reportes del Agente IA (Paleta Breca) */
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.16rem 0.52rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ai-badge-red {
+  background: var(--breca-tint-charcoal-bg);
+  color: var(--breca-charcoal);
+  border: 1px solid var(--breca-tint-charcoal-border);
+}
+
+.ai-badge-amber {
+  background: var(--breca-tint-teal-bg);
+  color: var(--breca-teal);
+  border: 1px solid var(--breca-tint-teal-border);
+}
+
+.ai-badge-green {
+  background: var(--breca-tint-sage-bg);
+  color: var(--breca-sage);
+  border: 1px solid var(--breca-tint-sage-border);
+}
+
+.ai-badge-blue {
+  background: var(--breca-tint-petrol-bg);
+  color: var(--breca-petrol);
+  border: 1px solid var(--breca-tint-petrol-border);
+}
+
+.ai-badge-indigo {
+  background: var(--breca-tint-teal-bg);
+  color: var(--breca-teal);
+  border: 1px solid var(--breca-tint-teal-border);
+}
+
+.ai-badge-valor {
+  background: var(--breca-gold);
+  color: var(--breca-charcoal);
+  border: 1px solid var(--breca-tint-gold-border);
+  font-weight: 800;
+}
+
+.ai-badge-navy {
+  background: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+}
+
 .ai-alert-box {
-  border-radius: 0.75rem;
+  border-radius: var(--breca-radius-sm);
   padding: 0.75rem 0.95rem;
-  font-size: 0.81rem;
-  line-height: 1.55;
+  font-size: 0.79rem;
+  line-height: 1.5;
 }
 
 .ai-alert-critical {
-  background-color: #fff1f2;
-  border-left: 4px solid #e11d48;
-  color: #881337;
+  background: rgba(29, 36, 44, 0.05);
+  border-left: 4px solid var(--breca-charcoal);
+  color: var(--breca-charcoal);
 }
 
 .ai-alert-info {
-  background-color: #eff6ff;
-  border-left: 4px solid #2563eb;
-  color: #1e3a8a;
+  background: rgba(0, 94, 133, 0.06);
+  border-left: 4px solid var(--breca-petrol);
+  color: var(--breca-charcoal);
 }
 
 .ai-alert-success {
-  background-color: #ecfdf5;
-  border-left: 4px solid #10b981;
-  color: #065f46;
+  background: rgba(77, 111, 97, 0.08);
+  border-left: 4px solid var(--breca-sage);
+  color: var(--breca-charcoal);
 }
 
 .ai-list {
-  padding-left: 1.2rem;
-  margin: 0.25rem 0;
-  list-style-type: disc;
+  margin: 0.25rem 0 0 0;
+  padding-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .ai-list li {
-  margin-bottom: 0.35rem;
+  color: var(--breca-text-primary);
 }
 
-/* Soporte también para etiquetas semánticas estándar dentro de respuestas validadas */
-.nexia-markdown h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #0B2545;
-  margin-top: 0.25rem;
-  margin-bottom: 0.5rem;
+/* Markdown Fallback */
+.nexia-markdown h3,
+.nexia-markdown h4 {
+  font-weight: 800;
+  color: var(--breca-text-primary);
+  margin-top: 0.65rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
 }
 
 .nexia-markdown p {
-  font-size: 0.86rem;
-  line-height: 1.6;
-  color: #1e293b;
   margin-bottom: 0.5rem;
+  line-height: 1.55;
 }
 
-.nexia-markdown table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0.65rem 0;
-  font-size: 0.8rem;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.65rem;
-  overflow: hidden;
-  display: block;
-  overflow-x: auto;
+.nexia-markdown ul,
+.nexia-markdown ol {
+  padding-left: 1.2rem;
+  margin-bottom: 0.6rem;
 }
 
-.nexia-markdown thead {
-  background-color: #0B2545;
-  color: #ffffff;
+.nexia-markdown ul {
+  list-style-type: disc;
 }
 
-.nexia-markdown th {
-  padding: 0.6rem 0.8rem;
-  text-align: left;
-  font-weight: 600;
-  font-size: 0.74rem;
+.nexia-markdown li {
+  margin-bottom: 0.25rem;
 }
 
-.nexia-markdown td {
-  padding: 0.55rem 0.8rem;
-  border-top: 1px solid #e2e8f0;
+.nexia-markdown strong {
+  color: var(--breca-black);
+  font-weight: 700;
 }
 
-/* Animación de escritura (Typing dots) */
-@keyframes pulseDot {
-  0%, 80%, 100% { transform: scale(0.65); opacity: 0.4; }
+/* Indicador de escritura */
+.typing-dot,
+.typing-dot-1,
+.typing-dot-2,
+.typing-dot-3 {
+  animation: typingBounce 1.3s infinite ease-in-out both;
+}
+.typing-dot:nth-child(1),
+.typing-dot-1 { animation-delay: -0.32s; }
+.typing-dot:nth-child(2),
+.typing-dot-2 { animation-delay: -0.16s; }
+.typing-dot-3 { animation-delay: 0s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
   40% { transform: scale(1); opacity: 1; }
 }
-.typing-dot-1 { animation: pulseDot 1.4s infinite ease-in-out both; animation-delay: -0.32s; }
-.typing-dot-2 { animation: pulseDot 1.4s infinite ease-in-out both; animation-delay: -0.16s; }
-.typing-dot-3 { animation: pulseDot 1.4s infinite ease-in-out both; }
-
-/* Cursor parpadeante para efecto streaming / typewriter */
-@keyframes cursorBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-.ai-streaming-cursor {
-  display: inline-block;
-  width: 7px;
-  height: 14px;
-  background-color: #2563eb;
-  margin-left: 2px;
-  vertical-align: middle;
-  border-radius: 1px;
-  animation: cursorBlink 0.8s infinite;
-}
-
-/* Utilidades para desplazamiento táctil horizontal en móviles */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.touch-pan-x {
-  touch-action: pan-x;
-  -webkit-overflow-scrolling: touch;
-}
 
 /* ==========================================================================
-   5. ADAPTABILIDAD RESPONSIVE A DISPOSITIVOS MÓVILES (SMARTPHONES & TABLETS)
+   MODAL FLOTANTE DEL AGENTE IA, FAB Y TARJETAS DE ACCIÓN RÁPIDA
    ========================================================================== */
-
-/* Tablets y Smartphones grandes (<= 768px) */
-@media (max-width: 768px) {
-  .executive-card {
-    border-radius: 1rem;
-    padding: 1.15rem !important;
-  }
-  .chart-canvas-box {
-    height: 230px;
-  }
-  .chart-canvas-box-lg {
-    height: 260px;
-  }
+.nexia-fab {
+  background-color: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
+  border: 1px solid rgba(178, 177, 177, 0.28);
+  box-shadow: var(--breca-shadow-modal);
 }
 
-/* Smartphones (<= 640px) */
-@media (max-width: 640px) {
-  /* Header compacto en móviles */
-  header .max-w-\[1480px\] {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-    padding-top: 0.65rem !important;
-    padding-bottom: 0.65rem !important;
-  }
-
-  .header-tab-btn {
-    padding: 0.45rem 0.75rem !important;
-    font-size: 0.75rem !important;
-  }
-
-  /* Drawer del Chat IA a pantalla completa en móviles */
-  #chat-drawer-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    left: 0 !important;
-    right: 0 !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    height: 100% !important;
-    max-height: 100% !important;
-    border-left: none !important;
-    border-radius: 0 !important;
-  }
-
-  /* Sugerencias rápidas en 1 columna en teléfonos para mayor legibilidad */
-  #quick-actions-grid {
-    grid-template-columns: 1fr !important;
-    gap: 0.5rem !important;
-  }
-
-  /* Tarjetas KPI compactas para visualización en 2 columnas */
-  .kpi-card-interactive {
-    padding: 0.85rem !important;
-    border-radius: 0.95rem !important;
-  }
-  .kpi-card-interactive .text-3xl,
-  .kpi-card-interactive .text-4xl {
-    font-size: 1.6rem !important;
-    line-height: 1.15 !important;
-  }
-  .kpi-card-interactive .w-11 {
-    width: 2.1rem !important;
-    height: 2.1rem !important;
-  }
-  .kpi-card-interactive .w-5 {
-    width: 1.1rem !important;
-    height: 1.1rem !important;
-  }
-
-  /* Matriz 9-Box en pantallas móviles: ultra legible y sin desborde */
-  .ninebox-grid {
-    gap: 0.45rem !important;
-  }
-  .ninebox-cell {
-    padding: 0.65rem 0.5rem !important;
-    min-height: 94px !important;
-    border-radius: 0.65rem !important;
-  }
-  .ninebox-cell .text-3xl {
-    font-size: 1.35rem !important;
-  }
-  .ninebox-cell .text-xs {
-    font-size: 0.68rem !important;
-  }
-  .ninebox-cell .text-\[11px\] {
-    font-size: 0.62rem !important;
-  }
-
-  /* Tablas responsivas dentro de respuestas IA */
-  .ai-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    display: block;
-  }
-  .ai-table th, .ai-table td {
-    padding: 0.5rem 0.6rem !important;
-    font-size: 0.72rem !important;
-  }
-  .ai-kpi-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 0.45rem !important;
-  }
-
-  /* Botón Flotante FAB en móvil: discreto y cómodo al tacto */
-  .nexia-fab {
-    bottom: 1rem !important;
-    right: 1rem !important;
-    padding: 0.55rem 0.95rem !important;
-  }
-  .nexia-fab .w-10 {
-    width: 2.25rem !important;
-    height: 2.25rem !important;
-  }
+.nexia-fab:hover {
+  border-color: var(--breca-petrol);
 }
 
-/* Dispositivos muy estrechos (<= 380px) */
-@media (max-width: 380px) {
-  .header-tab-btn span {
-    font-size: 0.7rem !important;
-  }
-  .ninebox-cell .text-3xl {
-    font-size: 1.15rem !important;
-  }
-  .kpi-card-interactive .text-3xl,
-  .kpi-card-interactive .text-4xl {
-    font-size: 1.35rem !important;
-  }
+.chat-drawer-backdrop {
+  background-color: rgba(29, 36, 44, 0.62);
+  backdrop-filter: blur(3px);
 }
 
-/* ==========================================================================
-   6. VENTANA FLOTANTE SPLIT-VIEW DEL AGENTE IA (LIENZO IZQUIERDO + CHAT DERECHO)
-   ========================================================================== */
 .ai-floating-workspace {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 25px 60px -15px rgba(11, 37, 69, 0.38), 0 0 0 1px rgba(15, 23, 42, 0.08);
+  width: 98vw;
+  max-width: 98vw;
+  height: 96vh;
+  border-radius: var(--breca-radius-md);
+  box-shadow: var(--breca-shadow-modal);
+  border: 1px solid var(--breca-border-default);
+}
+
+.centria-header-gradient {
+  background-color: var(--breca-charcoal);
+  border-bottom: 1px solid rgba(178, 177, 177, 0.22);
+}
+
+.chat-subheader-bar {
+  background-color: var(--breca-bg-surface);
+  border-bottom: 1px solid var(--breca-border-default);
+}
+
+.chat-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.26rem 0.58rem;
+  border-radius: var(--breca-radius-sm);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--breca-text-secondary);
+  background: var(--breca-bg-subtle);
+  border: 1px solid var(--breca-border-default);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.chat-mode-tab:hover {
+  color: var(--breca-text-primary);
+  background: var(--breca-bg-hover);
+  border-color: var(--breca-border-strong);
+}
+
+.chat-templates-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.26rem 0.56rem;
+  border-radius: var(--breca-radius-sm);
+  font-size: 0.67rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--breca-petrol);
+  background: var(--breca-tint-petrol-bg);
+  border: 1px solid var(--breca-tint-petrol-border);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.chat-templates-toggle-btn:hover {
+  background: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+  border-color: var(--breca-petrol);
+}
+
+.chat-inline-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--breca-radius-sm);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--breca-petrol);
+  background: var(--breca-tint-petrol-bg);
+  border: 1px solid var(--breca-tint-petrol-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chat-inline-link-btn:hover {
+  background: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+  border-color: var(--breca-petrol);
+}
+
+.ai-quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.42rem;
+}
+
+.chat-composer-box {
+  background-color: var(--breca-bg-subtle);
+  border: 1px solid var(--breca-border-default);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.chat-composer-box:focus-within {
+  background-color: var(--breca-bg-surface);
+  border-color: var(--breca-petrol);
+  box-shadow: 0 0 0 2px rgba(0, 94, 133, 0.14);
+}
+.ai-workspace-modal {
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              max-width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-radius 0.22s ease;
 }
 
 .ai-workspace-fullscreen {
+  width: 98vw !important;
   max-width: 98vw !important;
-  height: 96vh !important;
+  height: 95vh !important;
+  border-radius: var(--breca-radius-md) !important;
 }
 
-/* Estado de ejecución conversacional en el chat ("Ejecutando..." -> "¡Todo listo!") */
+.ai-prompt-card {
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-sm);
+  transition: all 0.16s ease;
+}
+
+.ai-prompt-card:hover {
+  border-color: var(--breca-petrol);
+  background: var(--breca-bg-subtle);
+  transform: translateY(-1px);
+  box-shadow: var(--breca-shadow-hover);
+}
+
+.ai-prompt-card-open {
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-teal);
+}
+
+.ai-prompt-card-open:hover {
+  border-color: var(--breca-petrol);
+  background: var(--breca-bg-subtle);
+}
+
+.ai-prompt-cat-template {
+  color: var(--breca-petrol);
+  background-color: var(--breca-tint-petrol-bg);
+  border-color: var(--breca-tint-petrol-border);
+}
+
+.ai-prompt-cat-open {
+  color: var(--breca-teal);
+  background-color: var(--breca-tint-teal-bg);
+  border-color: var(--breca-tint-teal-border);
+}
+
+.chat-mode-tab-active {
+  background: var(--breca-charcoal) !important;
+  color: var(--breca-text-inverse) !important;
+  border-color: var(--breca-charcoal) !important;
+  box-shadow: 0 1px 2px rgba(29, 36, 44, 0.2);
+}
+
+.chat-mode-tab-open {
+  background: var(--breca-petrol) !important;
+  color: var(--breca-text-inverse) !important;
+  border-color: var(--breca-petrol) !important;
+  box-shadow: 0 1px 2px rgba(0, 94, 133, 0.25);
+}
+
+.ai-route-badge-template {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.18rem 0.55rem;
+  border-radius: 9999px;
+  background: var(--breca-tint-petrol-bg);
+  color: var(--breca-petrol);
+  border: 1px solid var(--breca-tint-petrol-border);
+}
+
+.ai-route-badge-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.18rem 0.55rem;
+  border-radius: 9999px;
+  background: var(--breca-tint-teal-bg);
+  color: var(--breca-teal);
+  border: 1px solid var(--breca-tint-teal-border);
+}
+
+.ai-html-header-open {
+  background: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+  padding: 0.85rem 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ai-insight-banner {
+  background: var(--breca-bg-subtle);
+  border: 1px solid var(--breca-border-default);
+  border-left: 4px solid var(--breca-petrol);
+  border-radius: var(--breca-radius-sm);
+  padding: 0.75rem 0.95rem;
+  font-size: 0.8rem;
+  color: var(--breca-text-primary);
+  line-height: 1.55;
+}
+
+.ai-step-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.65rem;
+}
+
+.ai-step-card {
+  background: var(--breca-bg-subtle);
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-sm);
+  padding: 0.75rem 0.85rem;
+}
+
+.ai-step-card-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--breca-charcoal);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+
+.ai-step-card-text {
+  font-size: 0.78rem;
+  color: var(--breca-text-secondary);
+  line-height: 1.45;
+}
+
+.ai-followup-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ai-followup-chip {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.3rem;
+  font-size: 0.71rem;
+  font-weight: 700;
+  padding: 0.32rem 0.68rem;
+  border-radius: var(--breca-radius-md);
+  background: var(--breca-bg-surface);
+  color: var(--breca-charcoal);
+  border: 1px solid var(--breca-border-strong);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+.ai-followup-chip:hover {
+  background: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+  border-color: var(--breca-petrol);
+}
+
+/* ==========================================================================
+   TARJETAS GRÁFICAS SVG DEL LIENZO IZQUIERDO Y BURBUJAS DE CHAT
+   ========================================================================== */
+.ai-canvas-visual-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.ai-canvas-chart-card {
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-md);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--breca-shadow-card);
+}
+
 .ai-chat-exec-card {
-  background-color: #ffffff;
-  border: 1px solid #dbeafe;
-  border-radius: 1rem;
-  border-top-left-radius: 0.25rem;
-  padding: 0.9rem 1.05rem;
-  box-shadow: 0 2px 10px -2px rgba(11, 37, 69, 0.06);
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-md);
+  border-top-left-radius: 0.2rem;
+  padding: 0.85rem 1rem;
+  box-shadow: var(--breca-shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.6rem;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .ai-chat-exec-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px dashed #e2e8f0;
+  gap: 0.4rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--breca-border-subtle);
+  min-width: 0;
 }
 
 .ai-chat-status-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
   font-size: 0.68rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  max-width: 100%;
 }
 
 .ai-chat-status-running {
-  background-color: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
+  background: var(--breca-tint-petrol-bg);
+  color: var(--breca-petrol);
+  border: 1px solid var(--breca-tint-petrol-border);
 }
 
 .ai-chat-status-ready {
-  background-color: #ecfdf5;
-  color: #047857;
-  border: 1px solid #a7f3d0;
+  background: var(--breca-tint-sage-bg);
+  color: var(--breca-sage);
+  border: 1px solid var(--breca-tint-sage-border);
 }
 
 .ai-chat-narrative {
-  font-size: 0.83rem;
-  line-height: 1.6;
-  color: #1e293b;
+  font-size: 0.8rem;
+  color: var(--breca-text-primary);
+  line-height: 1.55;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .ai-chat-narrative p {
   margin: 0;
 }
 
-.ai-chat-narrative ul,
-.ai-chat-narrative ol {
-  margin: 0.2rem 0;
-  padding-left: 1.15rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.28rem;
+.ai-chat-narrative strong {
+  color: var(--breca-black);
+  font-weight: 700;
 }
 
-.ai-chat-narrative li {
-  line-height: 1.5;
+.ai-chat-narrative ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  list-style-type: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.ai-streaming-cursor {
+  display: inline-block;
+  width: 6px;
+  height: 14px;
+  margin-left: 3px;
+  vertical-align: middle;
+  background-color: var(--breca-petrol);
+  border-radius: 1px;
+  animation: brecaCursorBlink 0.85s infinite ease-in-out;
+}
+
+@keyframes brecaCursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
 }
 
 .ai-chat-canvas-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
   gap: 0.5rem;
-  padding: 0.55rem 0.8rem;
-  border-radius: 0.65rem;
-  background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%);
-  border: 1px solid #bfdbfe;
-  color: #1e3a8a;
-  font-size: 0.74rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--breca-radius-sm);
+  background: var(--breca-bg-subtle);
+  border: 1px solid var(--breca-border-default);
+  color: var(--breca-petrol);
+  font-size: 0.72rem;
   font-weight: 700;
+  text-align: left;
+  line-height: 1.35;
   cursor: pointer;
   transition: all 0.15s ease;
+  overflow-wrap: break-word;
 }
 
 .ai-chat-canvas-btn:hover {
-  background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-  border-color: #60a5fa;
-  transform: translateY(-1px);
+  background: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+  border-color: var(--breca-petrol);
 }
 
-/* Chips del historial de reportes en el Lienzo Izquierdo */
-.ai-history-chip {
+/* Barra de pestañas de reportes en el Lienzo Izquierdo */
+.ai-history-chip-group {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--breca-radius-sm);
+  background: var(--breca-bg-subtle);
+  color: var(--breca-text-secondary);
+  border: 1px solid var(--breca-border-default);
+  overflow: hidden;
+  transition: all 0.15s ease;
+  max-width: 240px;
+}
+
+.ai-history-chip-group:hover {
+  background: var(--breca-border-subtle);
+  color: var(--breca-text-primary);
+}
+
+.ai-history-chip-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.28rem 0.65rem;
-  border-radius: 0.5rem;
-  font-size: 0.7rem;
+  gap: 0.32rem;
+  font-size: 0.69rem;
   font-weight: 700;
-  background-color: #ffffff;
-  color: #475569;
-  border: 1px solid #cbd5e1;
-  white-space: nowrap;
+  padding: 0.24rem 0.55rem;
+  background: transparent;
+  color: inherit;
+  border: none;
   cursor: pointer;
-  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ai-history-chip:hover {
-  border-color: #60a5fa;
-  color: #0B2545;
+.ai-history-chip-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.42rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--breca-text-secondary);
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--breca-border-default);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ai-history-chip-close:hover {
+  background: var(--breca-charcoal);
+  color: var(--breca-text-inverse);
 }
 
 .ai-history-chip-active {
-  background-color: #0B2545;
-  color: #ffffff;
-  border-color: #0B2545;
+  background: var(--breca-charcoal) !important;
+  color: var(--breca-text-inverse) !important;
+  border-color: var(--breca-charcoal) !important;
 }
 
-.ai-history-chip-active:hover {
-  color: #ffffff;
+.ai-history-chip-active .ai-history-chip-close {
+  color: var(--breca-gray);
+  border-left-color: rgba(255, 255, 255, 0.18);
 }
 
-/* Gráficos visuales SVG en el Lienzo Izquierdo */
-.ai-canvas-visual-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.ai-history-chip-active .ai-history-chip-close:hover {
+  background: var(--breca-petrol);
+  color: var(--breca-text-inverse);
+}
+
+/* ==========================================================================
+   FICHA CORPORATIVA "VALORACIÓN EJECUTIVA ECUALIZADA" — BRECA (4 COLUMNAS)
+   ========================================================================== */
+.breca-ficha-slide {
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-border-default);
+  border-radius: var(--breca-radius-sm);
+  padding: 1.25rem 1.35rem 1rem 1.35rem;
+  box-shadow: var(--breca-shadow-card);
+  color: var(--breca-text-primary);
+}
+
+.breca-ficha-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.35rem;
+}
+
+.breca-ficha-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--breca-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.breca-ficha-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 0.85rem;
 }
 
-.ai-canvas-chart-card {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.85rem;
-  padding: 0.9rem 1rem;
-  box-shadow: 0 2px 6px -2px rgba(11, 37, 69, 0.04);
+.breca-ficha-main-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--breca-text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  position: relative;
+  padding-bottom: 0.35rem;
 }
 
-@media (max-width: 768px) {
-  .ai-canvas-visual-grid {
+.breca-ficha-main-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 96px;
+  height: 1.5px;
+  background: var(--breca-text-secondary);
+}
+
+.breca-ficha-ggs-part {
+  font-weight: 500;
+  color: var(--breca-text-primary);
+}
+
+.breca-ficha-valor-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--breca-gold);
+  color: var(--breca-charcoal);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.28rem 1.05rem;
+  border-radius: 9999px;
+  letter-spacing: 0.01em;
+}
+
+.breca-ficha-std-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--breca-bg-muted);
+  color: var(--breca-text-secondary);
+  border: 1px solid var(--breca-border-strong);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.24rem 0.9rem;
+  border-radius: 9999px;
+}
+
+.breca-ficha-company-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--breca-petrol);
+  background: var(--breca-tint-petrol-bg);
+  border: 1px solid var(--breca-tint-petrol-border);
+  padding: 0.25rem 0.7rem;
+  border-radius: 0.25rem;
+}
+
+/* Grilla de 4 Columnas del Slide Ejecutivo */
+.breca-ficha-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+  align-items: stretch;
+}
+
+@media (max-width: 1200px) {
+  .breca-ficha-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .breca-ficha-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* ============================================================================
-   REFINAMIENTO MINIMALISTA UX/UI (AZUL PROFUNDO #0B2545 + BLANCO + GRIS SUAVE)
-   ============================================================================ */
-body {
-  background-color: #f4f6f9;
-  color: #0b2545;
+.breca-ficha-col {
+  background: var(--breca-bg-surface);
+  border: 1px solid var(--breca-border-default);
+  display: flex;
+  flex-direction: column;
+  min-height: 430px;
+  position: relative;
 }
 
-.executive-card,
-.kpi-card-interactive {
-  background: #ffffff;
-  border-radius: 1.15rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(11, 37, 69, 0.03);
+/* Columna 2 ("FIT CON EL ROL") destacada con marco azul marino corporativo y pestaña superior */
+.breca-ficha-col-fit {
+  border: 2.5px solid var(--breca-fit-strong);
 }
 
-.kpi-card-interactive:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px -4px rgba(11, 37, 69, 0.06);
-  border-color: #cbd5e1;
+.breca-ficha-fit-tab {
+  position: absolute;
+  top: -25px;
+  right: -2.5px;
+  background: var(--breca-fit-strong);
+  color: var(--breca-text-inverse);
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-style: italic;
+  padding: 0.22rem 0.85rem;
+  line-height: 1.2;
 }
 
-.ai-floating-workspace {
-  border-radius: 1.25rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 24px 48px -12px rgba(11, 37, 69, 0.22);
-}
-
-.ai-canvas-chart-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
-  padding: 1.15rem 1.25rem;
-  box-shadow: 0 1px 2px rgba(11, 37, 69, 0.03);
-}
-
-.ai-html-card {
-  border-radius: 1rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px rgba(11, 37, 69, 0.03);
-}
-
-.ai-html-card-header {
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.ai-history-chip-group {
-  display: inline-flex;
+.breca-ficha-col-header {
+  min-height: 44px;
+  padding: 0.55rem 0.65rem;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--breca-text-inverse);
+}
+
+.breca-ficha-header-dark {
+  background: var(--breca-charcoal);
+}
+
+.breca-ficha-header-slate {
+  background: var(--breca-ficha-slate-header);
+}
+
+.breca-ficha-col-body {
+  padding: 0.9rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.75rem;
+}
+
+/* Columna 1: Foto circular + Nombre + Trayectoria + Formación */
+.breca-ficha-profile-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.breca-ficha-avatar {
+  width: 56px;
+  height: 56px;
   border-radius: 9999px;
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #475569;
-  transition: all 0.15s ease;
-  overflow: hidden;
+  background: var(--breca-bg-avatar);
+  border: 1px solid var(--breca-border-default);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--breca-text-secondary);
   flex-shrink: 0;
 }
 
-.ai-history-chip-group:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+.breca-ficha-avatar-initials {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--breca-text-primary);
+  line-height: 1.1;
 }
 
-.ai-history-chip-group.ai-history-chip-active {
-  background: #0b2545;
-  color: #ffffff;
-  border-color: #0b2545;
-  box-shadow: 0 2px 6px rgba(11, 37, 69, 0.16);
+.breca-ficha-avatar-sub {
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--breca-text-secondary);
 }
 
-.ai-history-chip-btn {
-  padding: 0.25rem 0.55rem 0.25rem 0.75rem;
+.breca-ficha-person-name {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--breca-text-primary);
+  line-height: 1.2;
+  margin: 0 0 0.2rem 0;
+}
+
+.breca-ficha-person-meta {
+  font-size: 0.69rem;
+  color: var(--breca-text-secondary);
+  line-height: 1.35;
+}
+
+.breca-ficha-subhead {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--breca-text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.breca-ficha-text-list {
+  margin: 0;
+  padding-left: 0.95rem;
   font-size: 0.7rem;
-  font-weight: 600;
-  white-space: nowrap;
+  color: var(--breca-text-primary);
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  gap: 0.24rem;
+}
+
+.breca-ficha-block-grow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--breca-border-subtle);
+  padding-bottom: 0.65rem;
+}
+
+/* Columna 2: Círculos numerados, semáforo de Fit y barras grises minimalistas */
+.breca-ficha-numbered-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.breca-ficha-num-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: var(--breca-fit-strong);
+  color: var(--breca-text-inverse);
+  font-size: 0.68rem;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  color: inherit;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.ai-history-chip-close {
-  padding: 0.25rem 0.6rem 0.25rem 0.35rem;
+.breca-ficha-numbered-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--breca-text-primary);
+}
+
+.breca-ficha-jtbd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.32rem;
+}
+
+.breca-ficha-jtbd-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.breca-ficha-jtbd-bar {
+  flex: 1;
+  background: #F3F3F3;
+  padding: 0.36rem 0.55rem;
+  font-size: 0.67rem;
+  color: var(--breca-text-primary);
+  line-height: 1.3;
+  border-radius: 2px;
+}
+
+.breca-ficha-comp-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 0.45rem;
+}
+
+.breca-ficha-comp-dots {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 0.25rem 0;
+}
+
+.breca-ficha-comp-box {
+  flex: 1;
+  background: #F3F3F3;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.67rem;
+  color: var(--breca-text-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.24rem;
+  border-radius: 2px;
+}
+
+/* Puntos de leyenda Fit (Low Fit / Partial Fit / Fit / Strong Fit) */
+.breca-fit-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.breca-fit-low {
+  background: var(--breca-bg-surface);
+  border: 1.5px solid var(--breca-fit-low-border);
+}
+
+.breca-fit-partial {
+  background: var(--breca-fit-partial);
+}
+
+.breca-fit-good {
+  background: var(--breca-fit-good);
+}
+
+.breca-fit-strong {
+  background: var(--breca-fit-strong);
+}
+
+/* Columna 3: Tabla de Readiness y Píldoras Grises Minimalistas */
+.breca-ficha-readiness-table {
+  width: 100%;
+  border-collapse: collapse;
   font-size: 0.68rem;
+}
+
+.breca-ficha-readiness-table td {
+  padding: 0.36rem 0.5rem;
+  border: 1px solid var(--breca-bg-surface);
+}
+
+.breca-ficha-readiness-lbl {
+  background: var(--breca-fit-strong);
+  color: var(--breca-text-inverse);
   font-weight: 700;
+  font-style: italic;
+  text-align: center;
+  width: 48%;
+}
+
+.breca-ficha-readiness-val {
+  background: #F3F3F3;
+  color: var(--breca-text-primary);
+  font-style: italic;
+  text-align: center;
+  font-weight: 600;
+}
+
+.breca-ficha-pill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.breca-ficha-pill-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--breca-text-primary);
+}
+
+.breca-ficha-gray-pill {
+  min-width: 108px;
+  text-align: center;
+  background: #E8E8E8;
+  color: var(--breca-text-primary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.26rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.breca-ficha-divider {
+  height: 1px;
+  background: var(--breca-border-subtle);
+  margin: 0.2rem 0;
+}
+
+/* Columna 4: Tabla Plan de Desarrollo y Committee Ask */
+.breca-ficha-dev-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.67rem;
+}
+
+.breca-ficha-dev-table thead th {
+  background: var(--breca-fit-strong);
+  color: var(--breca-text-inverse);
+  font-weight: 700;
+  font-style: italic;
+  text-align: center;
+  padding: 0.36rem 0.45rem;
+  border: 1px solid var(--breca-bg-surface);
+}
+
+.breca-ficha-dev-table tbody td {
+  background: #F3F3F3;
+  color: var(--breca-text-primary);
+  padding: 0.42rem 0.5rem;
+  border: 1px solid var(--breca-bg-surface);
+  vertical-align: top;
+  line-height: 1.35;
+}
+
+.breca-ficha-committee-box {
+  margin-top: auto;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--breca-border-default);
+}
+
+/* Pie de página del Slide: Leyenda de Fit + Wordmark BRECA */
+.breca-ficha-footer {
+  margin-top: 1rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--breca-border-default);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.breca-ficha-footer-note {
+  font-size: 0.65rem;
+  color: var(--breca-text-secondary);
+  font-weight: 600;
+}
+
+.breca-ficha-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 1.35rem;
+  margin-left: auto;
+}
+
+.breca-ficha-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.66rem;
+  color: var(--breca-text-secondary);
+  font-style: italic;
+}
+
+.breca-ficha-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.breca-ficha-wordmark {
+  font-family: var(--breca-font-serif);
+  font-size: 1.3rem;
+  letter-spacing: 0.12em;
+  color: var(--breca-text-primary);
+  font-weight: 400;
   line-height: 1;
-  color: inherit;
-  opacity: 0.65;
-  transition: all 0.15s ease;
-  border-left: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-.ai-history-chip-close:hover {
-  opacity: 1;
-  background: rgba(225, 29, 72, 0.14);
-  color: #e11d48;
+/* Ocultar el bloque de resumen conversacional dentro del lienzo visual y del modal flotante */
+#ai-canvas-body .breca-ficha-chat-only,
+#ficha-modal-body .breca-ficha-chat-only {
+  display: none;
 }
 
-.ai-history-chip-group.ai-history-chip-active .ai-history-chip-close:hover {
-  background: rgba(255, 255, 255, 0.22);
-  color: #fecdd3;
+/* ==========================================================================
+   MODO 1: VENTANA FLOTANTE EXTERNA DE FICHA EJECUTIVA (4 COLUMNAS SLIDE)
+   ========================================================================== */
+.breca-ficha-modal-panel {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1400px;
+  max-height: 94vh;
+  background-color: var(--breca-bg-canvas);
+  border-radius: var(--breca-radius-lg);
+  box-shadow: var(--breca-shadow-modal);
+  border: 1px solid var(--breca-border-strong);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.breca-ficha-modal-body {
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ==========================================================================
+   PROPORCIÓN MODULAR DE VISTA DIVIDIDA Y ESCALA COMPACTA EN EL AGENTE IA
+   (Modo 2 de Ficha: 2 columnas arriba y 2 columnas debajo + Componentes compactos)
+   ========================================================================== */
+#ai-canvas-panel.ai-split-canvas-col,
+#ai-chat-panel.ai-split-chat-col {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 1 1 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  #ai-canvas-panel.ai-split-canvas-col,
+  .ai-split-canvas-col {
+    width: var(--breca-split-canvas-lg);
+    max-width: var(--breca-split-canvas-lg);
+    flex: 0 0 var(--breca-split-canvas-lg);
+    min-width: 0;
+  }
+  #ai-chat-panel.ai-split-chat-col,
+  .ai-split-chat-col {
+    width: var(--breca-split-chat-lg);
+    max-width: var(--breca-split-chat-lg);
+    flex: 0 0 var(--breca-split-chat-lg);
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1280px) {
+  #ai-canvas-panel.ai-split-canvas-col,
+  .ai-split-canvas-col {
+    width: var(--breca-split-canvas-xl);
+    max-width: var(--breca-split-canvas-xl);
+    flex: 0 0 var(--breca-split-canvas-xl);
+  }
+  #ai-chat-panel.ai-split-chat-col,
+  .ai-split-chat-col {
+    width: var(--breca-split-chat-xl);
+    max-width: var(--breca-split-chat-xl);
+    flex: 0 0 var(--breca-split-chat-xl);
+  }
+}
+
+.ai-canvas-artifact-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+}
+
+/* MODO 2 DE FICHA: Dentro del Agente IA (#ai-canvas-body), dividir en 2 arriba y 2 debajo (2x2) */
+#ai-canvas-body .breca-ficha-slide {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 0.95rem 0.75rem 0.95rem;
+}
+
+#ai-canvas-body .breca-ficha-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 0.75rem;
+  row-gap: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  #ai-canvas-body .breca-ficha-grid {
+    grid-template-columns: 1fr;
+    row-gap: 1.15rem;
+  }
+}
+
+/* Escala modular ligeramente más pequeña para todos los componentes y textos dentro del Lienzo del Agente IA */
+#ai-canvas-body.ai-canvas-compact,
+#ai-canvas-body {
+  font-size: 0.78rem;
+}
+
+#ai-canvas-body .breca-ficha-top {
+  margin-bottom: 1.05rem;
+  gap: 0.5rem;
+}
+
+#ai-canvas-body .breca-ficha-kicker {
+  font-size: 0.6rem;
+  margin-bottom: 0.15rem;
+}
+
+#ai-canvas-body .breca-ficha-main-title {
+  font-size: 1.18rem;
+  padding-bottom: 0.25rem;
+}
+
+#ai-canvas-body .breca-ficha-valor-pill,
+#ai-canvas-body .breca-ficha-std-pill,
+#ai-canvas-body .breca-ficha-company-tag {
+  font-size: 0.64rem;
+  padding: 0.18rem 0.7rem;
+}
+
+#ai-canvas-body .breca-ficha-col {
+  min-height: 270px;
+}
+
+#ai-canvas-body .breca-ficha-fit-tab {
+  top: -21px;
+  font-size: 0.62rem;
+  padding: 0.16rem 0.65rem;
+}
+
+#ai-canvas-body .breca-ficha-col-header {
+  min-height: 34px;
+  padding: 0.38rem 0.5rem;
+  font-size: 0.62rem;
+}
+
+#ai-canvas-body .breca-ficha-col-body {
+  padding: 0.65rem 0.7rem;
+  gap: 0.5rem;
+}
+
+#ai-canvas-body .breca-ficha-avatar {
+  width: 44px;
+  height: 44px;
+}
+
+#ai-canvas-body .breca-ficha-avatar-initials {
+  font-size: 0.72rem;
+}
+
+#ai-canvas-body .breca-ficha-person-name {
+  font-size: 0.84rem;
+}
+
+#ai-canvas-body .breca-ficha-person-meta {
+  font-size: 0.63rem;
+}
+
+#ai-canvas-body .breca-ficha-subhead,
+#ai-canvas-body .breca-ficha-numbered-title,
+#ai-canvas-body .breca-ficha-pill-label {
+  font-size: 0.66rem;
+}
+
+#ai-canvas-body .breca-ficha-num-circle {
+  width: 19px;
+  height: 19px;
+  font-size: 0.62rem;
+}
+
+#ai-canvas-body .breca-ficha-text-list,
+#ai-canvas-body .breca-ficha-jtbd-bar,
+#ai-canvas-body .breca-ficha-comp-box,
+#ai-canvas-body .breca-ficha-readiness-table,
+#ai-canvas-body .breca-ficha-dev-table {
+  font-size: 0.63rem;
+}
+
+#ai-canvas-body .breca-ficha-gray-pill {
+  min-width: 92px;
+  font-size: 0.63rem;
+  padding: 0.18rem 0.55rem;
+}
+
+#ai-canvas-body .breca-ficha-footer {
+  margin-top: 0.7rem;
+  padding-top: 0.5rem;
+}
+
+#ai-canvas-body .breca-ficha-wordmark {
+  font-size: 1.05rem;
+}
+
+/* Dimensionamiento natural y escala compacta para Tablas, KPIs y Tarjetas dentro de #ai-canvas-body
+   (No estirar artificialmente tablas pequeñas/medianas a todo el ancho; solo crecen según su contenido hasta el 100%) */
+#ai-canvas-body .ai-structured-response {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  gap: 0.65rem;
+  font-size: 0.77rem;
+}
+
+#ai-canvas-body .ai-html-card {
+  width: fit-content;
+  min-width: min(100%, 460px);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#ai-canvas-body .ai-html-header,
+#ai-canvas-body .ai-html-header-open {
+  padding: 0.62rem 0.85rem;
+}
+
+#ai-canvas-body .ai-html-title {
+  font-size: 0.83rem;
+}
+
+#ai-canvas-body .ai-html-subtitle {
+  font-size: 0.67rem;
+}
+
+#ai-canvas-body .ai-html-body {
+  padding: 0.75rem 0.85rem;
+  gap: 0.65rem;
+  align-items: flex-start;
+}
+
+#ai-canvas-body .ai-html-body > * {
+  max-width: 100%;
+}
+
+#ai-canvas-body .ai-kpi-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  width: fit-content;
+  max-width: 100%;
+}
+
+#ai-canvas-body .ai-kpi-box {
+  padding: 0.48rem 0.72rem;
+  flex: 0 1 auto;
+  min-width: 122px;
+}
+
+#ai-canvas-body .ai-kpi-label {
+  font-size: 0.6rem;
+}
+
+#ai-canvas-body .ai-kpi-value {
+  font-size: 0.8rem;
+  margin-top: 0.12rem;
+}
+
+#ai-canvas-body .ai-section-title {
+  font-size: 0.67rem;
+  padding-bottom: 0.22rem;
+  width: 100%;
+}
+
+#ai-canvas-body .ai-table-wrap {
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+#ai-canvas-body .ai-table {
+  width: auto;
+  max-width: 100%;
+  font-size: 0.71rem;
+}
+
+#ai-canvas-body .ai-table thead th {
+  font-size: 0.62rem;
+  padding: 0.42rem 0.68rem;
+}
+
+#ai-canvas-body .ai-table tbody td {
+  padding: 0.4rem 0.68rem;
+}
+
+#ai-canvas-body .ai-badge {
+  font-size: 0.62rem;
+  padding: 0.12rem 0.42rem;
+}
+
+#ai-canvas-body .ai-alert-box,
+#ai-canvas-body .ai-insight-banner {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#ai-canvas-body .ai-step-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.5rem;
+  width: 100%;
+}
+
+#ai-canvas-body .ai-step-card {
+  padding: 0.55rem 0.68rem;
+}
+
+#ai-canvas-body .ai-step-card-title {
+  font-size: 0.67rem;
+  margin-bottom: 0.2rem;
+}
+
+#ai-canvas-body .ai-step-card-text {
+  font-size: 0.71rem;
+}
+
+#ai-canvas-body .ai-canvas-chart-card {
+  padding: 0.72rem 0.85rem;
+}
+
+/* Ajuste armónico y contención estricta del panel derecho de chat (#ai-chat-panel) */
+#ai-chat-panel #chat-messages-container > * {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#ai-chat-panel .target-content-area {
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+#ai-chat-panel .ai-chat-exec-card {
+  padding: 0.68rem 0.8rem;
+  gap: 0.45rem;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#ai-chat-panel .ai-chat-narrative {
+  font-size: 0.74rem;
+  line-height: 1.48;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+#ai-chat-panel .chat-bubble-ai {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+}
+
+#ai-chat-panel .breca-chat-user-bubble {
+  padding: 0.5rem 0.8rem;
+  font-size: 0.76rem;
+  max-width: 90%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+#ai-chat-panel .ai-followup-bar {
+  max-width: 100%;
+  min-width: 0;
+}
+
+#ai-chat-panel .ai-followup-chip {
+  font-size: 0.66rem;
+  padding: 0.24rem 0.55rem;
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+}
+
+/* Animación de entrada */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInSlide 0.22s ease-out forwards;
 }

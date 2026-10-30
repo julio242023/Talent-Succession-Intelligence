@@ -14,6 +14,159 @@
  * - 100% compatible con publicación estática en GitHub Pages y servidor FastAPI.
  */
 
+// ============================================================================
+// MÓDULO CENTRALIZADO DE TEMA Y COMPONENTES BRECA (Conectado a :root en style.css)
+// ============================================================================
+const BRECA_THEME = {
+  getCssToken(varName, fallback) {
+    if (typeof window === "undefined" || !document.documentElement) return fallback;
+    const val = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    return val || fallback;
+  },
+
+  getPalette() {
+    return {
+      gray: this.getCssToken("--breca-gray", "rgb(178, 177, 177)"),
+      slate: this.getCssToken("--breca-slate", "rgb(101, 103, 107)"),
+      charcoal: this.getCssToken("--breca-charcoal", "rgb(29, 36, 44)"),
+      black: this.getCssToken("--breca-black", "rgb(0, 0, 0)"),
+      sage: this.getCssToken("--breca-sage", "rgb(77, 111, 97)"),
+      teal: this.getCssToken("--breca-teal", "rgb(70, 112, 128)"),
+      petrol: this.getCssToken("--breca-petrol", "rgb(0, 94, 133)"),
+      gold: this.getCssToken("--breca-gold", "rgb(242, 183, 5)"),
+      borderDefault: this.getCssToken("--breca-border-default", "rgb(213, 214, 216)"),
+      borderSubtle: this.getCssToken("--breca-border-subtle", "rgb(230, 231, 232)"),
+      divider: this.getCssToken("--breca-border-subtle", "rgb(230, 231, 232)"),
+      surface: this.getCssToken("--breca-bg-surface", "rgb(255, 255, 255)"),
+    };
+  },
+
+  createChartOptions({
+    stacked = false,
+    onClick = null,
+    isDoughnut = false,
+    cutout = "62%",
+    xMax = undefined,
+    legendPosition = "bottom",
+    legendPadding = 14,
+    tooltipCallbacks = undefined,
+    xTickCallback = undefined,
+    yFontSize = 11,
+    xGridDisplay = false,
+    yGridDisplay = true,
+  } = {}) {
+    const p = this.getPalette();
+    const base = {
+      responsive: true,
+      maintainAspectRatio: false,
+      onClick: onClick || undefined,
+      plugins: {
+        legend: {
+          position: legendPosition,
+          labels: {
+            boxWidth: 11,
+            usePointStyle: true,
+            padding: legendPadding,
+            font: { family: "Inter", size: 11, weight: "600" },
+            color: p.charcoal,
+          },
+        },
+        tooltip: {
+          backgroundColor: p.charcoal,
+          titleFont: { family: "Inter", size: 12, weight: "700" },
+          bodyFont: { family: "Inter", size: 11 },
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: tooltipCallbacks,
+        },
+      },
+    };
+
+    if (isDoughnut) {
+      base.cutout = cutout;
+      return base;
+    }
+
+    base.scales = {
+      x: {
+        stacked,
+        max: xMax,
+        grid: {
+          display: xGridDisplay,
+          color: p.borderSubtle,
+        },
+        ticks: {
+          font: { family: "Inter", size: 11, weight: xGridDisplay ? "500" : "700" },
+          color: xGridDisplay ? p.slate : p.charcoal,
+          callback: xTickCallback,
+        },
+      },
+      y: {
+        stacked,
+        beginAtZero: true,
+        grid: {
+          display: yGridDisplay,
+          color: p.borderSubtle,
+        },
+        ticks: {
+          precision: 0,
+          font: { family: "Inter", size: yFontSize, weight: yGridDisplay ? "500" : "700" },
+          color: yGridDisplay ? p.slate : p.charcoal,
+        },
+      },
+    };
+    return base;
+  },
+
+  ui: {
+    statTile({ variant = "neutral", label, value, subtext, dataAttr = "", title = "" }) {
+      const tileVariant = `breca-stat-tile-${variant}`;
+      const valueColor =
+        variant === "sage"
+          ? "text-breca-sage"
+          : variant === "petrol"
+          ? "text-breca-petrol"
+          : variant === "teal"
+          ? "text-breca-teal"
+          : "text-breca-charcoal";
+      return `
+        <button type="button" ${dataAttr} class="breca-stat-tile ${tileVariant}" ${title ? `title="${title}"` : ""}>
+          <div class="text-[10px] font-bold uppercase tracking-wider text-breca-slate truncate">${label}</div>
+          <div class="text-base font-extrabold ${valueColor} tabular-nums mt-0.5">${value}</div>
+          <div class="text-[10px] font-medium text-breca-slate mt-0.5 truncate">${subtext}</div>
+        </button>
+      `;
+    },
+
+    riskBadge(riesgo) {
+      if (riesgo === "Alto") {
+        return `<span class="breca-pill breca-pill-charcoal"><span class="w-1.5 h-1.5 rounded-full bg-white"></span>Alto</span>`;
+      }
+      if (riesgo === "Medio") {
+        return `<span class="breca-pill breca-pill-teal"><span class="w-1.5 h-1.5 rounded-full bg-breca-teal"></span>Medio</span>`;
+      }
+      return `<span class="breca-pill breca-pill-sage"><span class="w-1.5 h-1.5 rounded-full bg-breca-sage"></span>Bajo</span>`;
+    },
+
+    readinessBadge(readiness, hasSucc) {
+      if (!hasSucc) {
+        return `<span class="breca-pill breca-pill-sm breca-pill-charcoal">Brecha de Sucesión</span>`;
+      }
+      if (readiness === "Inmediato") {
+        return `<span class="breca-pill breca-pill-sm breca-pill-sage">Ready Now (Inmediato)</span>`;
+      }
+      if (readiness === "1 a 3 años") {
+        return `<span class="breca-pill breca-pill-sm breca-pill-petrol">1 a 3 años</span>`;
+      }
+      if (readiness === "3 a 5 años") {
+        return `<span class="breca-pill breca-pill-sm breca-pill-teal">3 a 5 años</span>`;
+      }
+      return `<span class="breca-pill breca-pill-sm breca-pill-neutral">${escapeHtml(readiness)}</span>`;
+    },
+  },
+};
+window.BRECA_THEME = BRECA_THEME;
+
 const state = {
   records: [],
   filteredRecords: [],
@@ -38,6 +191,7 @@ const state = {
   canvasArtifacts: [],
   activeArtifactId: "HOME",
   mobileWorkspaceTab: "chat",
+  activeFichaRecord: null,
 };
 
 // Instancias vivas de Chart.js para actualización reactiva desde el documento
@@ -213,17 +367,17 @@ const QUESTION_CATALOG = [
   },
 ];
 
-// Metadata semántica de los 9 cuadrantes 9-Box
+// Metadata semántica modular de los 9 cuadrantes 9-Box (Clases de style.css)
 const NINE_BOX_META = {
-  9: { name: "Estrella / Top Talent", short: "Top Talent", badgeClass: "bg-[#0B2545] text-white border-[#0B2545]", cellClass: "bg-slate-50/90 border-slate-200 text-[#0B2545]" },
-  8: { name: "Alto Potencial", short: "Alto Potencial", badgeClass: "bg-[#0B2545]/10 text-[#0B2545] border-[#0B2545]/20", cellClass: "bg-slate-50/70 border-slate-200 text-[#0B2545]" },
-  7: { name: "Enigma / Potencial", short: "Enigma", badgeClass: "bg-slate-100 text-[#0B2545] border-slate-200", cellClass: "bg-white border-slate-200 text-[#0B2545]" },
-  6: { name: "Futuro Líder", short: "Futuro Líder", badgeClass: "bg-[#0B2545]/10 text-[#0B2545] border-[#0B2545]/20", cellClass: "bg-slate-50/70 border-slate-200 text-[#0B2545]" },
-  5: { name: "Talento Clave (Core)", short: "Talento Clave", badgeClass: "bg-slate-100 text-slate-700 border-slate-200", cellClass: "bg-white border-slate-200 text-slate-800" },
-  4: { name: "Profesional Confiable", short: "Confiable", badgeClass: "bg-slate-100 text-slate-600 border-slate-200", cellClass: "bg-white border-slate-200 text-slate-700" },
-  3: { name: "Especialista Efectivo", short: "Especialista", badgeClass: "bg-slate-100 text-slate-700 border-slate-200", cellClass: "bg-white border-slate-200 text-slate-700" },
-  2: { name: "En Observación", short: "Observación", badgeClass: "bg-slate-100 text-slate-600 border-slate-200", cellClass: "bg-slate-50/50 border-slate-200 text-slate-700" },
-  1: { name: "Bajo Desempeño", short: "Bajo Desemp.", badgeClass: "bg-slate-200/80 text-slate-700 border-slate-300", cellClass: "bg-slate-100/60 border-slate-200 text-slate-700" },
+  9: { name: "Estrella / Top Talent", short: "Top Talent", badgeClass: "ninebox-badge-top", cellClass: "ninebox-cell-top" },
+  8: { name: "Alto Potencial", short: "Alto Potencial", badgeClass: "ninebox-badge-high", cellClass: "ninebox-cell-high" },
+  7: { name: "Enigma / Potencial", short: "Enigma", badgeClass: "ninebox-badge-core", cellClass: "ninebox-cell-core" },
+  6: { name: "Futuro Líder", short: "Futuro Líder", badgeClass: "ninebox-badge-sage", cellClass: "ninebox-cell-sage" },
+  5: { name: "Talento Clave (Core)", short: "Talento Clave", badgeClass: "ninebox-badge-core", cellClass: "ninebox-cell-core" },
+  4: { name: "Profesional Confiable", short: "Confiable", badgeClass: "ninebox-badge-muted", cellClass: "ninebox-cell-muted" },
+  3: { name: "Especialista Efectivo", short: "Especialista", badgeClass: "ninebox-badge-core", cellClass: "ninebox-cell-core" },
+  2: { name: "En Observación", short: "Observación", badgeClass: "ninebox-badge-muted", cellClass: "ninebox-cell-muted" },
+  1: { name: "Bajo Desempeño", short: "Bajo Desemp.", badgeClass: "ninebox-badge-low", cellClass: "ninebox-cell-low" },
 };
 
 function escapeHtml(str) {
@@ -359,12 +513,12 @@ function refreshMetadataLists() {
   const companySelect = document.getElementById("global-company-select");
   if (companySelect) {
     const current = state.selectedCompany;
-    companySelect.innerHTML = `<option value="ALL" class="text-slate-900 font-semibold">Todas las Empresas (${state.records.length})</option>`;
+    companySelect.innerHTML = `<option value="ALL" class="text-breca-charcoal font-semibold">Todas las Empresas (${state.records.length})</option>`;
     state.companies.forEach((comp) => {
       const count = state.records.filter((r) => r.empresa === comp).length;
       const opt = document.createElement("option");
       opt.value = comp;
-      opt.className = "text-slate-900";
+      opt.className = "text-breca-charcoal";
       opt.textContent = `${comp} (${count})`;
       companySelect.appendChild(opt);
     });
@@ -508,7 +662,7 @@ function renderKPIs() {
   setTxt("kpi-coverage", `${coveragePct}%`);
   const covSub = document.getElementById("kpi-coverage-sub");
   if (covSub) {
-    covSub.innerHTML = `${withSuccessor} con sucesor · <span class="text-rose-600 font-semibold">${withoutSuccessor} sin sucesor</span>`;
+    covSub.innerHTML = `${withSuccessor} con sucesor · <span class="breca-kpi-highlight">${withoutSuccessor} sin sucesor</span>`;
   }
 
   setTxt("kpi-ready-now", readyNow);
@@ -517,7 +671,7 @@ function renderKPIs() {
   setTxt("kpi-top-talent-sub", `${topTalentPct}%`);
 
   setTxt("kpi-high-risk", highRisk);
-  setTxt("kpi-critical-no-succ", `🚨 ${highRiskNoSucc} en riesgo alto sin sucesor`);
+  setTxt("kpi-critical-no-succ", `${highRiskNoSucc} en riesgo alto sin sucesor`);
   setTxt("table-count-pill", state.filteredRecords.length);
   setTxt("header-table-count", state.filteredRecords.length);
 
@@ -529,11 +683,11 @@ function renderKPIs() {
   ).length;
 
   const presetLabels = {
-    "high-risk-no-successor": `🚨 Riesgo Alto Sin Sucesor (${highRiskNoSucc})`,
-    "critical-no-successor": `🛡️ Cargos de Valor Sin Sucesor (${criticalNoSuccCount})`,
-    "ready-now": `🟢 Sucesión Inmediata (${readyNow})`,
-    "top-9box-no-successor": `🌟 9-Box 8/9 Sin Sucesor (${top9BoxNoSuccCount})`,
-    "high-risk-over-3y": `⏳ Riesgo Alto + Readiness >3a (${highRiskOver3yCount})`,
+    "high-risk-no-successor": `Riesgo Alto Sin Sucesor (${highRiskNoSucc})`,
+    "critical-no-successor": `Cargos de Valor Sin Sucesor (${criticalNoSuccCount})`,
+    "ready-now": `Sucesión Inmediata (${readyNow})`,
+    "top-9box-no-successor": `9-Box 8/9 Sin Sucesor (${top9BoxNoSuccCount})`,
+    "high-risk-over-3y": `Riesgo Alto + Readiness >3a (${highRiskOver3yCount})`,
   };
   document.querySelectorAll(".preset-filter-btn").forEach((btn) => {
     const presetKey = btn.getAttribute("data-preset");
@@ -571,18 +725,18 @@ function renderAnalyticsDashboard() {
           <button
             type="button"
             data-9box-cell="${box}"
-            class="ninebox-cell ${meta.cellClass} ${isActive ? "ninebox-cell-active" : ""} border rounded-xl p-4 sm:p-5 text-left flex flex-col justify-between min-h-[124px]"
+            class="ninebox-cell ${meta.cellClass} ${isActive ? "ninebox-cell-active" : ""}"
           >
             <div class="flex items-start justify-between gap-2">
               <span class="text-xs font-extrabold uppercase tracking-wider opacity-80">Cuadrante ${box}</span>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-white/85 tabular-nums shadow-sm">${pct}%</span>
+              <span class="ninebox-pct-pill">${pct}%</span>
             </div>
             <div class="my-2">
               <div class="text-3xl font-extrabold tabular-nums leading-none">${count}</div>
               <div class="text-xs font-bold mt-1.5 truncate">${meta.name}</div>
             </div>
-            <div class="text-[11px] opacity-85 font-semibold pt-1 border-t border-current/10">
-              ${noSucc > 0 ? `⚠️ ${noSucc} sin sucesor` : `✅ Cobertura completa`}
+            <div class="text-[11px] opacity-85 font-semibold pt-1 border-t border-breca-divider">
+              ${noSucc > 0 ? `${noSucc} sin sucesor` : `Cobertura completa`}
             </div>
           </button>
         `;
@@ -593,24 +747,26 @@ function renderAnalyticsDashboard() {
   // 2. Actualizar los 4 Gráficos Vivos en Chart.js
   updateLiveCharts(scope);
 
-  // 2.b Poblar resúmenes ejecutivos debajo de los 4 gráficos vivos
+  // 2.b Poblar resúmenes ejecutivos debajo de los 4 gráficos vivos (Componentes Modulares BRECA_THEME.ui)
   const riskDistEl = document.getElementById("risk-distribution-container");
   if (riskDistEl) {
     const riskItems = [
-      { label: "Riesgo Alto", key: "Alto", badge: "bg-rose-50 text-rose-700 border-rose-200/80" },
-      { label: "Riesgo Medio", key: "Medio", badge: "bg-amber-50 text-amber-800 border-amber-200/80" },
-      { label: "Riesgo Bajo", key: "Bajo", badge: "bg-emerald-50 text-emerald-700 border-emerald-200/80" },
+      { label: "Riesgo Alto", key: "Alto", variant: "charcoal" },
+      { label: "Riesgo Medio", key: "Medio", variant: "teal" },
+      { label: "Riesgo Bajo", key: "Bajo", variant: "sage" },
     ];
     riskDistEl.innerHTML = riskItems
       .map((item) => {
         const cnt = scope.filter((r) => r.riesgo === item.key).length;
         const pct = ((cnt / total) * 100).toFixed(1);
-        return `
-          <div class="p-2.5 rounded-xl border ${item.badge} text-center">
-            <div class="text-lg font-extrabold tabular-nums leading-tight">${cnt}</div>
-            <div class="text-[11px] font-bold mt-0.5">${item.label} (${pct}%)</div>
-          </div>
-        `;
+        const noSucc = scope.filter((r) => r.riesgo === item.key && !hasSuccessorRecord(r)).length;
+        return BRECA_THEME.ui.statTile({
+          variant: item.variant,
+          label: item.label,
+          value: `${cnt} (${pct}%)`,
+          subtext: `${noSucc} sin sucesor`,
+          dataAttr: `data-quick-risk="${item.key}"`,
+        });
       })
       .join("");
   }
@@ -618,21 +774,22 @@ function renderAnalyticsDashboard() {
   const readinessDistEl = document.getElementById("readiness-distribution-container");
   if (readinessDistEl) {
     const rdItems = [
-      { label: "Inmediato", count: scope.filter((r) => hasSuccessorRecord(r) && r.readiness === "Inmediato").length, cls: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-      { label: "1 a 3 años", count: scope.filter((r) => hasSuccessorRecord(r) && r.readiness === "1 a 3 años").length, cls: "bg-blue-50 text-blue-700 border-blue-200" },
-      { label: "3 a 5 años", count: scope.filter((r) => hasSuccessorRecord(r) && r.readiness === "3 a 5 años").length, cls: "bg-amber-50 text-amber-800 border-amber-200" },
-      { label: "+ de 5 años", count: scope.filter((r) => hasSuccessorRecord(r) && r.readiness === "+ de 5 años").length, cls: "bg-orange-50 text-orange-800 border-orange-200" },
-      { label: "Sin Sucesor", count: scope.filter((r) => !hasSuccessorRecord(r)).length, cls: "bg-rose-50 text-rose-700 border-rose-200" },
+      { label: "Inmediato", count: scope.filter((r) => hasSuccessorRecord(r) && r.readiness === "Inmediato").length, variant: "sage" },
+      { label: "1 a 3 años", count: scope.filter((r) => hasSuccessorRecord(r) && r.readiness === "1 a 3 años").length, variant: "petrol" },
+      { label: "3 a 5 años", count: scope.filter((r) => hasSuccessorRecord(r) && r.readiness === "3 a 5 años").length, variant: "teal" },
+      { label: "+ de 5 años", count: scope.filter((r) => hasSuccessorRecord(r) && r.readiness === "+ de 5 años").length, variant: "neutral" },
+      { label: "Sin Sucesor", count: scope.filter((r) => !hasSuccessorRecord(r)).length, variant: "charcoal" },
     ];
     readinessDistEl.innerHTML = rdItems
-      .map(
-        (it) => `
-          <div class="p-2 rounded-xl border ${it.cls} text-center">
-            <div class="text-base font-extrabold tabular-nums leading-tight">${it.count}</div>
-            <div class="text-[10px] font-bold mt-0.5 truncate">${it.label}</div>
-          </div>
-        `
-      )
+      .map((it) => {
+        const pct = ((it.count / total) * 100).toFixed(0);
+        return BRECA_THEME.ui.statTile({
+          variant: it.variant,
+          label: it.label,
+          value: it.count,
+          subtext: `${pct}% del total`,
+        });
+      })
       .join("");
   }
 
@@ -643,12 +800,12 @@ function renderAnalyticsDashboard() {
       .map((lv) => {
         const totLv = scope.filter((r) => r.nivel === lv).length;
         const critLv = scope.filter((r) => r.nivel === lv && r.cargo_valor === "Sí").length;
-        return `
-          <div class="p-2.5 rounded-xl border border-slate-200/80 bg-slate-50/70 text-center">
-            <div class="text-base font-extrabold text-[#0B2545] tabular-nums leading-tight">${totLv} <span class="text-xs font-bold text-slate-500">(${lv})</span></div>
-            <div class="text-[10px] font-semibold text-indigo-700 mt-0.5">⭐ ${critLv} Cargos de Valor</div>
-          </div>
-        `;
+        return BRECA_THEME.ui.statTile({
+          variant: "neutral",
+          label: `Nivel ${lv}`,
+          value: totLv,
+          subtext: `${critLv} Cargos de Valor`,
+        });
       })
       .join("");
   }
@@ -659,47 +816,56 @@ function renderAnalyticsDashboard() {
       .map((comp) => {
         const cnt = state.records.filter((r) => r.empresa === comp).length;
         const active = state.selectedCompany === comp;
-        const cls = active
-          ? "bg-[#0B2545] text-white border-[#0B2545]"
-          : "bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border-slate-200";
         return `
-          <button type="button" data-company-chip="${escapeHtml(comp)}" class="px-2.5 py-1 rounded-lg border text-[11px] font-bold transition-colors ${cls}">
-            ${escapeHtml(comp)} (${cnt})
+          <button type="button" data-company-chip="${escapeHtml(comp)}" class="breca-company-chip ${active ? "breca-company-chip-active" : ""}">
+            <span>${escapeHtml(comp)}</span>
+            <span class="opacity-70 font-bold tabular-nums">(${cnt})</span>
           </button>
         `;
       })
       .join("");
   }
 
-  // 3. Radar de Atención Prioritaria (Riesgo Alto + Sin Sucesor) — Sin botones de IA adicionales
+  // 3. Radar de Atención Prioritaria (Riesgo Alto + Sin Sucesor)
   const alertsEl = document.getElementById("critical-alerts-list");
   if (alertsEl) {
     const criticalAlerts = scope.filter((r) => r.riesgo === "Alto" && !hasSuccessorRecord(r));
     if (criticalAlerts.length === 0) {
-      alertsEl.innerHTML = `<div class="p-5 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-semibold">✅ No existen talentos con Riesgo Alto y sin sucesor en esta unidad.</div>`;
+      alertsEl.innerHTML = `<div class="p-5 rounded-lg bg-breca-subtle text-breca-sage border border-breca-border text-xs font-semibold">No existen talentos con Riesgo Alto y sin sucesor en esta unidad.</div>`;
     } else {
       alertsEl.innerHTML = criticalAlerts
         .map(
           (r) => `
-          <div class="p-4 rounded-xl bg-rose-50/50 border border-rose-200/80 flex items-center justify-between gap-3">
-            <div>
-              <div class="text-sm font-bold text-slate-900">${escapeHtml(r.nombre)}</div>
-              <div class="text-xs text-slate-600 mt-0.5">${escapeHtml(r.posicion)} · <span class="font-semibold text-[#0B2545]">${escapeHtml(r.empresa)}</span></div>
-              <div class="flex items-center gap-2 mt-2">
-                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200">GGS ${r.ggs}</span>
-                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200">9-Box ${r.nine_box}</span>
-                ${r.cargo_valor === "Sí" ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">⭐ Cargo de Valor</span>` : ""}
+          <div class="breca-alert-card">
+            <div class="min-w-0">
+              <div class="text-sm font-bold text-breca-charcoal truncate">${escapeHtml(r.nombre)}</div>
+              <div class="text-xs text-breca-slate mt-0.5 truncate">${escapeHtml(r.posicion)} · <span class="font-bold text-breca-petrol">${escapeHtml(r.empresa)}</span></div>
+              <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                <span class="breca-pill breca-pill-sm breca-pill-outline">GGS ${r.ggs}</span>
+                <span class="breca-pill breca-pill-sm breca-pill-outline">9-Box ${r.nine_box}</span>
+                ${r.cargo_valor === "Sí" ? `<span class="breca-pill breca-pill-sm breca-pill-valor">Cargo de Valor</span>` : ""}
               </div>
             </div>
-            <button
-              type="button"
-              data-action="edit-critical"
-              data-id="${r.id}"
-              class="px-3 py-2 rounded-xl bg-white hover:bg-[#0B2545] text-[#0B2545] hover:text-white border border-rose-200 text-xs font-bold transition-colors shrink-0 shadow-sm"
-              title="Asignar sucesor o actualizar registro"
-            >
-              Gestionar
-            </button>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                data-action="ficha"
+                data-id="${r.id}"
+                class="breca-btn breca-btn-ficha"
+                title="Ver Ficha de Valoración Ejecutiva Ecualizada"
+              >
+                Ficha
+              </button>
+              <button
+                type="button"
+                data-action="edit-critical"
+                data-id="${r.id}"
+                class="breca-btn breca-btn-secondary !px-2.5 !py-1"
+                title="Asignar sucesor o actualizar registro"
+              >
+                Gestionar
+              </button>
+            </div>
           </div>
         `
         )
@@ -710,11 +876,11 @@ function renderAnalyticsDashboard() {
 
 function updateLiveCharts(scope) {
   if (!window.Chart) return;
-
-  const fontFamily = "'Plus Jakarta Sans', 'Inter', sans-serif";
+  const palette = BRECA_THEME.getPalette();
 
   // --------------------------------------------------------------------------
   // GRÁFICO 1: Riesgo de Pérdida vs. Cobertura de Sucesión (Barras Apiladas)
+  // Tokens de BRECA_THEME: petrol (Con Sucesor) y gray (Sin Sucesor)
   // --------------------------------------------------------------------------
   const riskLabels = ["Alto", "Medio", "Bajo"];
   const riskWithSucc = riskLabels.map((rk) => scope.filter((r) => r.riesgo === rk && hasSuccessorRecord(r)).length);
@@ -735,22 +901,21 @@ function updateLiveCharts(scope) {
             {
               label: "Con Sucesor",
               data: riskWithSucc,
-              backgroundColor: "#0B2545",
-              borderRadius: 6,
-              barPercentage: 0.58,
+              backgroundColor: palette.petrol,
+              borderRadius: 4,
+              barPercentage: 0.56,
             },
             {
               label: "Sin Sucesor (Brecha)",
               data: riskNoSucc,
-              backgroundColor: "#94A3B8",
-              borderRadius: 6,
-              barPercentage: 0.58,
+              backgroundColor: palette.gray,
+              borderRadius: 4,
+              barPercentage: 0.56,
             },
           ],
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
+        options: BRECA_THEME.createChartOptions({
+          stacked: true,
           onClick: (_evt, elements) => {
             if (!elements.length) return;
             const idx = elements[0].index;
@@ -761,39 +926,14 @@ function updateLiveCharts(scope) {
             switchTab("table");
             applyFiltersAndRender();
           },
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: { font: { family: fontFamily, size: 11, weight: "600" }, boxWidth: 12, padding: 14 },
-            },
-            tooltip: {
-              backgroundColor: "#0B2545",
-              titleFont: { family: fontFamily, size: 12, weight: "700" },
-              bodyFont: { family: fontFamily, size: 12 },
-              padding: 10,
-              cornerRadius: 8,
-            },
-          },
-          scales: {
-            x: {
-              stacked: true,
-              grid: { display: false },
-              ticks: { font: { family: fontFamily, size: 11, weight: "700" }, color: "#334155" },
-            },
-            y: {
-              stacked: true,
-              beginAtZero: true,
-              grid: { color: "#F1F5F9" },
-              ticks: { precision: 0, font: { family: fontFamily, size: 11 }, color: "#64748B" },
-            },
-          },
-        },
+        }),
       });
     }
   }
 
   // --------------------------------------------------------------------------
   // GRÁFICO 2: Pipeline por Horizonte de Readiness (Doughnut Ejecutivo)
+  // Tokens de BRECA_THEME: sage, petrol, teal, slate, gray
   // --------------------------------------------------------------------------
   const readinessCounts = [
     scope.filter((r) => hasSuccessorRecord(r) && r.readiness === "Inmediato").length,
@@ -816,37 +956,25 @@ function updateLiveCharts(scope) {
           datasets: [
             {
               data: readinessCounts,
-              backgroundColor: ["#0B2545", "#1E3A8A", "#475569", "#94A3B8", "#CBD5E1"],
+              backgroundColor: [palette.sage, palette.petrol, palette.teal, palette.slate, palette.gray],
               borderWidth: 2,
-              borderColor: "#FFFFFF",
-              hoverOffset: 6,
+              borderColor: palette.surface,
+              hoverOffset: 5,
             },
           ],
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: "62%",
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: { font: { family: fontFamily, size: 11, weight: "600" }, boxWidth: 11, padding: 10 },
-            },
-            tooltip: {
-              backgroundColor: "#0B2545",
-              titleFont: { family: fontFamily, size: 12, weight: "700" },
-              bodyFont: { family: fontFamily, size: 12 },
-              padding: 10,
-              cornerRadius: 8,
-            },
-          },
-        },
+        options: BRECA_THEME.createChartOptions({
+          isDoughnut: true,
+          cutout: "64%",
+          legendPadding: 10,
+        }),
       });
     }
   }
 
   // --------------------------------------------------------------------------
   // GRÁFICO 3: Nivel de Posición (N-0, N-1, N-2, N-3) y Cargos de Valor
+  // Tokens de BRECA_THEME: charcoal (Cargo de Valor) y teal (Posición Estándar)
   // --------------------------------------------------------------------------
   const levels = ["N-0", "N-1", "N-2", "N-3"];
   const criticalByLevel = levels.map((lv) => scope.filter((r) => r.nivel === lv && r.cargo_valor === "Sí").length);
@@ -867,53 +995,27 @@ function updateLiveCharts(scope) {
             {
               label: "Cargo de Valor (Crítico)",
               data: criticalByLevel,
-              backgroundColor: "#0B2545",
-              borderRadius: 6,
-              barPercentage: 0.6,
+              backgroundColor: palette.charcoal,
+              borderRadius: 4,
+              barPercentage: 0.58,
             },
             {
               label: "Posición Estándar",
               data: standardByLevel,
-              backgroundColor: "#94A3B8",
-              borderRadius: 6,
-              barPercentage: 0.6,
+              backgroundColor: palette.teal,
+              borderRadius: 4,
+              barPercentage: 0.58,
             },
           ],
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: { font: { family: fontFamily, size: 11, weight: "600" }, boxWidth: 12, padding: 14 },
-            },
-            tooltip: {
-              backgroundColor: "#0B2545",
-              titleFont: { family: fontFamily, size: 12, weight: "700" },
-              bodyFont: { family: fontFamily, size: 12 },
-              padding: 10,
-              cornerRadius: 8,
-            },
-          },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { font: { family: fontFamily, size: 11, weight: "700" }, color: "#334155" },
-            },
-            y: {
-              beginAtZero: true,
-              grid: { color: "#F1F5F9" },
-              ticks: { precision: 0, font: { family: fontFamily, size: 11 }, color: "#64748B" },
-            },
-          },
-        },
+        options: BRECA_THEME.createChartOptions({ stacked: false }),
       });
     }
   }
 
   // --------------------------------------------------------------------------
   // GRÁFICO 4: Cobertura y Riesgo por Unidad de Negocio (12 Empresas Breca)
+  // Tokens de BRECA_THEME: petrol (Con Sucesor), gray (Sin Sucesor), charcoal (Riesgo Alto)
   // --------------------------------------------------------------------------
   const companyStats = state.companies
     .map((c) => {
@@ -950,26 +1052,26 @@ function updateLiveCharts(scope) {
             {
               label: "Con Sucesor",
               data: compWithSucc,
-              backgroundColor: "#0B2545",
-              borderRadius: 5,
+              backgroundColor: palette.petrol,
+              borderRadius: 4,
             },
             {
               label: "Sin Sucesor",
               data: compNoSucc,
-              backgroundColor: "#CBD5E1",
-              borderRadius: 5,
+              backgroundColor: palette.gray,
+              borderRadius: 4,
             },
             {
               label: "Riesgo Alto",
               data: compHighRisk,
-              backgroundColor: "#64748B",
-              borderRadius: 5,
+              backgroundColor: palette.charcoal,
+              borderRadius: 4,
             },
           ],
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
+        options: BRECA_THEME.createChartOptions({
+          stacked: false,
+          legendPadding: 16,
           onClick: (_evt, elements) => {
             if (!elements.length) return;
             const idx = elements[0].index;
@@ -981,31 +1083,7 @@ function updateLiveCharts(scope) {
               applyFiltersAndRender();
             }
           },
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: { font: { family: fontFamily, size: 11, weight: "600" }, boxWidth: 12, padding: 16 },
-            },
-            tooltip: {
-              backgroundColor: "#0B2545",
-              titleFont: { family: fontFamily, size: 12, weight: "700" },
-              bodyFont: { family: fontFamily, size: 12 },
-              padding: 10,
-              cornerRadius: 8,
-            },
-          },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { font: { family: fontFamily, size: 11, weight: "600" }, color: "#334155" },
-            },
-            y: {
-              beginAtZero: true,
-              grid: { color: "#F1F5F9" },
-              ticks: { precision: 0, font: { family: fontFamily, size: 11 }, color: "#64748B" },
-            },
-          },
-        },
+        }),
       });
     }
   }
@@ -1050,58 +1128,39 @@ function renderTable() {
   tbody.innerHTML = pageItems
     .map((r) => {
       const boxMeta = NINE_BOX_META[r.nine_box] || NINE_BOX_META[5];
-
-      const riskBadge =
-        r.riesgo === "Alto"
-          ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80"><span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>Alto</span>`
-          : r.riesgo === "Medio"
-          ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/80"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Medio</span>`
-          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Bajo</span>`;
-
-      let readinessBadge = "";
-      if (!hasSuccessorRecord(r)) {
-        readinessBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200/70">⚠️ Sin sucesor</span>`;
-      } else if (r.readiness === "Inmediato") {
-        readinessBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Inmediato</span>`;
-      } else if (r.readiness === "1 a 3 años") {
-        readinessBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">1 a 3 años</span>`;
-      } else if (r.readiness === "3 a 5 años") {
-        readinessBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">3 a 5 años</span>`;
-      } else {
-        readinessBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-orange-50 text-orange-800 border border-orange-200">${escapeHtml(r.readiness)}</span>`;
-      }
-
+      const riskBadge = BRECA_THEME.ui.riskBadge(r.riesgo);
+      const readinessBadge = BRECA_THEME.ui.readinessBadge(r.readiness, hasSuccessorRecord(r));
       const criticalPill =
         r.cargo_valor === "Sí"
-          ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/70" title="Posición Crítica / Cargo de Valor">⭐ Crítico</span>`
+          ? `<span class="breca-pill breca-pill-sm breca-pill-valor" title="Posición Crítica / Cargo de Valor">Cargo de Valor</span>`
           : "";
 
       return `
         <tr class="group">
           <td class="py-3.5 px-5">
             <div class="flex items-center gap-3.5">
-              <div class="w-9 h-9 rounded-full bg-slate-100 text-[#0B2545] font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200/80">
+              <div class="breca-avatar-circle">
                 ${escapeHtml(getInitials(r.nombre))}
               </div>
               <div class="min-w-0">
-                <button type="button" data-action="edit" data-id="${r.id}" class="font-bold text-slate-900 hover:text-blue-600 text-left block truncate transition-colors" title="Editar registro de ${escapeHtml(r.nombre)}">
+                <button type="button" data-action="ficha" data-id="${r.id}" class="breca-person-link" title="Ver Ficha de Valoración Ejecutiva Ecualizada de ${escapeHtml(r.nombre)}">
                   ${escapeHtml(r.nombre)}
                 </button>
                 <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">
+                  <span class="breca-pill breca-pill-sm breca-pill-outline">
                     ${escapeHtml(r.empresa)}
                   </span>
-                  <span class="text-[10px] font-semibold text-slate-400">DNI: ${escapeHtml(r.documento)}</span>
-                  <span class="text-[11px] text-slate-400 truncate">· ${escapeHtml(r.tiempo_posicion)}</span>
+                  <span class="text-[10px] font-semibold text-breca-slate">DNI: ${escapeHtml(r.documento)}</span>
+                  <span class="text-[11px] text-breca-slate truncate">· ${escapeHtml(r.tiempo_posicion)}</span>
                 </div>
               </div>
             </div>
           </td>
 
           <td class="py-3.5 px-4">
-            <div class="font-medium text-slate-800 leading-snug">${escapeHtml(r.posicion)}</div>
+            <div class="font-medium text-breca-charcoal leading-snug">${escapeHtml(r.posicion)}</div>
             <div class="flex items-center gap-1.5 mt-1">
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">
+              <span class="breca-pill breca-pill-sm breca-pill-neutral">
                 ${escapeHtml(r.nivel)}
               </span>
               ${criticalPill}
@@ -1109,7 +1168,7 @@ function renderTable() {
           </td>
 
           <td class="py-3.5 px-3 text-center">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-slate-100 text-[#0B2545]">
+            <span class="breca-pill breca-pill-outline font-bold">
               GGS ${r.ggs}
             </span>
           </td>
@@ -1129,12 +1188,12 @@ function renderTable() {
             ${
               hasSuccessorRecord(r)
                 ? `<div class="flex flex-col gap-1">
-                     <span class="font-semibold text-slate-800 leading-tight">${escapeHtml(r.sucesor)}</span>
+                     <span class="font-semibold text-breca-charcoal leading-tight">${escapeHtml(r.sucesor)}</span>
                      <div class="flex flex-wrap items-center gap-1.5">
                        ${readinessBadge}
                        ${
                          r.motivacion_sucesor && r.motivacion_sucesor !== "-"
-                           ? `<span class="text-[10px] font-semibold text-slate-500">Motivación: ${escapeHtml(r.motivacion_sucesor)}</span>`
+                           ? `<span class="text-[10px] font-semibold text-breca-slate">Motivación: ${escapeHtml(r.motivacion_sucesor)}</span>`
                            : ""
                        }
                      </div>
@@ -1147,9 +1206,18 @@ function renderTable() {
             <div class="inline-flex items-center gap-1.5">
               <button
                 type="button"
+                data-action="ficha"
+                data-id="${r.id}"
+                class="breca-btn breca-btn-ficha"
+                title="Generar Ficha de Valoración Ejecutiva Ecualizada"
+              >
+                Ficha
+              </button>
+              <button
+                type="button"
                 data-action="edit"
                 data-id="${r.id}"
-                class="p-1.5 rounded-lg text-slate-400 hover:text-[#0B2545] hover:bg-slate-100 transition-colors"
+                class="breca-btn-icon"
                 title="Editar registro"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1160,7 +1228,7 @@ function renderTable() {
                 type="button"
                 data-action="delete"
                 data-id="${r.id}"
-                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                class="breca-btn-icon"
                 title="Eliminar registro"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1226,17 +1294,15 @@ function renderQuickActions() {
         class="ai-prompt-card ${isOpenMode ? "ai-prompt-card-open" : ""} text-left px-3 py-2.5 flex flex-col justify-between gap-1 group"
       >
         <div class="flex items-center justify-between gap-1.5">
-          <span class="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider ${
-            isOpenMode
-              ? "text-indigo-700 bg-indigo-50 border-indigo-200/80"
-              : "text-blue-700 bg-blue-50 border-blue-100"
-          } px-2 py-0.5 rounded-md border">
+          <span class="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+            isOpenMode ? "ai-prompt-cat-open" : "ai-prompt-cat-template"
+          }">
             <span>${qa.icon}</span>
             <span>${escapeHtml(qa.category)}</span>
           </span>
-          <span class="text-xs text-slate-300 group-hover:text-blue-600 transition-colors font-bold">→</span>
+          <span class="text-xs text-breca-gray group-hover:text-breca-petrol transition-colors font-bold">→</span>
         </div>
-        <div class="text-[11.5px] font-bold text-[#0B2545] group-hover:text-blue-700 leading-snug line-clamp-2">
+        <div class="text-[11.5px] font-bold text-breca-charcoal group-hover:text-breca-petrol leading-snug line-clamp-2">
           ${escapeHtml(qa.question)}
         </div>
       </button>
@@ -1250,8 +1316,8 @@ function renderQuestionCatalog() {
   if (!container) return;
   container.innerHTML = QUESTION_CATALOG.map(
     (cat, idx) => `
-      <div class="bg-white p-3 rounded-xl border ${idx === 5 ? "border-indigo-200 bg-indigo-50/20" : "border-slate-200/80"}">
-        <div class="font-extrabold ${idx === 5 ? "text-indigo-900" : "text-[#0B2545]"} text-xs mb-2">${escapeHtml(cat.category)}</div>
+      <div class="bg-white p-3 rounded-lg border ${idx === 5 ? "ai-prompt-card-open" : "border-breca-border"}">
+        <div class="font-extrabold ${idx === 5 ? "text-breca-teal" : "text-breca-charcoal"} text-xs mb-2">${escapeHtml(cat.category)}</div>
         <div class="grid grid-cols-1 gap-1.5">
           ${cat.items
             .map(
@@ -1259,7 +1325,7 @@ function renderQuestionCatalog() {
               <button
                 type="button"
                 data-catalog-question="${escapeHtml(q)}"
-                class="w-full text-left px-3 py-2 rounded-lg bg-slate-50/80 hover:bg-blue-600 text-slate-700 hover:text-white border border-slate-200/70 hover:border-blue-600 transition-colors text-xs font-medium"
+                class="w-full text-left px-3 py-2 rounded-md bg-breca-subtle hover:bg-breca-petrol text-breca-charcoal hover:text-white border border-breca-border hover:border-breca-petrol transition-colors text-xs font-medium"
               >
                 ${escapeHtml(q)}
               </button>
@@ -1272,10 +1338,6 @@ function renderQuestionCatalog() {
   ).join("");
 }
 
-/**
- * Reinicia la sesión de conversación y muestra un saludo ejecutivo limpio
- * que explica de un vistazo la capacidad híbrida (Plantillas de Reporte + Análisis Abierto Gemini IA).
- */
 /**
  * Cambia la pestaña visible en dispositivos móviles (< lg) dentro de la ventana flotante dividida:
  * - "chat": Muestra el chat conversacional y oculta el lienzo izquierdo en móvil.
@@ -1293,36 +1355,30 @@ function switchMobileWorkspaceTab(tabName) {
 
   if (state.mobileWorkspaceTab === "canvas") {
     canvasPanel.classList.remove("hidden");
-    canvasPanel.classList.add("flex", "w-full");
+    canvasPanel.classList.add("flex");
     chatPanel.classList.add("hidden", "lg:flex");
     chatPanel.classList.remove("flex");
 
-    if (btnCanvas) {
-      btnCanvas.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-extrabold bg-[#0B2545] text-white shadow-sm transition-colors flex items-center justify-center gap-1.5";
-    }
-    if (btnChat) {
-      btnChat.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-white text-slate-700 border border-slate-200/80 transition-colors flex items-center justify-center gap-1.5";
-    }
+    btnCanvas?.classList.add("breca-mobile-tab-active");
+    btnChat?.classList.remove("breca-mobile-tab-active");
   } else {
     canvasPanel.classList.add("hidden", "lg:flex");
-    canvasPanel.classList.remove("flex", "w-full");
+    canvasPanel.classList.remove("flex");
     chatPanel.classList.remove("hidden");
     chatPanel.classList.add("flex");
 
-    if (btnChat) {
-      btnChat.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-extrabold bg-[#0B2545] text-white shadow-sm transition-colors flex items-center justify-center gap-1.5";
-    }
-    if (btnCanvas) {
-      btnCanvas.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-white text-slate-700 border border-slate-200/80 transition-colors flex items-center justify-center gap-1.5";
-    }
+    btnChat?.classList.add("breca-mobile-tab-active");
+    btnCanvas?.classList.remove("breca-mobile-tab-active");
   }
 }
 
 /**
  * Construye gráficos visuales SVG ejecutivos (Donut de Cobertura/Riesgo + Barras Horizontales de Readiness y 9-Box)
+ * consumiendo la paleta corporativa centralizada desde BRECA_THEME.getPalette()
  * sin utilizar ningún atributo inline style= para cumplir con las reglas estrictas del proyecto.
  */
 function buildQueryVisualChartHtml(query, routeType, records) {
+  const palette = BRECA_THEME.getPalette();
   const allRecords = Array.isArray(records) && records.length > 0 ? records : state.records;
   const qNorm = String(query || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -1349,7 +1405,7 @@ function buildQueryVisualChartHtml(query, routeType, records) {
   const redAlerts = scopeRecords.filter((r) => r.riesgo === "Alto" && r.tiene_sucesor !== "Sí").length;
 
   const readyNow = scopeRecords.filter((r) => r.readiness === "Inmediato").length;
-  const ready1to2 = scopeRecords.filter((r) => r.readiness === "1 a 2 años").length;
+  const ready1to3 = scopeRecords.filter((r) => r.readiness === "1 a 3 años" || r.readiness === "1 a 2 años").length;
   const ready3to5 = scopeRecords.filter((r) => r.readiness === "3 a 5 años" || r.readiness === "+ de 5 años").length;
   const topTalent = scopeRecords.filter((r) => Number(r.nine_box) >= 8).length;
 
@@ -1358,37 +1414,37 @@ function buildQueryVisualChartHtml(query, routeType, records) {
 
   return `
     <div class="ai-canvas-visual-grid">
-      <!-- Tarjeta Gráfica 1: Donut SVG de Cobertura y Semáforo de Riesgo -->
+      <!-- Tarjeta Gráfica 1: Donut SVG de Cobertura y Semáforo de Riesgo (Paleta Breca Modular) -->
       <div class="ai-canvas-chart-card">
-        <div class="flex items-center justify-between mb-2.5">
-          <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#0B2545]">📊 Cobertura y Riesgo (${escapeHtml(scopeTitle)})</span>
+        <div class="flex items-center justify-between gap-2 mb-2.5">
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-breca-charcoal">Cobertura y Riesgo (${escapeHtml(scopeTitle)})</span>
           <span class="ai-badge ai-badge-blue">${scopeRecords.length} pos.</span>
         </div>
         <div class="flex items-center gap-4">
           <div class="relative w-24 h-24 shrink-0 flex items-center justify-center">
             <svg class="w-24 h-24 -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#e2e8f0" stroke-width="3.8"></circle>
-              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#0B2545" stroke-width="3.6" stroke-dasharray="${covPct} ${100 - covPct}" stroke-dashoffset="0"></circle>
+              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="${palette.divider}" stroke-width="3.8"></circle>
+              <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="${palette.petrol}" stroke-width="3.6" stroke-dasharray="${covPct} ${100 - covPct}" stroke-dashoffset="0"></circle>
             </svg>
             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span class="text-sm font-extrabold text-[#0B2545]">${covPct}%</span>
-              <span class="text-[9px] font-bold uppercase text-slate-400">Cubierto</span>
+              <span class="text-sm font-extrabold text-breca-charcoal">${covPct}%</span>
+              <span class="text-[9px] font-bold uppercase text-breca-slate">Cubierto</span>
             </div>
           </div>
-          <div class="flex-1 space-y-1.5 text-xs">
-            <div class="flex items-center justify-between">
-              <span class="text-slate-600 font-medium">✅ Con Sucesor:</span>
-              <strong class="text-emerald-700 font-extrabold">${withSuc} (${covPct}%)</strong>
+          <div class="flex-1 space-y-1.5 text-xs min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-breca-slate font-medium inline-flex items-center gap-1.5"><span class="breca-status-dot breca-dot-sage"></span>Con Sucesor:</span>
+              <strong class="text-breca-sage font-extrabold">${withSuc} (${covPct}%)</strong>
             </div>
-            <div class="flex items-center justify-between">
-              <span class="text-slate-600 font-medium">⚠️ Sin Sucesor:</span>
-              <strong class="text-amber-700 font-extrabold">${withoutSuc} (${100 - covPct}%)</strong>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-breca-slate font-medium inline-flex items-center gap-1.5"><span class="breca-status-dot breca-dot-teal"></span>Sin Sucesor:</span>
+              <strong class="text-breca-teal font-extrabold">${withoutSuc} (${100 - covPct}%)</strong>
             </div>
-            <div class="flex items-center justify-between pt-1 border-t border-slate-100">
-              <span class="text-slate-600 font-medium">🚨 Alerta Roja (Alto s/suc):</span>
-              <strong class="text-rose-700 font-extrabold">${redAlerts}</strong>
+            <div class="flex items-center justify-between gap-2 pt-1 border-t border-breca-divider">
+              <span class="text-breca-slate font-medium inline-flex items-center gap-1.5"><span class="breca-status-dot breca-dot-charcoal"></span>Riesgo Alto s/suc:</span>
+              <strong class="text-breca-charcoal font-extrabold">${redAlerts}</strong>
             </div>
-            <div class="flex items-center gap-1.5 pt-0.5 text-[10px]">
+            <div class="flex items-center flex-wrap gap-1.5 pt-0.5 text-[10px]">
               <span class="ai-badge ai-badge-red">Alto: ${riskHigh}</span>
               <span class="ai-badge ai-badge-amber">Medio: ${riskMed}</span>
               <span class="ai-badge ai-badge-green">Bajo: ${riskLow}</span>
@@ -1397,38 +1453,38 @@ function buildQueryVisualChartHtml(query, routeType, records) {
         </div>
       </div>
 
-      <!-- Tarjeta Gráfica 2: Barras SVG de Pipeline Readiness y Top Talent 9-Box -->
+      <!-- Tarjeta Gráfica 2: Barras SVG de Pipeline Readiness y Top Talent 9-Box (Paleta Breca Modular) -->
       <div class="ai-canvas-chart-card">
-        <div class="flex items-center justify-between mb-2.5">
-          <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#0B2545]">🚀 Pipeline de Sucesión y 9-Box</span>
+        <div class="flex items-center justify-between gap-2 mb-2.5">
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-breca-charcoal">Pipeline de Sucesión y 9-Box</span>
           <span class="ai-badge ai-badge-indigo">Top 8-9: ${topTalent}</span>
         </div>
         <div class="space-y-2 text-xs">
           <div>
             <div class="flex justify-between text-[11px] mb-0.5">
-              <span class="font-semibold text-slate-700">⚡ Lista Ahora (Inmediato)</span>
-              <span class="font-extrabold text-emerald-700">${readyNow} pos.</span>
+              <span class="font-semibold text-breca-charcoal inline-flex items-center gap-1.5"><span class="breca-status-dot breca-dot-sage"></span>Lista Ahora (Inmediato)</span>
+              <span class="font-extrabold text-breca-sage">${readyNow} pos.</span>
             </div>
-            <svg class="w-full h-2.5 rounded-full overflow-hidden bg-slate-100" viewBox="0 0 200 10" preserveAspectRatio="none">
-              <rect x="0" y="0" width="${barW(readyNow)}" height="10" rx="5" fill="#0B2545"></rect>
+            <svg class="w-full h-2.5 rounded-full overflow-hidden bg-breca-muted" viewBox="0 0 200 10" preserveAspectRatio="none">
+              <rect x="0" y="0" width="${barW(readyNow)}" height="10" rx="5" fill="${palette.sage}"></rect>
             </svg>
           </div>
           <div>
             <div class="flex justify-between text-[11px] mb-0.5">
-              <span class="font-semibold text-slate-700">⏳ Corto Plazo (1 a 2 años)</span>
-              <span class="font-extrabold text-blue-700">${ready1to2} pos.</span>
+              <span class="font-semibold text-breca-charcoal inline-flex items-center gap-1.5"><span class="breca-status-dot breca-dot-petrol"></span>Corto Plazo (1 a 3 años)</span>
+              <span class="font-extrabold text-breca-petrol">${ready1to3} pos.</span>
             </div>
-            <svg class="w-full h-2.5 rounded-full overflow-hidden bg-slate-100" viewBox="0 0 200 10" preserveAspectRatio="none">
-              <rect x="0" y="0" width="${barW(ready1to2)}" height="10" rx="5" fill="#334155"></rect>
+            <svg class="w-full h-2.5 rounded-full overflow-hidden bg-breca-muted" viewBox="0 0 200 10" preserveAspectRatio="none">
+              <rect x="0" y="0" width="${barW(ready1to3)}" height="10" rx="5" fill="${palette.petrol}"></rect>
             </svg>
           </div>
           <div>
             <div class="flex justify-between text-[11px] mb-0.5">
-              <span class="font-semibold text-slate-700">🌱 Mediano/Largo (3 a 5+ años)</span>
-              <span class="font-extrabold text-amber-700">${ready3to5} pos.</span>
+              <span class="font-semibold text-breca-charcoal inline-flex items-center gap-1.5"><span class="breca-status-dot breca-dot-teal"></span>Mediano/Largo (3 a 5+ años)</span>
+              <span class="font-extrabold text-breca-teal">${ready3to5} pos.</span>
             </div>
-            <svg class="w-full h-2.5 rounded-full overflow-hidden bg-slate-100" viewBox="0 0 200 10" preserveAspectRatio="none">
-              <rect x="0" y="0" width="${barW(ready3to5)}" height="10" rx="5" fill="#94A3B8"></rect>
+            <svg class="w-full h-2.5 rounded-full overflow-hidden bg-breca-muted" viewBox="0 0 200 10" preserveAspectRatio="none">
+              <rect x="0" y="0" width="${barW(ready3to5)}" height="10" rx="5" fill="${palette.teal}"></rect>
             </svg>
           </div>
         </div>
@@ -1446,7 +1502,6 @@ function renderCanvasHomeOverview() {
   const canvasBody = document.getElementById("ai-canvas-body");
   const titleEl = document.getElementById("ai-canvas-title");
   const badgeEl = document.getElementById("ai-canvas-route-badge");
-  const followupsEl = document.getElementById("ai-canvas-followups");
   const closeBtn = document.getElementById("btn-close-active-artifact");
 
   if (!canvasBody) return;
@@ -1466,19 +1521,15 @@ function renderCanvasHomeOverview() {
     closeBtn.classList.add("hidden");
     closeBtn.classList.remove("inline-flex");
   }
-  if (followupsEl) {
-    followupsEl.classList.add("hidden");
-    followupsEl.innerHTML = "";
-  }
 
   const chartsHtml = buildQueryVisualChartHtml("", "TEMPLATE", records);
 
   canvasBody.innerHTML = `
     <div class="space-y-4">
       ${chartsHtml}
-      <div class="px-4 py-3 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-between gap-3 text-xs text-slate-500">
-        <span>Escribe una consulta en el chat para abrir tablas o análisis detallados en nuevas ventanas.</span>
-        <span class="text-[11px] font-semibold text-[#0B2545] shrink-0">${total} registros</span>
+      <div class="px-4 py-3 rounded-lg bg-white border border-breca-border flex items-center justify-between gap-3 text-xs text-breca-slate">
+        <span>Escribe una consulta en el chat o selecciona un ejecutivo para abrir su Ficha de Valoración Ejecutiva Ecualizada o análisis con gráficos.</span>
+        <span class="text-[11px] font-bold text-breca-charcoal shrink-0">${total} registros</span>
       </div>
     </div>
   `;
@@ -1490,9 +1541,11 @@ function splitAgentResponseForWorkspace(validatedHtml, query, routeType, routeLa
   const parser = new DOMParser();
   const doc = parser.parseFromString(validatedHtml, "text/html");
 
-  // Extraer título del reporte si existe
-  const reportTitleEl = doc.querySelector(".ai-html-title, h3, h4");
-  const reportTitle = reportTitleEl ? reportTitleEl.textContent.trim() : query;
+  // Extraer título del reporte o de la Ficha Ejecutiva Breca si existe
+  const reportTitleEl = doc.querySelector(".breca-ficha-main-title, .ai-html-title, h3, h4");
+  const reportTitle = reportTitleEl ? reportTitleEl.textContent.trim().replace(/\s+/g, " ") : query;
+
+  const isIndividualFicha = validatedHtml.includes("breca-ficha-slide");
 
   // Contar tablas y KPIs presentes en la respuesta estructurada
   const tablesCount = doc.querySelectorAll("table").length;
@@ -1505,8 +1558,8 @@ function splitAgentResponseForWorkspace(validatedHtml, query, routeType, routeLa
 
   // Clonar el documento para construir la versión puramente conversacional/textual del chat
   const chatDoc = parser.parseFromString(validatedHtml, "text/html");
-  // Eliminar tablas y grillas de KPI del lado del chat para que vayan exclusivamente al lienzo izquierdo
-  chatDoc.querySelectorAll(".ai-table-wrap, table, .ai-kpi-grid, .ai-html-header").forEach((el) => el.remove());
+  // Eliminar tablas, grillas de KPI y el slide de Ficha de 4 columnas del lado del chat para que vayan exclusivamente al lienzo izquierdo
+  chatDoc.querySelectorAll(".ai-table-wrap, table, .ai-kpi-grid, .ai-html-header, .breca-ficha-slide").forEach((el) => el.remove());
 
   // Recolectar bloques narrativos (párrafos, alertas ejecutivas y listas de hallazgos)
   const narrativeBlocks = [];
@@ -1531,12 +1584,12 @@ function splitAgentResponseForWorkspace(validatedHtml, query, routeType, routeLa
       `<p>He procesado la consulta <strong>"${escapeHtml(query)}"</strong> sobre el Talent Pool oficial (${state.records.length} posiciones) y he proyectado el reporte elaborado con sus gráficos y tablas en el panel izquierdo.</p>`
     );
   }
-  if (kpiSummaryItems.length > 0) {
+  if (!isIndividualFicha && kpiSummaryItems.length > 0) {
     narrativeBlocks.push(
       `<p>📌 <strong>Indicadores clave detectados:</strong> ${kpiSummaryItems.join(" · ")}.</p>`
     );
   }
-  if (tablesCount > 0) {
+  if (!isIndividualFicha && tablesCount > 0) {
     const totalRows = doc.querySelectorAll("tbody tr").length;
     narrativeBlocks.push(
       `<p>📊 Se ${tablesCount === 1 ? "ha generado <strong>1 tabla ejecutiva</strong>" : `han generado <strong>${tablesCount} tablas ejecutivas</strong>`} (${totalRows} registros detallados) en una nueva pestaña del panel izquierdo.</p>`
@@ -1549,25 +1602,26 @@ function splitAgentResponseForWorkspace(validatedHtml, query, routeType, routeLa
     <div class="ai-chat-exec-card">
       <div class="ai-chat-exec-header">
         <span class="ai-chat-status-pill ai-chat-status-ready">
-          <span>✅</span>
-          <span>¡Todo listo! · Análisis completado</span>
+          <span class="breca-status-dot breca-dot-sage"></span>
+          <span>${isIndividualFicha ? "Ficha Ejecutiva Ecualizada" : "Análisis completado"}</span>
         </span>
-        <span class="text-[10px] font-bold text-slate-400">${escapeHtml(routeLabel)}</span>
+        <span class="text-[10px] font-bold text-breca-slate truncate max-w-full">${escapeHtml(routeLabel)}</span>
       </div>
       <div class="ai-chat-narrative">
         ${narrativeHtml}
       </div>
       <button type="button" data-focus-artifact="${escapeHtml(artifactId)}" class="ai-chat-canvas-btn">
-        <span>📄 Ver resultado en el panel izquierdo: <strong>${escapeHtml(reportTitle.slice(0, 48))}</strong></span>
-        <span>→</span>
+        <span class="min-w-0 flex-1">Ver en el lienzo izquierdo: <strong>${escapeHtml(reportTitle.slice(0, 48))}</strong></span>
+        <span class="shrink-0">→</span>
       </button>
     </div>
   `;
 
-  // Construir el contenido visual elaborado para el Lienzo Izquierdo (#ai-canvas-body)
-  // Los 2 gráficos generales viven únicamente en la primera pestaña ("HOME"); cada pestaña generada muestra solo su resultado específico
+  // Construir el contenido visual elaborado para el Lienzo Izquierdo (#ai-canvas-body):
+  // Las tarjetas de Resumen (Cobertura/Riesgo y Pipeline 9-Box) son exclusivas de la vista inicial
+  // "Resumen" (renderCanvasHomeOverview) y NO se repiten en las nuevas subpestañas generadas (#1, #2, etc.).
   const canvasVisualHtml = `
-    <div class="space-y-4 animate-fade-in">
+    <div class="ai-canvas-artifact-content animate-fade-in">
       ${validatedHtml}
     </div>
   `;
@@ -1685,7 +1739,6 @@ function renderActiveCanvasArtifact(artifactId) {
   const canvasBody = document.getElementById("ai-canvas-body");
   const titleEl = document.getElementById("ai-canvas-title");
   const badgeEl = document.getElementById("ai-canvas-route-badge");
-  const followupsEl = document.getElementById("ai-canvas-followups");
   const closeBtn = document.getElementById("btn-close-active-artifact");
 
   if (titleEl) titleEl.textContent = art.title || art.query;
@@ -1702,30 +1755,6 @@ function renderActiveCanvasArtifact(artifactId) {
   if (canvasBody) {
     canvasBody.innerHTML = art.canvasHtml;
     canvasBody.scrollTop = 0;
-  }
-
-  if (followupsEl) {
-    if (Array.isArray(art.followUps) && art.followUps.length > 0) {
-      const isOpen = art.routeType === "OPEN_ANALYSIS";
-      followupsEl.classList.remove("hidden");
-      followupsEl.innerHTML = `
-        <div class="ai-followup-bar">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Profundizar:</span>
-          ${art.followUps
-            .map(
-              (fq) =>
-                `<button type="button" data-followup-question="${escapeHtml(fq)}" class="ai-followup-chip">
-                  <span>${isOpen ? "⚡" : "🧠"}</span>
-                  <span>${escapeHtml(fq)}</span>
-                </button>`
-            )
-            .join("")}
-        </div>
-      `;
-    } else {
-      followupsEl.classList.add("hidden");
-      followupsEl.innerHTML = "";
-    }
   }
 
   updateCanvasHistoryBar();
@@ -1747,14 +1776,14 @@ function startNewChatSession() {
   renderCanvasHomeOverview();
 
   container.innerHTML = `
-    <div class="flex items-start gap-2.5">
-      <div class="w-7 h-7 rounded-lg bg-[#0B2545] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+    <div class="flex items-start gap-2.5 min-w-0 max-w-full">
+      <div class="breca-ai-avatar mt-0.5 shrink-0">
         IA
       </div>
-      <div class="chat-bubble-ai rounded-2xl rounded-tl-sm px-4 py-3 text-xs text-slate-700 max-w-[94%] leading-relaxed">
-        <p class="font-bold text-[#0B2545] mb-1">Asistente Ejecutivo (${total} posiciones · ${companiesCount} empresas)</p>
-        <p class="text-slate-600">
-          Escribe tu consulta abajo o haz clic en <button type="button" data-expand-quick="true" class="font-semibold text-[#0B2545] underline hover:text-blue-700">Ver plantillas</button> si deseas revisar sugerencias rápidas.
+      <div class="chat-bubble-ai rounded-xl rounded-tl-sm px-3.5 py-3 text-xs text-breca-charcoal flex-1 min-w-0 leading-relaxed">
+        <p class="font-bold text-breca-charcoal mb-1">Asistente Ejecutivo (${total} posiciones · ${companiesCount} empresas)</p>
+        <p class="text-breca-slate">
+          Escribe tu consulta abajo o haz clic en <button type="button" data-expand-quick="true" class="chat-inline-link-btn">Ver plantillas ▼</button> para generar fichas ejecutivas ecualizadas y reportes con gráficos.
         </p>
       </div>
     </div>
@@ -2234,7 +2263,7 @@ async function sendChatQuestion(questionText) {
     const userDiv = document.createElement("div");
     userDiv.className = "flex justify-end";
     userDiv.innerHTML = `
-      <div class="max-w-[88%] rounded-2xl rounded-tr-sm bg-[#0B2545] text-white px-4 py-2.5 text-xs sm:text-sm font-medium shadow-sm">
+      <div class="breca-chat-user-bubble">
         ${escapeHtml(q)}
       </div>
     `;
@@ -2248,7 +2277,7 @@ async function sendChatQuestion(questionText) {
     botDiv = document.createElement("div");
     botDiv.className = "flex items-start gap-2.5";
     botDiv.innerHTML = `
-      <div class="w-8 h-8 rounded-xl bg-[#0B2545] text-white flex items-center justify-center text-xs font-extrabold shrink-0 shadow-sm mt-0.5">
+      <div class="breca-ai-avatar mt-0.5">
         IA
       </div>
       <div class="flex-1 min-w-0 target-content-area">
@@ -2259,7 +2288,7 @@ async function sendChatQuestion(questionText) {
               <span>Ejecutando consulta sobre 101 posiciones...</span>
             </span>
           </div>
-          <p class="text-xs text-slate-500">Procesando indicadores de sucesión y preparando gráficos y tablas en el panel izquierdo...</p>
+          <p class="text-xs text-breca-slate">Procesando indicadores de sucesión y preparando fichas, gráficos y tablas en el panel izquierdo...</p>
         </div>
       </div>
     `;
@@ -2330,7 +2359,7 @@ async function sendChatQuestion(questionText) {
   if (validated.isLinear) {
     // Respuesta puramente conversacional (ej. saludo o aclaración): se queda en el chat derecho
     if (targetArea) {
-      targetArea.innerHTML = `<div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-slate-200/90 shadow-sm"></div>`;
+      targetArea.innerHTML = `<div class="chat-bubble-ai rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm"></div>`;
       const innerBox = targetArea.firstElementChild;
       streamTypewriterContent(innerBox, validated.html, true);
     }
@@ -2365,7 +2394,7 @@ async function sendChatQuestion(questionText) {
     const followUpChatHtml =
       followUps.length > 0
         ? `<div class="ai-followup-bar mt-1.5">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1">Continuar:</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-breca-slate mr-1">Continuar:</span>
             ${followUps
               .slice(0, 2)
               .map(
@@ -2645,6 +2674,41 @@ function closeTalentModal() {
   if (overlay) overlay.classList.add("hidden");
 }
 
+/**
+ * MODO 1 (Fuera del Agente IA): Abre la Ficha de Valoración Ejecutiva Ecualizada
+ * en una ventana flotante dedicada con las 4 columnas en una sola fila (1x4).
+ */
+function openFichaModal(record) {
+  if (!record) return;
+  const overlay = document.getElementById("ficha-modal-overlay");
+  const titleEl = document.getElementById("ficha-modal-title");
+  const subtitleEl = document.getElementById("ficha-modal-subtitle");
+  const bodyEl = document.getElementById("ficha-modal-body");
+  if (!overlay || !bodyEl) return;
+
+  state.activeFichaRecord = record;
+
+  if (titleEl) {
+    titleEl.textContent = `Valoración Ejecutiva Ecualizada · ${record.nombre}`;
+  }
+  if (subtitleEl) {
+    subtitleEl.textContent = `${record.posicion} · ${record.empresa} · Nivel ${record.nivel} (GGS ${record.ggs}) · Vista de Presentación 4 Columnas`;
+  }
+
+  const fichaHtml =
+    typeof window.CENTRIA_BUILD_FICHA_HTML === "function"
+      ? window.CENTRIA_BUILD_FICHA_HTML(record)
+      : "";
+
+  bodyEl.innerHTML = fichaHtml;
+  overlay.classList.remove("hidden");
+}
+
+function closeFichaModal() {
+  const overlay = document.getElementById("ficha-modal-overlay");
+  if (overlay) overlay.classList.add("hidden");
+}
+
 async function saveTalentFromModal(e) {
   e.preventDefault();
   const idVal = document.getElementById("form-talent-id").value;
@@ -2813,14 +2877,14 @@ function showToast(message, type = "info") {
   if (!container) return;
 
   const toast = document.createElement("div");
-  const colorClass =
+  const variantClass =
     type === "error"
-      ? "bg-rose-600 text-white"
+      ? "breca-toast-error"
       : type === "success"
-      ? "bg-[#0B2545] text-white border border-blue-400/30"
-      : "bg-slate-800 text-white";
+      ? "breca-toast-success"
+      : "breca-toast-info";
 
-  toast.className = `pointer-events-auto px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold ${colorClass} transition-opacity duration-300`;
+  toast.className = `breca-toast ${variantClass}`;
   toast.textContent = message;
   container.appendChild(toast);
 
@@ -2931,7 +2995,7 @@ function bindEventListeners() {
     }
   });
 
-  // Delegación de eventos en Tabla (Edición y Eliminación)
+  // Delegación de eventos en Tabla (Ficha Ejecutiva, Edición y Eliminación)
   document.getElementById("talent-table-body")?.addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-action]");
     if (!btn) return;
@@ -2940,7 +3004,9 @@ function bindEventListeners() {
     const rec = state.records.find((r) => String(r.id) === String(id));
     if (!rec) return;
 
-    if (action === "edit") {
+    if (action === "ficha") {
+      openFichaModal(rec);
+    } else if (action === "edit") {
       openTalentModal(rec);
     } else if (action === "delete") {
       state.records = state.records.filter((r) => String(r.id) !== String(id));
@@ -2964,11 +3030,17 @@ function bindEventListeners() {
   });
 
   document.getElementById("critical-alerts-list")?.addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-action='edit-critical']");
+    const btn = e.target.closest("button[data-action]");
     if (!btn) return;
+    const action = btn.getAttribute("data-action");
     const id = btn.getAttribute("data-id");
     const rec = state.records.find((r) => String(r.id) === String(id));
-    if (rec) openTalentModal(rec);
+    if (!rec) return;
+    if (action === "ficha") {
+      openFichaModal(rec);
+    } else if (action === "edit-critical") {
+      openTalentModal(rec);
+    }
   });
 
   document.getElementById("company-breakdown-container")?.addEventListener("click", (e) => {
@@ -3001,6 +3073,18 @@ function bindEventListeners() {
   document.getElementById("btn-cancel-talent-modal")?.addEventListener("click", closeTalentModal);
   document.getElementById("talent-modal-backdrop")?.addEventListener("click", closeTalentModal);
   document.getElementById("talent-crud-form")?.addEventListener("submit", saveTalentFromModal);
+
+  // Modal Flotante de Ficha Ejecutiva (Modo 1: Fuera del Agente IA, 4 columnas en fila)
+  document.getElementById("btn-close-ficha-modal")?.addEventListener("click", closeFichaModal);
+  document.getElementById("ficha-modal-backdrop")?.addEventListener("click", closeFichaModal);
+  document.getElementById("btn-ficha-open-in-agent")?.addEventListener("click", () => {
+    const rec = state.activeFichaRecord;
+    closeFichaModal();
+    openChatDrawer();
+    if (rec) {
+      sendChatQuestion(`Genera la ficha ejecutiva de ${rec.nombre} de ${rec.empresa}.`);
+    }
+  });
 
   // Agente IA: FAB abre/reanuda, Minimizar o clic fuera preserva, Cerrar/Nueva sesión reinicia
   
@@ -3037,13 +3121,6 @@ function bindEventListeners() {
     document.getElementById("catalog-panel")?.classList.add("hidden");
   });
 
-  document.getElementById("btn-expand-drawer")?.addEventListener("click", () => {
-    const panel = document.getElementById("chat-drawer-panel");
-    if (!panel) return;
-    state.drawerExpanded = !state.drawerExpanded;
-    panel.classList.toggle("ai-workspace-fullscreen", state.drawerExpanded);
-  });
-
   // Controles de Vista Dividida (Conmutador móvil, Panorama Base e Historial de Reportes en el Lienzo Izquierdo)
   document.getElementById("btn-mobile-view-chat")?.addEventListener("click", () => {
     switchMobileWorkspaceTab("chat");
@@ -3076,12 +3153,6 @@ function bindEventListeners() {
       sendChatQuestion(qBtn.getAttribute("data-quick-question"));
       return;
     }
-    const fBtn = e.target.closest("button[data-followup-question]");
-    if (fBtn) {
-      sendChatQuestion(fBtn.getAttribute("data-followup-question"));
-    }
-  });
-  document.getElementById("ai-canvas-followups")?.addEventListener("click", (e) => {
     const fBtn = e.target.closest("button[data-followup-question]");
     if (fBtn) {
       sendChatQuestion(fBtn.getAttribute("data-followup-question"));

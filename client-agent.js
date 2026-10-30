@@ -39,25 +39,29 @@
   }
 
   function riskBadgeHtml(riesgo) {
-    if (riesgo === "Alto") return `<span class="ai-badge ai-badge-red">🔴 Alto</span>`;
-    if (riesgo === "Medio") return `<span class="ai-badge ai-badge-amber">🟡 Medio</span>`;
-    return `<span class="ai-badge ai-badge-green">🟢 Bajo</span>`;
+    if (riesgo === "Alto") {
+      return `<span class="ai-badge ai-badge-red"><span class="breca-status-dot breca-dot-charcoal"></span>Alto</span>`;
+    }
+    if (riesgo === "Medio") {
+      return `<span class="ai-badge ai-badge-amber"><span class="breca-status-dot breca-dot-teal"></span>Medio</span>`;
+    }
+    return `<span class="ai-badge ai-badge-green"><span class="breca-status-dot breca-dot-sage"></span>Bajo</span>`;
   }
 
   function readinessBadgeHtml(r) {
     if (!hasSuccessor(r)) {
-      return `<span class="ai-badge ai-badge-red">⚠️ Sin sucesor</span>`;
+      return `<span class="ai-badge ai-badge-red"><span class="breca-status-dot breca-dot-charcoal"></span>Sin sucesor</span>`;
     }
     if (r.readiness === "Inmediato") {
-      return `<span class="ai-badge ai-badge-green">🟢 Inmediato</span>`;
+      return `<span class="ai-badge ai-badge-green"><span class="breca-status-dot breca-dot-sage"></span>Inmediato</span>`;
     }
     if (r.readiness === "1 a 3 años") {
-      return `<span class="ai-badge ai-badge-blue">🔵 1 a 3 años</span>`;
+      return `<span class="ai-badge ai-badge-blue"><span class="breca-status-dot breca-dot-petrol"></span>1 a 3 años</span>`;
     }
     if (r.readiness === "3 a 5 años") {
-      return `<span class="ai-badge ai-badge-amber">🟡 3 a 5 años</span>`;
+      return `<span class="ai-badge ai-badge-amber"><span class="breca-status-dot breca-dot-teal"></span>3 a 5 años</span>`;
     }
-    return `<span class="ai-badge ai-badge-amber">🟠 ${esc(r.readiness)}</span>`;
+    return `<span class="ai-badge ai-badge-amber"><span class="breca-status-dot breca-dot-slate"></span>${esc(r.readiness)}</span>`;
   }
 
   function nineBoxDesc(box) {
@@ -420,7 +424,7 @@
                   <strong>Hallazgo Clave de Consultoría IA:</strong> Contar con un sucesor nominal no garantiza una transición exitosa si su motivación es baja o condicionada. En el pool actual de <strong>${withSucList.length} sucesores</strong>, se detectan <strong>${lowOrMedSuc.length} casos con motivación Media o Baja</strong> (ej. priorizan estabilidad en su rol actual o están sujetos a ubicación geográfica), lo que representa un <strong>riesgo de sucesión fallida</strong> si el titular se retira.
                 </div>
 
-                <div class="ai-section-title">📊 Distribución por Perfil de Motivación del Sucesor</div>
+                <div class="ai-section-title">1. Distribución por Perfil de Motivación del Sucesor</div>
                 <div class="ai-table-wrap">
                   <table class="ai-table">
                     <thead>
@@ -438,7 +442,7 @@
                   </table>
                 </div>
 
-                <div class="ai-section-title">⚠️ Casos de Atención: Sucesores con Motivación Baja o Media (${lowOrMedSuc.length} detectados)</div>
+                <div class="ai-section-title">2. Casos de Atención: Sucesores con Motivación Baja o Media (${lowOrMedSuc.length} detectados)</div>
                 <div class="ai-table-wrap">
                   <table class="ai-table">
                     <thead>
@@ -548,7 +552,7 @@
                   <strong>Patrón Detectado por IA:</strong> Se identifican <strong>${highTenureHighRisk.length} ejecutivos con más de 4 años en la misma posición y Riesgo de Pérdida Alto</strong>. Cuando un líder de alto desempeño supera los 48 meses sin rotación ni promoción (frecuentemente bloqueado porque su sucesor aún está a 3–5 años o no tiene sucesor), la probabilidad de rotación voluntaria hacia el mercado se dispara.
                 </div>
 
-                <div class="ai-section-title">🚨 Ejecutivos con Alta Permanencia (≥ 4 años) y Riesgo de Pérdida Alto</div>
+                <div class="ai-section-title">Ejecutivos con Alta Permanencia (≥ 4 años) y Riesgo de Pérdida Alto</div>
                 <div class="ai-table-wrap">
                   <table class="ai-table">
                     <thead>
@@ -814,7 +818,7 @@
           <td>${esc(r.posicion)} (${esc(r.nivel)} · GGS ${r.ggs})</td>
           <td><span class="ai-badge ai-badge-indigo">9-Box ${r.nine_box}</span></td>
           <td>${riskBadgeHtml(r.riesgo)}</td>
-          <td>${hasSuccessor(r) ? esc(r.sucesor) + " (" + esc(r.readiness) + ")" : '<span class="ai-badge ai-badge-red">⚠️ Sin sucesor</span>'}</td>
+          <td>${hasSuccessor(r) ? esc(r.sucesor) + " (" + esc(r.readiness) + ")" : '<span class="ai-badge ai-badge-red">Sin sucesor</span>'}</td>
           <td>${
             !hasSuccessor(r)
               ? "Asignar back-up interino + retención inmediata"
@@ -837,7 +841,7 @@
           <div class="ai-html-card">
             <div class="ai-html-header-open">
               <div>
-                <h4 class="ai-html-title">🧠 Análisis Estratégico y Recomendaciones IA · ${esc(scopeLabel)}</h4>
+                <h4 class="ai-html-title">Análisis Estratégico y Recomendaciones IA · ${esc(scopeLabel)}</h4>
                 <div class="ai-html-subtitle">Evaluación analítica sobre ${scopeRecords.length} posiciones activas del reporte 2026_Reporte_Sucesion.xlsx</div>
               </div>
               <span class="ai-badge ai-badge-indigo">Consultoría IA</span>
@@ -849,26 +853,26 @@
 
               <div class="ai-step-grid">
                 <div class="ai-step-card">
-                  <div class="ai-step-card-title">🚨 1. Contención (0 - 30 días)</div>
+                  <div class="ai-step-card-title">1. Contención (0 - 30 días)</div>
                   <div class="ai-step-card-text">
                     Intervenir prioritariamente en los <strong>${critNoSuc.length} casos de Riesgo Alto sin sucesor</strong> mediante entrevistas de retención, blindaje de compensación/proyectos y designación de un back-up de emergencia.
                   </div>
                 </div>
                 <div class="ai-step-card">
-                  <div class="ai-step-card-title">⚡ 2. Aceleración (30 - 90 días)</div>
+                  <div class="ai-step-card-title">2. Aceleración (30 - 90 días)</div>
                   <div class="ai-step-card-text">
                     Para los <strong>${highRiskLongSuc.length} titulares en Riesgo Alto con sucesor lejano (&gt;3 años)</strong>, asignar co-liderazgo operativo o emparejar con los <strong>${readyNowScope.length} candidatos Ready Now</strong> del grupo.
                   </div>
                 </div>
                 <div class="ai-step-card">
-                  <div class="ai-step-card-title">🌟 3. Desbloqueo de Top Talent</div>
+                  <div class="ai-step-card-title">3. Desbloqueo de Top Talent</div>
                   <div class="ai-step-card-text">
                     Nombrar sucesores para los <strong>${topNoSuc.length} líderes 9-Box 8–9 sin cobertura</strong>, habilitando su promoción hacia roles N-1/N-0 sin desproteger la operación.
                   </div>
                 </div>
               </div>
 
-              <div class="ai-section-title">🎯 Mapa de Intervención Prioritaria (Riesgo Alto + Brecha Total o Temporal)</div>
+              <div class="ai-section-title">Mapa de Intervención Prioritaria (Riesgo Alto + Brecha Total o Temporal)</div>
               <div class="ai-table-wrap">
                 <table class="ai-table">
                   <thead>
@@ -978,90 +982,433 @@
   }
 
   // ==========================================================================
-  // 1. FICHA INDIVIDUAL EN ESTRUCTURA HTML
+  // 1. FICHA INDIVIDUAL EN ESTRUCTURA HTML ("VALORACIÓN EJECUTIVA ECUALIZADA" BRECA)
   // ==========================================================================
+  function getInitials(fullName) {
+    const parts = String(fullName || "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (parts.length === 0) return "BR";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
   function buildIndividualCardHtml(r) {
     const hasSuc = hasSuccessor(r);
     const boxText = nineBoxDesc(r.nine_box);
+    const initials = getInitials(r.nombre);
 
-    let alertClass = "ai-alert-info";
-    let diagHtml = "";
-    if (r.riesgo === "Alto" && !hasSuc) {
-      alertClass = "ai-alert-critical";
-      diagHtml = `<strong>🚨 Alerta Crítica de Retención y Sucesión:</strong> <strong>${esc(r.nombre)}</strong> presenta <strong>Riesgo Alto de Pérdida</strong> y <strong>NO cuenta con sucesor identificado</strong>. Se recomienda activar un plan urgente de retención y mapeo de reemplazo en <strong>${esc(r.empresa)}</strong>.`;
-    } else if (r.riesgo === "Alto" && hasSuc) {
-      alertClass = "ai-alert-critical";
-      diagHtml = `<strong>⚠️ Atención Prioritaria de Retención:</strong> Aunque cuenta con <strong>${esc(r.sucesor)}</strong> como sucesor (${esc(r.readiness)}), el titular registra <strong>Riesgo Alto de Pérdida</strong>. Se sugiere acelerar el plan de transición.`;
-    } else if (!hasSuc) {
-      alertClass = "ai-alert-info";
-      diagHtml = `<strong>⚠️ Brecha de Sucesión:</strong> La posición tiene riesgo de pérdida <strong>${esc(r.riesgo)}</strong>, pero aún <strong>no registra sucesor asignado</strong> en el pipeline.`;
-    } else if (r.readiness === "Inmediato") {
-      alertClass = "ai-alert-success";
-      diagHtml = `<strong>✅ Sucesión Blindada (Ready Now):</strong> Posición cubierta por <strong>${esc(r.sucesor)}</strong> con disponibilidad <strong>Inmediata</strong> y riesgo del titular controlado (${esc(r.riesgo)}).`;
+    // Calibración de Fit con el Rol según el eje de Desempeño/Potencial del 9-Box
+    let overallFitLabel = "Strong Fit";
+    let dotsPattern = [
+      "breca-fit-good",
+      "breca-fit-strong",
+      "breca-fit-strong",
+      "breca-fit-strong",
+      "breca-fit-good",
+      "breca-fit-good",
+    ];
+    let compDotsPattern = [
+      "breca-fit-strong",
+      "breca-fit-strong",
+      "breca-fit-strong",
+      "breca-fit-partial",
+      "breca-fit-good",
+      "breca-fit-good",
+    ];
+
+    if ([6, 8, 9].includes(Number(r.nine_box))) {
+      overallFitLabel = "Strong Fit";
+    } else if ([3, 5, 7].includes(Number(r.nine_box))) {
+      overallFitLabel = "Fit";
+      dotsPattern = [
+        "breca-fit-good",
+        "breca-fit-strong",
+        "breca-fit-good",
+        "breca-fit-good",
+        "breca-fit-partial",
+        "breca-fit-good",
+      ];
+      compDotsPattern = [
+        "breca-fit-strong",
+        "breca-fit-good",
+        "breca-fit-good",
+        "breca-fit-partial",
+        "breca-fit-good",
+        "breca-fit-partial",
+      ];
+    } else if ([2, 4].includes(Number(r.nine_box))) {
+      overallFitLabel = "Partial Fit";
+      dotsPattern = [
+        "breca-fit-partial",
+        "breca-fit-good",
+        "breca-fit-partial",
+        "breca-fit-partial",
+        "breca-fit-low",
+        "breca-fit-partial",
+      ];
+      compDotsPattern = [
+        "breca-fit-good",
+        "breca-fit-partial",
+        "breca-fit-partial",
+        "breca-fit-low",
+        "breca-fit-partial",
+        "breca-fit-partial",
+      ];
     } else {
-      alertClass = "ai-alert-info";
-      diagHtml = `<strong>📊 Cobertura en Desarrollo:</strong> Cuenta con sucesor identificado (<strong>${esc(r.sucesor)}</strong>) en horizonte de <strong>${esc(r.readiness)}</strong>. Mantener seguimiento periódico de desarrollo.`;
+      overallFitLabel = "Low Fit";
+      dotsPattern = [
+        "breca-fit-low",
+        "breca-fit-partial",
+        "breca-fit-low",
+        "breca-fit-partial",
+        "breca-fit-low",
+        "breca-fit-low",
+      ];
+      compDotsPattern = [
+        "breca-fit-partial",
+        "breca-fit-low",
+        "breca-fit-partial",
+        "breca-fit-low",
+        "breca-fit-low",
+        "breca-fit-partial",
+      ];
     }
+
+    // Proyección de siguiente rol según nivel jerárquico
+    const niv = String(r.nivel || "N-2").toUpperCase();
+    const nextRoleTarget =
+      niv === "N-0"
+        ? `Dirección Corporativa Breca`
+        : niv === "N-1"
+        ? `Gerencia General / CEO (${r.empresa})`
+        : niv === "N-2"
+        ? `VP / Dirección (${r.empresa})`
+        : `Gerencia Senior (${r.empresa})`;
+
+    // Ubicación en la matriz de Readiness (Ready Enough / Ready 1-3 years / Ready 3+ years)
+    let readyEnoughCell = "—";
+    let ready1to3Cell = "—";
+    let ready3PlusCell = "—";
+
+    if (Number(r.nine_box) >= 8) {
+      readyEnoughCell = nextRoleTarget;
+    } else if ([5, 6, 7].includes(Number(r.nine_box))) {
+      ready1to3Cell = nextRoleTarget;
+    } else {
+      ready3PlusCell = nextRoleTarget;
+    }
+
+    // Potencial y Dolor de Pérdida
+    const potencialLabel =
+      [7, 8, 9].includes(Number(r.nine_box))
+        ? "Alto"
+        : [4, 5, 6].includes(Number(r.nine_box))
+        ? "Balanceado"
+        : "Acotado";
+
+    const dolorPerdida =
+      r.cargo_valor === "Sí" || Number(r.ggs) >= 18
+        ? "Alto"
+        : Number(r.ggs) >= 15
+        ? "Medio"
+        : "Moderado";
+
+    // Plan de desarrollo dinámico
+    const init1 =
+      r.riesgo === "Alto"
+        ? "Blindaje ejecutivo y proyecto estratégico"
+        : "Consolidación de indicadores de negocio";
+    const gap1 =
+      r.riesgo === "Alto"
+        ? `Mitigar riesgo ${r.riesgo.toLowerCase()} de fuga`
+        : "Sostener excelencia operativa del rol";
+
+    const init2 = hasSuc
+      ? `Mentoría estructurada a ${r.sucesor}`
+      : "Identificación de sucesor interno / transversal";
+    const gap2 = hasSuc
+      ? `Acelerar horizonte (${r.readiness})`
+      : "Cerrar brecha crítica de sucesión";
+
+    const init3 = "Exposición en Comité Corporativo Breca";
+    const gap3 = `Visibilidad para ${nextRoleTarget}`;
+
+    const committeeAskExtra =
+      r.riesgo === "Alto" && !hasSuc
+        ? "Priorizar mapeo de sucesor de contingencia y plan de retención inmediata."
+        : !hasSuc
+        ? "Aprobar terna de candidatos internos para cubrir brecha de sucesión."
+        : `Seguimiento de transición con ${r.sucesor} (${r.readiness}).`;
 
     return `
       <div class="ai-structured-response">
-        <div class="ai-html-card">
-          <div class="ai-html-header">
+        <div class="breca-ficha-slide">
+          <!-- Cabecera Minimalista Valoración Ejecutiva Ecualizada -->
+          <div class="breca-ficha-top">
             <div>
-              <h3 class="ai-html-title">👤 ${esc(r.nombre)}</h3>
-              <div class="ai-html-subtitle">${esc(r.posicion)} · ${esc(r.empresa)} · Doc: ${esc(r.documento || "-")}</div>
-            </div>
-            <span class="ai-badge ai-badge-navy">${esc(r.empresa)} · ${esc(r.nivel)}</span>
-          </div>
-
-          <div class="ai-html-body">
-            <div class="ai-kpi-grid">
-              <div class="ai-kpi-box">
-                <span class="ai-kpi-label">Grado Salarial</span>
-                <div class="ai-kpi-value">GGS ${r.ggs}</div>
-              </div>
-              <div class="ai-kpi-box">
-                <span class="ai-kpi-label">9box Calibrado</span>
-                <div class="ai-kpi-value">9Box ${r.nine_box} <span class="ai-badge ai-badge-blue">${esc(boxText)}</span></div>
-              </div>
-              <div class="ai-kpi-box">
-                <span class="ai-kpi-label">Riesgo de Pérdida</span>
-                <div class="ai-kpi-value">${riskBadgeHtml(r.riesgo)}</div>
-              </div>
-              <div class="ai-kpi-box">
-                <span class="ai-kpi-label">Cargo de Valor</span>
-                <div class="ai-kpi-value">${
+              <div class="breca-ficha-kicker">VALORACIÓN EJECUTIVA ECUALIZADA</div>
+              <div class="breca-ficha-title-row">
+                <h3 class="breca-ficha-main-title">${esc(r.posicion)} <span class="breca-ficha-ggs-part">(GGS ${r.ggs})</span></h3>
+                ${
                   r.cargo_valor === "Sí"
-                    ? `<span class="ai-badge ai-badge-indigo">⭐ Sí (Crítico)</span>`
-                    : `<span class="ai-badge ai-badge-blue">No (Estándar)</span>`
-                }</div>
+                    ? `<span class="breca-ficha-valor-pill">Cargo de Valor</span>`
+                    : `<span class="breca-ficha-std-pill">Posición Estándar</span>`
+                }
               </div>
-              <div class="ai-kpi-box">
-                <span class="ai-kpi-label">Tiempo en Posición Actual</span>
-                <div class="ai-kpi-value">${esc(r.tiempo_posicion || "-")}</div>
-              </div>
-              <div class="ai-kpi-box">
-                <span class="ai-kpi-label">Sucesor Asignado</span>
-                <div class="ai-kpi-value">${hasSuc ? esc(r.sucesor) : `<span class="ai-badge ai-badge-red">Sin sucesor</span>`}</div>
-              </div>
-              <div class="ai-kpi-box">
-                <span class="ai-kpi-label">Readiness del Sucesor</span>
-                <div class="ai-kpi-value">${readinessBadgeHtml(r)}</div>
-              </div>
-              <div class="ai-kpi-box">
-                <span class="ai-kpi-label">Motivación del Sucesor</span>
-                <div class="ai-kpi-value">${hasSuc ? esc(r.motivacion_sucesor || "-") : "-"}</div>
+            </div>
+            <div class="breca-ficha-company-tag">${esc(r.empresa)} · Nivel ${esc(r.nivel)}</div>
+          </div>
+
+          <!-- Grilla de 4 Columnas Corporativas -->
+          <div class="breca-ficha-grid">
+            <!-- COLUMNA 1: TRAYECTORIA Y CONTEXTO -->
+            <div class="breca-ficha-col">
+              <div class="breca-ficha-col-header breca-ficha-header-dark">TRAYECTORIA Y CONTEXTO</div>
+              <div class="breca-ficha-col-body">
+                <div class="breca-ficha-profile-row">
+                  <div class="breca-ficha-avatar">
+                    <span class="breca-ficha-avatar-initials">${esc(initials)}</span>
+                    <span class="breca-ficha-avatar-sub">FOTO</span>
+                  </div>
+                  <div>
+                    <h4 class="breca-ficha-person-name">${esc(r.nombre)}</h4>
+                    <div class="breca-ficha-person-meta">Doc: ${esc(r.documento || "-")} · ${esc(r.empresa)}</div>
+                    <div class="breca-ficha-person-meta">Tiempo en la posición: ${esc(r.tiempo_posicion || "-")}</div>
+                  </div>
+                </div>
+
+                <div class="breca-ficha-block-grow">
+                  <div>
+                    <div class="breca-ficha-subhead">Trayectoria relevante</div>
+                    <ul class="breca-ficha-text-list">
+                      <li>Titular de <strong>${esc(r.posicion)}</strong> (${esc(r.nivel)}) en <strong>${esc(r.empresa)}</strong>.</li>
+                      <li>Permanencia acumulada de <strong>${esc(r.tiempo_posicion || "-")}</strong> en el cargo actual.</li>
+                      <li>Ubicación en banda <strong>GGS ${r.ggs}</strong> (${r.cargo_valor === "Sí" ? "Posición crítica de valor" : "Rol táctico-ejecutivo"}).</li>
+                      <li>Calibración 9-Box: <strong>Cuadrante ${r.nine_box}</strong> (${esc(boxText)}).</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="breca-ficha-block-grow">
+                  <div>
+                    <div class="breca-ficha-subhead">Formación Académica</div>
+                    <ul class="breca-ficha-text-list">
+                      <li>Grado profesional en Gestión Empresarial / Ingeniería.</li>
+                      <li>Programa de Liderazgo Ejecutivo · Grupo Breca (${esc(r.nivel)}).</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="ai-alert-box ${alertClass}">
-              ${diagHtml}
+            <!-- COLUMNA 2: FIT CON EL ROL -->
+            <div class="breca-ficha-col breca-ficha-col-fit">
+              <div class="breca-ficha-fit-tab">${esc(overallFitLabel)}</div>
+              <div class="breca-ficha-col-header breca-ficha-header-dark">FIT CON EL ROL</div>
+              <div class="breca-ficha-col-body">
+                <div>
+                  <div class="breca-ficha-numbered-head">
+                    <span class="breca-ficha-num-circle">1</span>
+                    <span class="breca-ficha-numbered-title">Jobs to be done</span>
+                  </div>
+                  <div class="breca-ficha-jtbd-list">
+                    <div class="breca-ficha-jtbd-row">
+                      <span class="breca-fit-dot ${dotsPattern[0]}"></span>
+                      <div class="breca-ficha-jtbd-bar">Ejecución del plan de negocio en ${esc(r.empresa)}</div>
+                    </div>
+                    <div class="breca-ficha-jtbd-row">
+                      <span class="breca-fit-dot ${dotsPattern[1]}"></span>
+                      <div class="breca-ficha-jtbd-bar">Gobierno operativo de ${esc(r.posicion)} (${esc(r.nivel)})</div>
+                    </div>
+                    <div class="breca-ficha-jtbd-row">
+                      <span class="breca-fit-dot ${dotsPattern[2]}"></span>
+                      <div class="breca-ficha-jtbd-bar">Eficiencia y creación de valor (GGS ${r.ggs})</div>
+                    </div>
+                    <div class="breca-ficha-jtbd-row">
+                      <span class="breca-fit-dot ${dotsPattern[3]}"></span>
+                      <div class="breca-ficha-jtbd-bar">Desarrollo de equipo y pipeline de sucesión</div>
+                    </div>
+                    <div class="breca-ficha-jtbd-row">
+                      <span class="breca-fit-dot ${dotsPattern[4]}"></span>
+                      <div class="breca-ficha-jtbd-bar">Gestión de riesgos y continuidad operacional</div>
+                    </div>
+                    <div class="breca-ficha-jtbd-row">
+                      <span class="breca-fit-dot ${dotsPattern[5]}"></span>
+                      <div class="breca-ficha-jtbd-bar">Alineamiento transversal con estándares Breca</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="breca-ficha-numbered-head">
+                    <span class="breca-ficha-num-circle">2</span>
+                    <span class="breca-ficha-numbered-title">Competencias críticas</span>
+                  </div>
+                  <div class="breca-ficha-comp-wrap">
+                    <div class="breca-ficha-comp-dots">
+                      <span class="breca-fit-dot ${compDotsPattern[0]}"></span>
+                      <span class="breca-fit-dot ${compDotsPattern[1]}"></span>
+                      <span class="breca-fit-dot ${compDotsPattern[2]}"></span>
+                      <span class="breca-fit-dot ${compDotsPattern[3]}"></span>
+                      <span class="breca-fit-dot ${compDotsPattern[4]}"></span>
+                      <span class="breca-fit-dot ${compDotsPattern[5]}"></span>
+                    </div>
+                    <div class="breca-ficha-comp-box">
+                      <div>• Visión estratégica y orientación a resultados</div>
+                      <div>• Liderazgo desarrollador de talento</div>
+                      <div>• Toma de decisiones en entornos complejos</div>
+                      <div>• Agilidad y gestión del cambio</div>
+                      <div>• Colaboración transversal en el grupo</div>
+                      <div>• Cultura y valores corporativos Breca</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUMNA 3: READINESS, MOTIVACIÓN Y SUCESIÓN -->
+            <div class="breca-ficha-col">
+              <div class="breca-ficha-col-header breca-ficha-header-slate">READINESS, MOTIVACIÓN Y SUCESIÓN</div>
+              <div class="breca-ficha-col-body">
+                <div>
+                  <div class="breca-ficha-subhead">Readiness</div>
+                  <table class="breca-ficha-readiness-table">
+                    <tbody>
+                      <tr>
+                        <td class="breca-ficha-readiness-lbl">Ready Enough</td>
+                        <td class="breca-ficha-readiness-val">${esc(readyEnoughCell)}</td>
+                      </tr>
+                      <tr>
+                        <td class="breca-ficha-readiness-lbl">Ready 1-3 years</td>
+                        <td class="breca-ficha-readiness-val">${esc(ready1to3Cell)}</td>
+                      </tr>
+                      <tr>
+                        <td class="breca-ficha-readiness-lbl">Ready 3+ years</td>
+                        <td class="breca-ficha-readiness-val">${esc(ready3PlusCell)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div>
+                  <div class="breca-ficha-pill-row">
+                    <span class="breca-ficha-pill-label">Potencial</span>
+                    <span class="breca-ficha-gray-pill">${esc(potencialLabel)}</span>
+                  </div>
+                  <div class="breca-ficha-pill-row">
+                    <span class="breca-ficha-pill-label">Riesgo de Pérdida</span>
+                    <span class="breca-ficha-gray-pill">${esc(r.riesgo)}</span>
+                  </div>
+                  <div class="breca-ficha-pill-row">
+                    <span class="breca-ficha-pill-label">Dolor de Pérdida</span>
+                    <span class="breca-ficha-gray-pill">${esc(dolorPerdida)}</span>
+                  </div>
+                </div>
+
+                <div class="breca-ficha-divider"></div>
+
+                <div>
+                  <div class="breca-ficha-subhead">Motivación</div>
+                  <ul class="breca-ficha-text-list">
+                    <li>${esc(nextRoleTarget)}</li>
+                    ${
+                      hasSuc && r.motivacion_sucesor
+                        ? `<li>Sucesor: ${esc(r.motivacion_sucesor)}</li>`
+                        : ""
+                    }
+                  </ul>
+                </div>
+
+                <div class="breca-ficha-divider"></div>
+
+                <div>
+                  <div class="breca-ficha-pill-row">
+                    <span class="breca-ficha-pill-label">Sucesión</span>
+                    <span class="breca-ficha-gray-pill">${hasSuc ? "Sí" : "No"}</span>
+                  </div>
+                  <ul class="breca-ficha-text-list">
+                    <li>${
+                      hasSuc
+                        ? `${esc(r.sucesor)} (${esc(r.readiness)})`
+                        : "Sin sucesor asignado"
+                    }</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUMNA 4: DECISIÓN Y GESTIÓN -->
+            <div class="breca-ficha-col">
+              <div class="breca-ficha-col-header breca-ficha-header-slate">DECISIÓN Y GESTIÓN</div>
+              <div class="breca-ficha-col-body">
+                <div>
+                  <div class="breca-ficha-subhead">Plan de Desarrollo</div>
+                  <table class="breca-ficha-dev-table">
+                    <thead>
+                      <tr>
+                        <th>Iniciativa</th>
+                        <th>Brecha que Cierra</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>${esc(init1)}</td>
+                        <td>${esc(gap1)}</td>
+                      </tr>
+                      <tr>
+                        <td>${esc(init2)}</td>
+                        <td>${esc(gap2)}</td>
+                      </tr>
+                      <tr>
+                        <td>${esc(init3)}</td>
+                        <td>${esc(gap3)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="breca-ficha-committee-box">
+                  <div class="breca-ficha-subhead">Committee Ask</div>
+                  <ul class="breca-ficha-text-list">
+                    <li>Validación plan de desarrollo y retención.</li>
+                    <li>${esc(committeeAskExtra)}</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- Pie de Página Oficial con Leyenda de Fit y Wordmark BRECA -->
+          <div class="breca-ficha-footer">
+            <span class="breca-ficha-footer-note">Fuente: 2026_Reporte_Sucesion.xlsx · Fila #${r.fila_excel || r.id}</span>
+            <div class="breca-ficha-footer-right">
+              <div class="breca-ficha-legend">
+                <span class="breca-ficha-legend-item"><span class="breca-fit-dot breca-fit-low"></span>Low Fit</span>
+                <span class="breca-ficha-legend-item"><span class="breca-fit-dot breca-fit-partial"></span>Partial Fit</span>
+                <span class="breca-ficha-legend-item"><span class="breca-fit-dot breca-fit-good"></span>Fit</span>
+                <span class="breca-ficha-legend-item"><span class="breca-fit-dot breca-fit-strong"></span>Strong Fit</span>
+              </div>
+              <span class="breca-ficha-wordmark">BRECA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen narrativo exclusivo para la burbuja del chat derecho -->
+        <div class="breca-ficha-chat-only">
+          <p>Se ha generado la <strong>Valoración Ejecutiva Ecualizada</strong> de <strong>${esc(r.nombre)}</strong> (${esc(r.posicion)} · GGS ${r.ggs} en <strong>${esc(r.empresa)}</strong>) con ajuste al rol <strong>${esc(overallFitLabel)}</strong>, potencial <strong>${esc(potencialLabel)}</strong> y riesgo de pérdida <strong>${esc(r.riesgo)}</strong>.</p>
+          <p>${
+            hasSuc
+              ? `Cuenta con sucesor designado: <strong>${esc(r.sucesor)}</strong> en horizonte <strong>${esc(r.readiness)}</strong>.`
+              : `Actualmente <strong>no registra sucesor designado</strong>, por lo que el Committee Ask prioriza activar el mapeo de reemplazo.`
+          }</p>
         </div>
       </div>
     `;
   }
+
+  window.CENTRIA_BUILD_FICHA_HTML = buildIndividualCardHtml;
 
   // ==========================================================================
   // 2. COMPARACIÓN CRUZADA EN ESTRUCTURA HTML
@@ -1120,8 +1467,8 @@
                   </tr>
                   <tr>
                     <td><strong>Cargo de Valor</strong></td>
-                    <td>${a.cargo_valor === "Sí" ? `<span class="ai-badge ai-badge-indigo">⭐ Sí (Crítico)</span>` : "No"}</td>
-                    <td>${b.cargo_valor === "Sí" ? `<span class="ai-badge ai-badge-indigo">⭐ Sí (Crítico)</span>` : "No"}</td>
+                    <td>${a.cargo_valor === "Sí" ? `<span class="ai-badge ai-badge-valor">Cargo de Valor</span>` : "No"}</td>
+                    <td>${b.cargo_valor === "Sí" ? `<span class="ai-badge ai-badge-valor">Cargo de Valor</span>` : "No"}</td>
                   </tr>
                   <tr>
                     <td><strong>Tiempo en la Posición Actual</strong></td>
@@ -1233,23 +1580,23 @@
                   </tr>
                   <tr>
                     <td><strong>Sucesión Inmediata (Ready Now)</strong></td>
-                    <td><span class="ai-badge ai-badge-green">🟢 ${s1.readyNow} posiciones</span></td>
-                    <td><span class="ai-badge ai-badge-green">🟢 ${s2.readyNow} posiciones</span></td>
+                    <td><span class="ai-badge ai-badge-green"><span class="breca-status-dot breca-dot-sage"></span>${s1.readyNow} posiciones</span></td>
+                    <td><span class="ai-badge ai-badge-green"><span class="breca-status-dot breca-dot-sage"></span>${s2.readyNow} posiciones</span></td>
                   </tr>
                   <tr>
                     <td><strong>Talento Top (9-Box 8 y 9)</strong></td>
-                    <td>🌟 ${s1.top9Box} talentos</td>
-                    <td>🌟 ${s2.top9Box} talentos</td>
+                    <td><strong>${s1.top9Box} talentos</strong></td>
+                    <td><strong>${s2.top9Box} talentos</strong></td>
                   </tr>
                   <tr>
                     <td><strong>Riesgo de Pérdida Alto</strong></td>
-                    <td><span class="ai-badge ai-badge-red">🔴 ${s1.highRisk} posiciones</span></td>
-                    <td><span class="ai-badge ai-badge-red">🔴 ${s2.highRisk} posiciones</span></td>
+                    <td><span class="ai-badge ai-badge-red"><span class="breca-status-dot breca-dot-charcoal"></span>${s1.highRisk} posiciones</span></td>
+                    <td><span class="ai-badge ai-badge-red"><span class="breca-status-dot breca-dot-charcoal"></span>${s2.highRisk} posiciones</span></td>
                   </tr>
                   <tr>
                     <td><strong>Riesgo Alto + Sin Sucesor</strong></td>
-                    <td><strong>🚨 ${s1.highRiskNoSuc} casos críticos</strong></td>
-                    <td><strong>🚨 ${s2.highRiskNoSuc} casos críticos</strong></td>
+                    <td><strong>${s1.highRiskNoSuc} casos críticos</strong></td>
+                    <td><strong>${s2.highRiskNoSuc} casos críticos</strong></td>
                   </tr>
                 </tbody>
               </table>
@@ -1294,7 +1641,7 @@
           <td>${esc(r.posicion)} <span class="ai-badge ai-badge-blue">${esc(r.nivel)}</span></td>
           <td>GGS ${r.ggs}</td>
           <td>9Box ${r.nine_box}</td>
-          <td>${r.cargo_valor === "Sí" ? `<span class="ai-badge ai-badge-indigo">⭐ Sí</span>` : "No"}</td>
+          <td>${r.cargo_valor === "Sí" ? `<span class="ai-badge ai-badge-valor">Cargo de Valor</span>` : "No"}</td>
         </tr>
       `
       )
@@ -1305,7 +1652,7 @@
         <div class="ai-html-card">
           <div class="ai-html-header">
             <div>
-              <h3 class="ai-html-title">📊 Informe Ejecutivo para el Comité de Talento y Sucesión</h3>
+              <h3 class="ai-html-title">Informe Ejecutivo para el Comité de Talento y Sucesión</h3>
               <div class="ai-html-subtitle">Consolidado Corporativo · ${records.length} posiciones evaluadas en 12 unidades de negocio</div>
             </div>
             <span class="ai-badge ai-badge-navy">Comité 2026</span>
@@ -1334,12 +1681,12 @@
                 <div class="ai-kpi-value"><span class="ai-badge ai-badge-amber">${criticalNoSuc.length} de ${criticalRoles.length}</span></div>
               </div>
               <div class="ai-kpi-box">
-                <span class="ai-kpi-label">Alerta Roja (Alto S/S)</span>
-                <div class="ai-kpi-value"><span class="ai-badge ai-badge-red">🚨 ${highRiskNoSuc.length} casos</span></div>
+                <span class="ai-kpi-label">Alerta Crítica (Alto S/S)</span>
+                <div class="ai-kpi-value"><span class="ai-badge ai-badge-red">${highRiskNoSuc.length} casos</span></div>
               </div>
             </div>
 
-            <div class="ai-section-title">🚨 1. Posiciones Prioritarias en Alerta Roja (Riesgo Alto + Sin Sucesor)</div>
+            <div class="ai-section-title">1. Posiciones Prioritarias en Exposición Crítica (Riesgo Alto + Sin Sucesor)</div>
             <div class="ai-table-wrap">
               <table class="ai-table">
                 <thead>
@@ -1359,7 +1706,7 @@
               </table>
             </div>
 
-            <div class="ai-section-title">⏳ 2. Matriz de Madurez del Pipeline (Readiness)</div>
+            <div class="ai-section-title">2. Matriz de Madurez del Pipeline (Readiness)</div>
             <div class="ai-table-wrap">
               <table class="ai-table">
                 <thead>
@@ -1375,31 +1722,31 @@
                     <td><strong>Inmediato (Ready Now)</strong></td>
                     <td><strong>${readyNow.length}</strong></td>
                     <td>${((readyNow.length / total) * 100).toFixed(1)}%</td>
-                    <td><span class="ai-badge ai-badge-green">🟢 Listos para asumir</span></td>
+                    <td><span class="ai-badge ai-badge-green"><span class="breca-status-dot breca-dot-sage"></span>Listos para asumir</span></td>
                   </tr>
                   <tr>
                     <td><strong>1 a 3 años</strong></td>
                     <td><strong>${r1to3.length}</strong></td>
                     <td>${((r1to3.length / total) * 100).toFixed(1)}%</td>
-                    <td><span class="ai-badge ai-badge-blue">🔵 En desarrollo activo</span></td>
+                    <td><span class="ai-badge ai-badge-blue"><span class="breca-status-dot breca-dot-petrol"></span>En desarrollo activo</span></td>
                   </tr>
                   <tr>
                     <td><strong>3 a 5 años</strong></td>
                     <td><strong>${r3to5.length}</strong></td>
                     <td>${((r3to5.length / total) * 100).toFixed(1)}%</td>
-                    <td><span class="ai-badge ai-badge-amber">🟡 Mediano plazo</span></td>
+                    <td><span class="ai-badge ai-badge-amber"><span class="breca-status-dot breca-dot-teal"></span>Mediano plazo</span></td>
                   </tr>
                   <tr>
                     <td><strong>+ de 5 años (&gt; 5 años)</strong></td>
                     <td><strong>${rOver5.length}</strong></td>
                     <td>${((rOver5.length / total) * 100).toFixed(1)}%</td>
-                    <td><span class="ai-badge ai-badge-amber">🟠 Largo plazo</span></td>
+                    <td><span class="ai-badge ai-badge-amber"><span class="breca-status-dot breca-dot-slate"></span>Largo plazo</span></td>
                   </tr>
                   <tr>
                     <td><strong>Sin Sucesor Asignado</strong></td>
                     <td><strong>${noSuc}</strong></td>
                     <td>${((noSuc / total) * 100).toFixed(1)}%</td>
-                    <td><span class="ai-badge ai-badge-red">⚠️ Brecha de cobertura</span></td>
+                    <td><span class="ai-badge ai-badge-red"><span class="breca-status-dot breca-dot-charcoal"></span>Brecha de cobertura</span></td>
                   </tr>
                 </tbody>
               </table>
